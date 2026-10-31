@@ -1,11 +1,44 @@
+---
+type: Architecture Proposal
+title: "Feature Proposal: Native macOS Local Development for AX via Apple Container & ate-local"
+description: "Architectural proposal, Substrate concept mapping, and empirical Apple Silicon benchmarks for ate-local."
+status: stable
+tags: [atelocal, apple-container, substrate, proposal, benchmarks]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+sources:
+  - id: ax-issue-526
+    resource: https://github.com/google/ax/issues/526
+    title: "google/ax#526: ax local start/status/stop"
+  - id: fork-atelocal
+    resource: https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container
+    title: "ghchinoy/ax:feat/ate-local-apple-container"
+experiment:
+  track: ate-local
+  beads:
+    - ax-experiments-1rx
+    - ax-experiments-1rx.3
+  upstream:
+    repo: google/ax
+    base_commit: f0228f1
+    issues: [526, 515, 517, 532, 536]
+  forks:
+    - repo: ghchinoy/ax
+      branch: feat/ate-local-apple-container
+---
+
 # Feature Proposal: Native macOS Local Development for AX via Apple Container & `ate-local`
 
 > **Document Status**: Internal Proposal & Review Document  
 > **Author**: Hussain Chinoy (`ghchinoy@google.com`)  
 > **Target Audience**: AX and Agent Substrate committers, maintainers, and platform engineers  
-> **Working Branch**: [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) (cleanly rebased on `google/ax:main` at `d0bc38b`)  
-> **Companion Guides**: [`TESTING-ate-local.md`](./TESTING-ate-local.md), [`INTRO-ax-on-apple-container.md`](./INTRO-ax-on-apple-container.md), [`FRICTION-REPORT-correlation-and-swarm-telemetry.md`](./FRICTION-REPORT-correlation-and-swarm-telemetry.md)  
-> **Archived Drafts**: [`archive/prior-proposal.md`](./archive/prior-proposal.md), [`archive/glidepath.md`](./archive/glidepath.md)
+> **Working Branch**: [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) (cleanly rebased on `google/ax:main` at `f0228f1`)  
+> **Companion Guides**: [`TESTING.md`](/ate-local/TESTING.md), [`/swarm/GUIDE.md`](/swarm/GUIDE.md), [`/viz/FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md)  
+> **Archived Drafts**: [`archive/prior-proposal.md`](/ate-local/archive/prior-proposal.md), [`archive/glidepath.md`](/ate-local/archive/glidepath.md)
 
 ---
 
@@ -339,7 +372,7 @@ Should `ate-local` automatically provision a local host bind mount (e.g., `~/.ax
 ## 13. Quick Links & Reproduction
 
 - **Full Fork Branch Diff**: [`google/ax:main...ghchinoy:ax:feat/ate-local-apple-container`](https://github.com/google/ax/compare/main...ghchinoy:ax:feat/ate-local-apple-container)
-- **Local Testing Guide**: [`TESTING-ate-local.md`](./TESTING-ate-local.md)
+- **Local Testing Guide**: [`TESTING.md`](/ate-local/TESTING.md)
 - **Quick Test Commands**:
   ```bash
   git clone https://github.com/ghchinoy/ax.git && cd ax

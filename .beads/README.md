@@ -1,3 +1,17 @@
+---
+type: Tool Reference
+title: "Beads — AI-Native Issue Tracking"
+description: "Reference documentation for the Beads (bd) git-native issue tracker used in this repository."
+status: stable
+tags: [beads, bd, issue-tracking]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+---
+
 # Beads - AI-Native Issue Tracking
 
 Welcome to Beads! This repository uses **Beads** for issue tracking - a modern, AI-native tool designed to live directly in your codebase alongside your code.

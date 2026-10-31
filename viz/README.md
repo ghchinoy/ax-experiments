@@ -1,6 +1,29 @@
+---
+type: Experiment Track
+title: "AX Swarm Visualizer"
+description: "Interactive Lit 3 + Force-Graph + Cytoscape CoSE replay web application and Go trace recorder (ax-trace) quickstart."
+status: stable
+tags: [viz, telemetry, trace, force-graph, cytoscape, lit]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+experiment:
+  track: viz
+  beads:
+    - ax-experiments-311
+    - ax-experiments-311.1
+    - ax-experiments-311.2
+  entrypoints:
+    - viz/recorder/main.go
+    - viz/web
+---
+
 # AX Swarm Visualizer
 
-Interactive replay tool for multi-agent swarm execution traces on macOS with Apple container.
+Interactive replay tool for multi-agent swarm execution traces on macOS with Apple container. See [`SCHEMA.md`](/viz/SCHEMA.md) for the JSONL trace event specification and [`FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md) for the swarm telemetry and correlation RFC.
 
 Built with **Vite 8**, **Lit 3**, **Force-Graph** (dynamic force-directed particle physics), and **Cytoscape.js** (structured CoSE layout).
 

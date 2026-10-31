@@ -1,9 +1,35 @@
+---
+type: Telemetry RFC
+title: "Architectural Friction Report: Correlation IDs, Swarm Lineage, and Observability in AX"
+description: "Post-implementation analysis and RFC proposing correlation_id, parent_task, W3C TraceContext propagation, and AX-mediated inter-actor messaging."
+status: stable
+tags: [viz, telemetry, rfc, correlation, opentelemetry, w3c-tracecontext]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+sources:
+  - id: ax-issue-346
+    resource: https://github.com/google/ax/issues/346
+    title: "google/ax#346: Task status lifecycle after command exit"
+experiment:
+  track: viz
+  beads:
+    - ax-experiments-311
+  upstream:
+    repo: google/ax
+    base_commit: f0228f1
+    issues: [346]
+---
+
 # Architectural Friction Report: Correlation IDs, Swarm Lineage, and Observability in AX
 
 > **Document Status**: Post-Implementation Analysis & RFC  
 > **Author**: Hussain Chinoy (`ghchinoy@google.com`)  
 > **Target Audience**: AX and Agent Substrate committers, architecture working group, and platform engineers  
-> **Context**: Derived from building the Apple Container swarm replayer (`viz/`) and multi-agent recipes (`swarm/`) on AX `main` (`d0bc38b`)
+> **Context**: Derived from building the Apple Container swarm replayer ([`/viz/README.md`](/viz/README.md)) and multi-agent recipes ([`/swarm/README.md`](/swarm/README.md)) on AX `main` (`f0228f1`)
 
 ---
 

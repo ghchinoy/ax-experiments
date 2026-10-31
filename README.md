@@ -1,3 +1,24 @@
+---
+type: Repository Overview
+title: "AX Experiments: Multi-Agent Swarms, Declarative Runners, Telemetry & Local Substrate"
+description: "Companion R&D repository for prototyping, stress-testing, and visualizing AX and Agent Substrate across local Apple container microVMs, multi-agent swarms, declarative Genkit Go runners, and trace replay."
+status: stable
+tags: [ax, substrate, atelocal, swarm, genkit, viz, okf]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+sources:
+  - id: upstream-ax
+    resource: https://github.com/google/ax
+    title: "google/ax: Agent Executor"
+  - id: upstream-substrate
+    resource: https://github.com/agent-substrate/substrate
+    title: "agent-substrate/substrate: Agent Substrate"
+---
+
 # AX Experiments: Multi-Agent Swarms, Declarative Runners, Telemetry & Local Substrate
 
 Companion R&D repository for prototyping, stress-testing, and visualizing **[AX (Agent Executor)](https://github.com/google/ax)** and **[Agent Substrate](https://github.com/agent-substrate/substrate)**—from 3-second local microVMs on Apple Silicon macOS (`ate-local`) to declarative **Genkit Go** agents (`genkit-runner`), multi-agent swarm topologies, and interactive execution trace replay.
@@ -6,14 +27,16 @@ Companion R&D repository for prototyping, stress-testing, and visualizing **[AX 
 
 ## Why This Repository Exists
 
-While [`google/ax`](https://github.com/google/ax) and [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) provide the core runtime and actor control plane, this repository serves as the **experimental proving ground** where new developer workflows, multi-agent coordination patterns, and telemetry RFCs are validated before graduating upstream:
+While [`google/ax`](https://github.com/google/ax) and [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) provide the core runtime and actor control plane, this repository serves as the **experimental proving ground** where new developer workflows, multi-agent coordination patterns, and telemetry RFCs are validated before graduating upstream.
 
-| Track | Directory | Focus & Hypothesis | Upstream Alignment & Specs |
+Each experiment track is organized in its own self-contained top-level directory (and indexed as an **Open Knowledge Format (OKF) v0.2** bundle via root `index.md`):
+
+| Track | Folder | Focus & Hypothesis | Upstream / Fork Alignment & Docs |
 |---|---|---|---|
-| **1. Local macOS Substrate (`ate-local`)** | [`docs/`](./docs/) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [Proposal](./docs/PROPOSAL-apple-container-substrate.md) · [Testing Guide](./docs/TESTING-ate-local.md) |
-| **2. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](./swarm/) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [Developer Intro](./docs/INTRO-ax-on-apple-container.md) · [`swarm/README.md`](./swarm/README.md) |
-| **3. Declarative Genkit Go Runner** | [`genkit/`](./genkit/) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), `ghchinoy/ax:feat/genkit-runner` · [Genkit Runner Tutorial](./docs/TUTORIAL-genkit-runner.md) |
-| **4. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [Friction Report & Telemetry RFC](./docs/FRICTION-REPORT-correlation-and-swarm-telemetry.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/README.md`](./viz/README.md) |
+| **1. Local macOS Substrate (`ate-local`)** | [`ate-local/`](/ate-local/README.md) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [`PROPOSAL.md`](/ate-local/PROPOSAL.md) · [`TESTING.md`](/ate-local/TESTING.md) |
+| **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](/swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](/swarm/README.md) · [`swarm/GUIDE.md`](/swarm/GUIDE.md) |
+| **2b. Declarative Genkit Go Runner** | [`genkit/`](/genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](/genkit/README.md) · [`genkit/TUTORIAL.md`](/genkit/TUTORIAL.md) |
+| **3. Swarm Telemetry & Visual Replay** | [`viz/`](/viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](/viz/README.md) · [`viz/SCHEMA.md`](/viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md) |
 
 ---
 
@@ -55,13 +78,13 @@ Open the local URL shown by Vite (`http://localhost:5173`) to scrub through pre-
 
 ### Option B: Full Local AX + `ate-local` Stack on macOS
 
-To run the swarm recipes (`swarm/01..08`) and record live traces on your Mac:
+To run the swarm recipes (`swarm/01..08`), the Genkit microVM runner (`genkit/run-apple-container.sh`), and record live traces on your Mac:
 
 1. **Prerequisites**:
    - **Apple Silicon Mac** running macOS 26+
    - **Apple `container` CLI** 1.0+ (`/usr/local/bin/container` — verify with `container system start && container list`)
    - **Go 1.26+**
-   - **`GEMINI_API_KEY`** exported in your shell *(only required for AI recipes `04`, `05`, and `06`)*
+   - **`GEMINI_API_KEY`** exported in your shell *(only required for AI swarm recipes `04`, `05`, `06` and `genkit/run-apple-container.sh`)*
 
 2. **Start the local AX stack** from the [`ghchinoy/ax`](https://github.com/ghchinoy/ax) checkout (`feat/ate-local-apple-container` branch):
    ```bash
@@ -72,7 +95,7 @@ To run the swarm recipes (`swarm/01..08`) and record live traces on your Mac:
    ```
    This launches `postgres:17-alpine` in an Apple container, starts `ate-local` on `:50051`, and starts `ax-server` on `:8090` in ~3 seconds.
 
-3. **Build the local arm64 Gemini agent image** *(needed for recipes `02`, `04`, `05`, `06`)*:
+3. **Build the local arm64 Gemini agent image** *(needed for recipes `02`, `04`, `05`, `06`, `08`, and `genkit/run-apple-container.sh`)*:
    ```bash
    cd ~/projects/ax-experiments
    make agent-image
@@ -124,11 +147,18 @@ All 8 recipes can be run via `make swarm-XX` or directly via `./swarm/XX-*.sh` a
 
 ### 3. Run the Declarative Genkit Go Runner (`genkit/`)
 
-To test declarative Dotprompt agents with workspace tools, skills (`SKILL.md`), stdio MCP servers, and suspend/resume session snapshots (either locally or on a GCE Ubuntu 24.04 VM with Kind + Agent Substrate v0.6.0), follow the step-by-step guide in [`docs/TUTORIAL-genkit-runner.md`](./docs/TUTORIAL-genkit-runner.md) using the manifests in [`genkit/`](./genkit/).
+To test declarative Dotprompt agents with workspace tools, skills (`SKILL.md`), stdio MCP servers, and suspend/resume session snapshots (on Apple `container` microVMs, local Linux/Crostini, or a GCE Ubuntu 24.04 VM with Kind + Agent Substrate v0.6.0):
+
+```bash
+export GEMINI_API_KEY="your-key"
+./genkit/run-apple-container.sh
+```
+
+See [`/genkit/README.md`](/genkit/README.md) and the 3-part [`/genkit/TUTORIAL.md`](/genkit/TUTORIAL.md) for full details.
 
 ### 4. Record & Replay Swarm Execution Traces (`viz/`)
 
-Capture a live `.jsonl` trace (conforming to [`viz/SCHEMA.md`](./viz/SCHEMA.md)) while running any swarm recipe:
+Capture a live `.jsonl` trace (conforming to [`/viz/SCHEMA.md`](/viz/SCHEMA.md)) while running any swarm recipe:
 
 ```bash
 # Build the Go trace recorder
@@ -164,56 +194,66 @@ AX_LOCAL_POSTGRES_NAME=ax-exp-postgres \
 
 ### Verification Gates
 
-Before committing changes to scripts, the trace recorder, or the visualizer, run the verification checks:
+Before committing changes to markdown concepts, scripts, the trace recorder, or the visualizer, run the verification checks:
 
 ```bash
-# 1. Lint swarm shell scripts
-bash -n swarm/*.sh
+# 1. Validate OKF v0.2 bundle conformance & concept graph
+~/projects/binder/bin/binder validate . --strict
+~/projects/binder/bin/binder review .
 
-# 2. Build and vet the Go trace recorder
+# 2. Lint swarm and genkit shell scripts
+bash -n swarm/*.sh genkit/*.sh
+
+# 3. Build and vet the Go trace recorder
 cd viz/recorder && go build ./... && go vet ./...
 
-# 3. Typecheck and build the Lit 3 + Vite web visualizer
+# 4. Typecheck and build the Lit 3 + Vite web visualizer
 cd viz/web && pnpm typecheck && pnpm build
 ```
 
 ---
 
-## Repository Structure & Documentation
+## Repository Structure
 
 ```
 ax-experiments/
-├── AGENTS.md               # Agent contract & Beads (bd) experiment tracking rules
+├── index.md                # OKF v0.2 root bundle index (declares okf_version: "0.2")
+├── README.md               # Repository overview, quickstart & verification gates
+├── AGENTS.md               # Agent contract, OKF ruleset & Beads (bd) tracking rules
 ├── Makefile                # Convenience targets for images, swarm recipes, recorder & web UI
-├── genkit/                 # Genkit Go runner (google/ax#538) manifests & GCE E2E bootstrap
-│   ├── workspace.yaml      # Workspace with files, incident-runbook SKILL.md, and stdio MCP server
-│   ├── task.yaml           # Declarative Dotprompt Task using vertexai/gemini-2.5-flash
-│   └── bootstrap-gce.sh    # Ubuntu 24.04 GCE startup script (Kind + Substrate v0.6.0 + AX + Genkit)
-├── swarm/                  # 8 runnable multi-agent swarm & sandbox recipes (01–08)
+├── ate-local/              # Track 1: Local Apple Container Substrate (google/ax#526)
+│   ├── README.md           # Track overview & quick verification
+│   ├── PROPOSAL.md         # Architecture proposal & Apple Silicon benchmarks
+│   ├── TESTING.md          # Automated unit/live microVM test suite & stack walkthrough
+│   └── archive/            # Archived early proposal and glidepath drafts
+├── swarm/                  # Track 2a: Multi-Agent Swarm Recipes (01–08)
+│   ├── README.md           # Recipe catalog & quickstart
+│   ├── GUIDE.md            # Developer guide, 3 swarm patterns & empirical timings
 │   ├── agent-image/        # arm64 Gemini agent image (reads Task.spec.config via loopback metadata)
 │   ├── lib.sh              # Shared orchestration & opt-in trace emission library
 │   └── 01..08-*.sh         # Fan-out, git workspaces, code review panel, debate, map-reduce, spec.config
-├── viz/                    # Interactive Swarm Trace Recorder & Web Visualizer
-│   ├── SCHEMA.md           # JSONL trace event schema
-│   ├── recorder/           # Go trace recorder (ax-trace)
-│   ├── traces/             # Recorded swarm execution traces (.jsonl)
-│   └── web/                # Lit 3 + Force-Graph + Cytoscape CoSE replay UI (Auto/Light/Dark mode)
-└── docs/                   # Proposals, testing guides, tutorials, and architecture RFCs
+├── genkit/                 # Track 2b: Declarative Genkit Go Runner (google/ax#538)
+│   ├── README.md           # Track overview & manifest catalog
+│   ├── TUTORIAL.md         # 3-part tutorial (local Linux, GCE Kind + Substrate, Apple container)
+│   ├── workspace.yaml      # Workspace with files, incident-runbook SKILL.md, and stdio MCP server
+│   ├── task.yaml           # Vertex AI / Linux & GCE Task manifest
+│   ├── task-apple-container.yaml # Apple container microVM Task manifest
+│   ├── run-apple-container.sh    # Automated Apple container E2E script
+│   └── bootstrap-gce.sh    # Ubuntu 24.04 GCE startup script (Kind + Substrate v0.6.0 + AX + Genkit)
+└── viz/                    # Track 3: Interactive Swarm Trace Recorder & Web Visualizer
+    ├── README.md           # Visualizer & recorder quickstart
+    ├── SCHEMA.md           # JSONL trace event schema
+    ├── FRICTION-REPORT.md  # Correlation IDs, swarm lineage & W3C TraceContext RFC
+    ├── recorder/           # Go trace recorder (ax-trace)
+    ├── traces/             # Recorded swarm execution traces (.jsonl)
+    └── web/                # Lit 3 + Force-Graph + Cytoscape CoSE replay UI (Auto/Light/Dark mode)
 ```
-
-### Architecture Guides & Proposals (`docs/`)
-
-- **[`TUTORIAL-genkit-runner.md`](./docs/TUTORIAL-genkit-runner.md)** — Two-part tutorial for declarative, suspendable Genkit Go agents on AX (local Crostini/Linux runner mode + full GCE Kind/Substrate cluster E2E with `atenet-router` scale-to-zero wakeup).
-- **[`INTRO-ax-on-apple-container.md`](./docs/INTRO-ax-on-apple-container.md)** — Developer guide introducing AX primitives on Apple `container`, the three swarm orchestration patterns, and empirical timings for recipes `01`–`08`.
-- **[`PROPOSAL-apple-container-substrate.md`](./docs/PROPOSAL-apple-container-substrate.md)** — Architectural proposal and benchmark analysis for `ate-local` (`ateapipb.ControlServer` on macOS Apple `container`).
-- **[`TESTING-ate-local.md`](./docs/TESTING-ate-local.md)** — Step-by-step verification guide for running automated unit/live tests and exercising the full local stack.
-- **[`FRICTION-REPORT-correlation-and-swarm-telemetry.md`](./docs/FRICTION-REPORT-correlation-and-swarm-telemetry.md)** — Post-implementation RFC proposing `correlation_id`, `parent_task`, W3C `TraceContext` injection, and AX-mediated inter-actor messaging.
 
 ---
 
 ## Experiment Tracking & Contributing
 
-This repository uses **[Beads (`bd`)](https://github.com/steveyegge/beads)** to track research epics, runnable experiment spikes, and architectural decisions against upstream [`google/ax`](https://github.com/google/ax) and [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate):
+This repository uses **[Beads (`bd`)](https://github.com/steveyegge/beads)** and **Open Knowledge Format (OKF) v0.2** frontmatter to track research epics, runnable experiment spikes, and architectural decisions. Experiments may be purely repo-local or linked to `0..N` fork branches and upstream [`google/ax`](https://github.com/google/ax) / [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) issues/PRs:
 
 ```bash
 bd list --all          # View all research tracks (Epics 1–3) and experiment beads
@@ -221,6 +261,6 @@ bd ready               # Show unblocked experiments ready to run
 ```
 
 When contributing a new experiment or swarm recipe:
-1. Register the experiment bead with `bd create` linking the target `ax` branch, upstream issue/PR, and `docs/` spec (see [`AGENTS.md`](./AGENTS.md) for required metadata flags).
+1. Place the experiment in its track folder (or a new self-contained top-level folder) with a conformant OKF v0.2 `README.md` and register it in root `index.md` and `bd` (see [`/AGENTS.md`](/AGENTS.md)).
 2. Run the experiment against an isolated local stack and record measured timings with `bd update <id> --notes="..."`.
 3. Open a pull request or upstream the validated change directly to [`google/ax`](https://github.com/google/ax) or [`agent-substrate/substrate`](https://github.com/agent-substrate/substrate).

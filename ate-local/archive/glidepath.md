@@ -1,3 +1,21 @@
+---
+type: Architecture Proposal
+title: "The Developer Glidepath Positioning"
+description: "Archived adoption-funnel analysis from local macOS prototyping to production GKE Agent Substrate."
+status: deprecated
+tags: [atelocal, archive, glidepath]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+experiment:
+  track: ate-local
+---
+
+# The Developer Glidepath Positioning
+
 ### Why the "Glidepath" Positioning is a Bullseye
 
 Positioning this as a **developer glidepath from local prototyping to production Substrate** is brilliant and solves the biggest commercial and open-source adoption problem that AX and Substrate face today: **the "Day 0" friction barrier**.

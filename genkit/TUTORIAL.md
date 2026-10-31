@@ -1,3 +1,45 @@
+---
+type: Experiment Tutorial
+title: "Tutorial: Declarative, Suspendable AI Agents on AX with Genkit Go"
+description: "Three-part end-to-end tutorial covering local Linux execution, GCE Kind + Agent Substrate v0.6.0 wake-on-request, and macOS Apple container microVM verification."
+status: stable
+tags: [genkit, runner, dotprompt, a2a, mcp, skills, tutorial]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+sources:
+  - id: ax-issue-538
+    resource: https://github.com/google/ax/issues/538
+    title: "google/ax#538: Genkit Go runner"
+  - id: ax-issue-526
+    resource: https://github.com/google/ax/issues/526
+    title: "google/ax#526: ax local start/status/stop"
+  - id: fork-genkit-runner
+    resource: https://github.com/ghchinoy/ax/tree/feat/genkit-runner
+    title: "ghchinoy/ax:feat/genkit-runner"
+experiment:
+  track: genkit
+  beads:
+    - ax-experiments-c0h.3
+    - ax-experiments-c0h.4
+    - ax-experiments-c0h.5
+  entrypoints:
+    - genkit/run-apple-container.sh
+    - genkit/bootstrap-gce.sh
+  upstream:
+    repo: google/ax
+    base_commit: f0228f1
+    issues: [538, 526, 523]
+  forks:
+    - repo: ghchinoy/ax
+      branch: feat/genkit-runner
+    - repo: ghchinoy/ax
+      branch: feat/ate-local-apple-container
+---
+
 # Declarative, Suspendable AI Agents on AX with Genkit Go
 
 This two-part guide introduces **AX** (`ax.io/v1alpha1`), shows how **Genkit Go** maps onto sandboxed agent tasks, and walks through running `genkit-runner`:

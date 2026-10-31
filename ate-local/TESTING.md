@@ -1,3 +1,35 @@
+---
+type: Verification Guide
+title: "Testing ate-local: AX on Apple Container"
+description: "Step-by-step verification guide covering automated unit/live microVM tests and the full local stack walkthrough."
+status: stable
+tags: [atelocal, testing, apple-container, microvm]
+generated:
+  by: human:ghchinoy
+  at: 2026-10-31T00:00:00Z
+verified:
+  - by: human:ghchinoy
+    at: 2026-10-31T00:00:00Z
+sources:
+  - id: ax-issue-526
+    resource: https://github.com/google/ax/issues/526
+    title: "google/ax#526: ax local start/status/stop"
+  - id: fork-atelocal
+    resource: https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container
+    title: "ghchinoy/ax:feat/ate-local-apple-container"
+experiment:
+  track: ate-local
+  beads:
+    - ax-experiments-1rx.2
+  upstream:
+    repo: google/ax
+    base_commit: f0228f1
+    issues: [526, 515, 517, 532, 536]
+  forks:
+    - repo: ghchinoy/ax
+      branch: feat/ate-local-apple-container
+---
+
 # Testing `ate-local`: AX on Apple Container
 
 > **Internal proposal first.** This is an exploratory prototype for review with
@@ -10,9 +42,9 @@
 > Please do not share or link to this document or the fork outside the team yet.
 
 - Fork: https://github.com/ghchinoy/ax
-- Branch: `feat/ate-local-apple-container` (rebased on `google/ax` `main` at `d0bc38b`)
+- Branch: `feat/ate-local-apple-container` (rebased on `google/ax` `main` at `f0228f1`)
 - Status: experimental prototype
-- Companion Guides: [Proposal (`PROPOSAL-apple-container-substrate.md`)](./PROPOSAL-apple-container-substrate.md), [Developer Intro & Swarm Recipes (`INTRO-ax-on-apple-container.md`)](./INTRO-ax-on-apple-container.md), [Friction Report on Correlation & Telemetry (`FRICTION-REPORT-correlation-and-swarm-telemetry.md`)](./FRICTION-REPORT-correlation-and-swarm-telemetry.md)
+- Companion Guides: [Proposal (`PROPOSAL.md`)](/ate-local/PROPOSAL.md), [Developer Intro & Swarm Recipes (`/swarm/GUIDE.md`)](/swarm/GUIDE.md), [Friction Report on Correlation & Telemetry (`/viz/FRICTION-REPORT.md`)](/viz/FRICTION-REPORT.md)
 
 ---
 
