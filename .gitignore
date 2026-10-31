@@ -1,6 +1,8 @@
 node_modules/
 viz/web/dist/
 viz/recorder/ax-trace
+genkit/sandbox-workspace/
+genkit/ax-state/
 .DS_Store
 *.log
 *.pid
