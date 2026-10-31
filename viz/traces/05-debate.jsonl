@@ -1,0 +1,30 @@
+{"t":0,"src":"recipe","kind":"run.start","id":"05-debate","label":"05-debate","meta":{"pattern":"adversarial-debate","tasks":2}}
+{"t":0.01,"src":"recipe","kind":"node.add","id":"debate-proposer","from":"host","to":"debate-proposer","role":"proposer","label":"Proposer"}
+{"t":0.023,"src":"recipe","kind":"node.add","id":"debate-critic","from":"host","to":"debate-critic","role":"critic","label":"Critic"}
+{"t":0.097,"src":"ax","kind":"node.phase","id":"debate-proposer","phase":"Suspended","label":"debate-proposer -\u003e Suspended"}
+{"t":0.098,"src":"ax","kind":"node.phase","id":"debate-critic","phase":"Suspended","label":"debate-critic -\u003e Suspended"}
+{"t":0.101,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-proposer","label":"Reconciling debate-proposer"}
+{"t":0.101,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-proposer","label":"Suspending actor debate-proposer"}
+{"t":0.202,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-critic","label":"Reconciling debate-critic"}
+{"t":0.202,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-critic","label":"Suspending actor debate-critic"}
+{"t":1.132,"src":"ax","kind":"node.phase","id":"debate-critic","phase":"Running","label":"debate-critic -\u003e Running"}
+{"t":1.132,"src":"ax","kind":"node.phase","id":"debate-proposer","phase":"Running","label":"debate-proposer -\u003e Running"}
+{"t":1.21,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-critic","label":"Reconciling debate-critic"}
+{"t":1.21,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-critic","label":"Resuming actor debate-critic"}
+{"t":1.694,"src":"ax","kind":"node.ready","id":"debate-critic","phase":"Running","workerIP":"192.168.64.106","label":"debate-critic Ready at 192.168.64.106"}
+{"t":1.715,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-proposer","label":"Reconciling debate-proposer"}
+{"t":1.715,"src":"controller","kind":"ctl.step","id":"control-plane","to":"debate-proposer","label":"Resuming actor debate-proposer"}
+{"t":2.251,"src":"ax","kind":"node.ready","id":"debate-proposer","phase":"Running","workerIP":"192.168.64.107","label":"debate-proposer Ready at 192.168.64.107"}
+{"t":2.348,"src":"recipe","kind":"note","label":"Round 1: Proposer Opening Argument"}
+{"t":2.358,"src":"recipe","kind":"edge.msg","from":"host","to":"debate-proposer","label":"request opening argument","meta":{"bytes":120}}
+{"t":2.37,"src":"recipe","kind":"edge.exec","from":"host","to":"debate-proposer","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":5.498,"src":"recipe","kind":"edge.exec","from":"host","to":"debate-proposer","label":"exec done (3s)","meta":{"duration":3,"exitCode":0,"state":"end"}}
+{"t":5.509,"src":"recipe","kind":"edge.msg","from":"debate-proposer","to":"host","label":"proposer opening statement","meta":{"bytes":369}}
+{"t":5.521,"src":"recipe","kind":"note","label":"Round 2: Critic Rebuttal"}
+{"t":5.532,"src":"recipe","kind":"edge.msg","from":"host","to":"debate-critic","label":"stream proposal for rebuttal","meta":{"bytes":369}}
+{"t":5.544,"src":"recipe","kind":"edge.exec","from":"host","to":"debate-critic","label":"exec sh -c AGENT_PROMPT='Rebut this proposal ","meta":{"state":"start"}}
+{"t":9.807,"src":"recipe","kind":"edge.exec","from":"host","to":"debate-critic","label":"exec done (5s)","meta":{"duration":5,"exitCode":0,"state":"end"}}
+{"t":9.819,"src":"recipe","kind":"edge.msg","from":"debate-critic","to":"host","label":"critic rebuttal argument","meta":{"bytes":377}}
+{"t":9.832,"src":"recipe","kind":"run.end","id":"05-debate","label":"05-debate","meta":{"duration":10,"status":"success"}}
+{"t":9.859,"src":"ax","kind":"node.phase","id":"debate-proposer","phase":"Terminating","workerIP":"192.168.64.107","label":"debate-proposer -\u003e Terminating"}
+{"t":9.881,"src":"controller","kind":"node.remove","id":"debate-proposer","label":"Deleted debate-proposer"}

@@ -1,0 +1,6 @@
+node_modules/
+viz/web/dist/
+viz/recorder/ax-trace
+.DS_Store
+*.log
+*.pid

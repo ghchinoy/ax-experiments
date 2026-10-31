@@ -1,0 +1,54 @@
+{"t":0,"src":"recipe","kind":"run.start","id":"06-map-reduce","label":"06-map-reduce","meta":{"pattern":"scatter-gather","tasks":4}}
+{"t":0.01,"src":"recipe","kind":"node.add","id":"map-topic-1","from":"host","to":"map-topic-1","role":"mapper","label":"Mapper 1 (Kernel)"}
+{"t":0.022,"src":"recipe","kind":"node.add","id":"map-topic-2","from":"host","to":"map-topic-2","role":"mapper","label":"Mapper 2 (Streams)"}
+{"t":0.032,"src":"recipe","kind":"node.add","id":"map-topic-3","from":"host","to":"map-topic-3","role":"mapper","label":"Mapper 3 (Network)"}
+{"t":0.044,"src":"recipe","kind":"node.add","id":"reduce-synthesis","from":"host","to":"reduce-synthesis","role":"reducer","label":"Reducer (Editor)"}
+{"t":0.073,"src":"ax","kind":"node.phase","id":"map-topic-1","phase":"Suspended","label":"map-topic-1 -\u003e Suspended"}
+{"t":0.074,"src":"ax","kind":"node.phase","id":"map-topic-2","phase":"Suspended","label":"map-topic-2 -\u003e Suspended"}
+{"t":0.074,"src":"ax","kind":"node.phase","id":"map-topic-3","phase":"Suspended","label":"map-topic-3 -\u003e Suspended"}
+{"t":0.075,"src":"ax","kind":"node.phase","id":"reduce-synthesis","phase":"Suspended","label":"reduce-synthesis -\u003e Suspended"}
+{"t":0.084,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-1","label":"Reconciling map-topic-1"}
+{"t":0.084,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-1","label":"Suspending actor map-topic-1"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-2","label":"Reconciling map-topic-2"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-2","label":"Suspending actor map-topic-2"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-3","label":"Reconciling map-topic-3"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-3","label":"Suspending actor map-topic-3"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"reduce-synthesis","label":"Reconciling reduce-synthesis"}
+{"t":0.185,"src":"controller","kind":"ctl.step","id":"control-plane","to":"reduce-synthesis","label":"Suspending actor reduce-synthesis"}
+{"t":1.194,"src":"ax","kind":"node.phase","id":"reduce-synthesis","phase":"Running","label":"reduce-synthesis -\u003e Running"}
+{"t":1.195,"src":"ax","kind":"node.phase","id":"map-topic-3","phase":"Running","label":"map-topic-3 -\u003e Running"}
+{"t":1.195,"src":"ax","kind":"node.phase","id":"map-topic-2","phase":"Running","label":"map-topic-2 -\u003e Running"}
+{"t":1.195,"src":"ax","kind":"node.phase","id":"map-topic-1","phase":"Running","label":"map-topic-1 -\u003e Running"}
+{"t":1.294,"src":"controller","kind":"ctl.step","id":"control-plane","to":"reduce-synthesis","label":"Reconciling reduce-synthesis"}
+{"t":1.294,"src":"controller","kind":"ctl.step","id":"control-plane","to":"reduce-synthesis","label":"Resuming actor reduce-synthesis"}
+{"t":1.761,"src":"ax","kind":"node.ready","id":"reduce-synthesis","phase":"Running","workerIP":"192.168.64.119","label":"reduce-synthesis Ready at 192.168.64.119"}
+{"t":1.799,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-3","label":"Reconciling map-topic-3"}
+{"t":1.799,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-3","label":"Resuming actor map-topic-3"}
+{"t":2.281,"src":"ax","kind":"node.ready","id":"map-topic-3","phase":"Running","workerIP":"192.168.64.120","label":"map-topic-3 Ready at 192.168.64.120"}
+{"t":2.303,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-2","label":"Reconciling map-topic-2"}
+{"t":2.303,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-2","label":"Resuming actor map-topic-2"}
+{"t":2.862,"src":"ax","kind":"node.ready","id":"map-topic-2","phase":"Running","workerIP":"192.168.64.121","label":"map-topic-2 Ready at 192.168.64.121"}
+{"t":2.907,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-1","label":"Reconciling map-topic-1"}
+{"t":2.907,"src":"controller","kind":"ctl.step","id":"control-plane","to":"map-topic-1","label":"Resuming actor map-topic-1"}
+{"t":3.443,"src":"ax","kind":"node.ready","id":"map-topic-1","phase":"Running","workerIP":"192.168.64.122","label":"map-topic-1 Ready at 192.168.64.122"}
+{"t":3.703,"src":"recipe","kind":"note","label":"Scatter Phase: 3 Mappers in Parallel"}
+{"t":3.713,"src":"recipe","kind":"edge.msg","from":"host","to":"map-topic-1","label":"map subtask: kernel","meta":{"bytes":100}}
+{"t":3.723,"src":"recipe","kind":"edge.msg","from":"host","to":"map-topic-2","label":"map subtask: streams","meta":{"bytes":120}}
+{"t":3.733,"src":"recipe","kind":"edge.msg","from":"host","to":"map-topic-3","label":"map subtask: network","meta":{"bytes":110}}
+{"t":3.745,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-1","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":7.582,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-1","label":"exec done (4s)","meta":{"duration":4,"exitCode":0,"state":"end"}}
+{"t":7.594,"src":"recipe","kind":"edge.msg","from":"map-topic-1","to":"host","label":"map result 1","meta":{"bytes":168}}
+{"t":7.605,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-2","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":15.48,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-2","label":"exec done (8s)","meta":{"duration":8,"exitCode":0,"state":"end"}}
+{"t":15.5,"src":"recipe","kind":"edge.msg","from":"map-topic-2","to":"host","label":"map result 2","meta":{"bytes":190}}
+{"t":15.515,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-3","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":19.427,"src":"recipe","kind":"edge.exec","from":"host","to":"map-topic-3","label":"exec done (3s)","meta":{"duration":3,"exitCode":0,"state":"end"}}
+{"t":19.439,"src":"recipe","kind":"edge.msg","from":"map-topic-3","to":"host","label":"map result 3","meta":{"bytes":212}}
+{"t":19.45,"src":"recipe","kind":"note","label":"Gather Phase: Synthesis by Reducer"}
+{"t":19.46,"src":"recipe","kind":"edge.msg","from":"host","to":"reduce-synthesis","label":"stream aggregated map outputs","meta":{"bytes":601}}
+{"t":19.473,"src":"recipe","kind":"edge.exec","from":"host","to":"reduce-synthesis","label":"exec sh -c AGENT_PROMPT='Synthesize these thr","meta":{"state":"start"}}
+{"t":25.433,"src":"recipe","kind":"edge.exec","from":"host","to":"reduce-synthesis","label":"exec done (5s)","meta":{"duration":5,"exitCode":0,"state":"end"}}
+{"t":25.446,"src":"recipe","kind":"edge.msg","from":"reduce-synthesis","to":"host","label":"final synthesis output","meta":{"bytes":711}}
+{"t":25.457,"src":"recipe","kind":"run.end","id":"06-map-reduce","label":"06-map-reduce","meta":{"duration":26,"status":"success"}}
+{"t":25.485,"src":"ax","kind":"node.phase","id":"map-topic-1","phase":"Terminating","workerIP":"192.168.64.122","label":"map-topic-1 -\u003e Terminating"}
+{"t":25.491,"src":"controller","kind":"node.remove","id":"map-topic-1","label":"Deleted map-topic-1"}

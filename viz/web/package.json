@@ -1,0 +1,26 @@
+{
+  "name": "ax-swarm-viz",
+  "version": "1.0.0",
+  "description": "AX Swarm Visualizer for Apple Container traces",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.29.3",
+  "dependencies": {
+    "cytoscape": "^3.34.3",
+    "cytoscape-fcose": "^2.2.0",
+    "force-graph": "^1.51.4",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

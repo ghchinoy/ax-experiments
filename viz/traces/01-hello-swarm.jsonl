@@ -1,0 +1,76 @@
+{"t":0,"src":"recipe","kind":"run.start","id":"01-hello-swarm","label":"01-hello-swarm","meta":{"pattern":"fan-out","tasks":8}}
+{"t":0.022,"src":"recipe","kind":"node.add","id":"hello-node-0","from":"host","to":"hello-node-0","role":"worker","label":"hello-node-0"}
+{"t":0.039,"src":"recipe","kind":"node.add","id":"hello-node-1","from":"host","to":"hello-node-1","role":"worker","label":"hello-node-1"}
+{"t":0.057,"src":"recipe","kind":"node.add","id":"hello-node-2","from":"host","to":"hello-node-2","role":"worker","label":"hello-node-2"}
+{"t":0.081,"src":"recipe","kind":"node.add","id":"hello-node-3","from":"host","to":"hello-node-3","role":"worker","label":"hello-node-3"}
+{"t":0.104,"src":"recipe","kind":"node.add","id":"hello-node-4","from":"host","to":"hello-node-4","role":"worker","label":"hello-node-4"}
+{"t":0.13,"src":"recipe","kind":"node.add","id":"hello-node-5","from":"host","to":"hello-node-5","role":"worker","label":"hello-node-5"}
+{"t":0.147,"src":"recipe","kind":"node.add","id":"hello-node-6","from":"host","to":"hello-node-6","role":"worker","label":"hello-node-6"}
+{"t":0.171,"src":"recipe","kind":"node.add","id":"hello-node-7","from":"host","to":"hello-node-7","role":"worker","label":"hello-node-7"}
+{"t":0.265,"src":"ax","kind":"node.phase","id":"hello-node-0","phase":"Suspended","label":"hello-node-0 -\u003e Suspended"}
+{"t":0.266,"src":"ax","kind":"node.phase","id":"hello-node-1","phase":"Suspended","label":"hello-node-1 -\u003e Suspended"}
+{"t":0.267,"src":"ax","kind":"node.phase","id":"hello-node-2","phase":"Suspended","label":"hello-node-2 -\u003e Suspended"}
+{"t":0.267,"src":"ax","kind":"node.phase","id":"hello-node-3","phase":"Suspended","label":"hello-node-3 -\u003e Suspended"}
+{"t":0.268,"src":"ax","kind":"node.phase","id":"hello-node-4","phase":"Suspended","label":"hello-node-4 -\u003e Suspended"}
+{"t":0.269,"src":"ax","kind":"node.phase","id":"hello-node-5","phase":"Suspended","label":"hello-node-5 -\u003e Suspended"}
+{"t":0.269,"src":"ax","kind":"node.phase","id":"hello-node-6","phase":"Suspended","label":"hello-node-6 -\u003e Suspended"}
+{"t":0.27,"src":"ax","kind":"node.phase","id":"hello-node-7","phase":"Suspended","label":"hello-node-7 -\u003e Suspended"}
+{"t":0.291,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-0","label":"Reconciling hello-node-0"}
+{"t":0.291,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-0","label":"Suspending actor hello-node-0"}
+{"t":0.391,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-1","label":"Reconciling hello-node-1"}
+{"t":0.391,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-1","label":"Suspending actor hello-node-1"}
+{"t":0.391,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-2","label":"Reconciling hello-node-2"}
+{"t":0.391,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-2","label":"Suspending actor hello-node-2"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-3","label":"Reconciling hello-node-3"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-3","label":"Suspending actor hello-node-3"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-4","label":"Reconciling hello-node-4"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-4","label":"Suspending actor hello-node-4"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-5","label":"Reconciling hello-node-5"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-5","label":"Suspending actor hello-node-5"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-6","label":"Reconciling hello-node-6"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-6","label":"Suspending actor hello-node-6"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-7","label":"Reconciling hello-node-7"}
+{"t":0.492,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-7","label":"Suspending actor hello-node-7"}
+{"t":1.322,"src":"ax","kind":"node.phase","id":"hello-node-0","phase":"Running","label":"hello-node-0 -\u003e Running"}
+{"t":1.323,"src":"ax","kind":"node.phase","id":"hello-node-1","phase":"Running","label":"hello-node-1 -\u003e Running"}
+{"t":1.323,"src":"ax","kind":"node.phase","id":"hello-node-4","phase":"Running","label":"hello-node-4 -\u003e Running"}
+{"t":1.323,"src":"ax","kind":"node.phase","id":"hello-node-3","phase":"Running","label":"hello-node-3 -\u003e Running"}
+{"t":1.329,"src":"ax","kind":"node.phase","id":"hello-node-5","phase":"Running","label":"hello-node-5 -\u003e Running"}
+{"t":1.329,"src":"ax","kind":"node.phase","id":"hello-node-7","phase":"Running","label":"hello-node-7 -\u003e Running"}
+{"t":1.329,"src":"ax","kind":"node.phase","id":"hello-node-6","phase":"Running","label":"hello-node-6 -\u003e Running"}
+{"t":1.329,"src":"ax","kind":"node.phase","id":"hello-node-2","phase":"Running","label":"hello-node-2 -\u003e Running"}
+{"t":1.398,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-0","label":"Reconciling hello-node-0"}
+{"t":1.398,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-0","label":"Resuming actor hello-node-0"}
+{"t":1.962,"src":"ax","kind":"node.ready","id":"hello-node-0","phase":"Running","workerIP":"192.168.64.108","label":"hello-node-0 Ready at 192.168.64.108"}
+{"t":2.002,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-1","label":"Reconciling hello-node-1"}
+{"t":2.002,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-1","label":"Resuming actor hello-node-1"}
+{"t":2.537,"src":"ax","kind":"node.ready","id":"hello-node-1","phase":"Running","workerIP":"192.168.64.109","label":"hello-node-1 Ready at 192.168.64.109"}
+{"t":2.606,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-4","label":"Reconciling hello-node-4"}
+{"t":2.606,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-4","label":"Resuming actor hello-node-4"}
+{"t":3.103,"src":"ax","kind":"node.ready","id":"hello-node-4","phase":"Running","workerIP":"192.168.64.110","label":"hello-node-4 Ready at 192.168.64.110"}
+{"t":3.109,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-3","label":"Reconciling hello-node-3"}
+{"t":3.109,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-3","label":"Resuming actor hello-node-3"}
+{"t":3.688,"src":"ax","kind":"node.ready","id":"hello-node-3","phase":"Running","workerIP":"192.168.64.111","label":"hello-node-3 Ready at 192.168.64.111"}
+{"t":3.733,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-5","label":"Reconciling hello-node-5"}
+{"t":3.733,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-5","label":"Resuming actor hello-node-5"}
+{"t":4.211,"src":"ax","kind":"node.ready","id":"hello-node-5","phase":"Running","workerIP":"192.168.64.112","label":"hello-node-5 Ready at 192.168.64.112"}
+{"t":4.237,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-7","label":"Reconciling hello-node-7"}
+{"t":4.237,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-7","label":"Resuming actor hello-node-7"}
+{"t":4.751,"src":"ax","kind":"node.ready","id":"hello-node-7","phase":"Running","workerIP":"192.168.64.113","label":"hello-node-7 Ready at 192.168.64.113"}
+{"t":4.842,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-6","label":"Reconciling hello-node-6"}
+{"t":4.842,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-6","label":"Resuming actor hello-node-6"}
+{"t":5.312,"src":"ax","kind":"node.ready","id":"hello-node-6","phase":"Running","workerIP":"192.168.64.114","label":"hello-node-6 Ready at 192.168.64.114"}
+{"t":5.346,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-2","label":"Reconciling hello-node-2"}
+{"t":5.346,"src":"controller","kind":"ctl.step","id":"control-plane","to":"hello-node-2","label":"Resuming actor hello-node-2"}
+{"t":5.865,"src":"ax","kind":"node.ready","id":"hello-node-2","phase":"Running","workerIP":"192.168.64.115","label":"hello-node-2 Ready at 192.168.64.115"}
+{"t":6.217,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-0","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.309,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-1","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.398,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-2","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.483,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-3","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.575,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-4","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.666,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-5","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.752,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-6","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.842,"src":"recipe","kind":"edge.exec","from":"host","to":"hello-node-7","label":"exec done (0s)","meta":{"duration":0,"exitCode":0,"state":"end"}}
+{"t":6.857,"src":"recipe","kind":"run.end","id":"01-hello-swarm","label":"01-hello-swarm","meta":{"duration":7,"status":"success"}}
+{"t":6.881,"src":"ax","kind":"node.phase","id":"hello-node-0","phase":"Terminating","workerIP":"192.168.64.108","label":"hello-node-0 -\u003e Terminating"}
+{"t":6.958,"src":"controller","kind":"node.remove","id":"hello-node-0","label":"Deleted hello-node-0"}

@@ -1,0 +1,40 @@
+{"t":0,"src":"recipe","kind":"run.start","id":"04-review-panel","label":"04-review-panel","meta":{"pattern":"multi-agent-panel","tasks":3}}
+{"t":0.012,"src":"recipe","kind":"node.add","id":"panel-security-reviewer","from":"host","to":"panel-security-reviewer","role":"security-auditor","label":"Security Auditor"}
+{"t":0.023,"src":"recipe","kind":"node.add","id":"panel-readability-reviewer","from":"host","to":"panel-readability-reviewer","role":"readability-mentor","label":"Readability Mentor"}
+{"t":0.035,"src":"recipe","kind":"node.add","id":"panel-performance-reviewer","from":"host","to":"panel-performance-reviewer","role":"performance-engineer","label":"Performance Engineer"}
+{"t":0.073,"src":"ax","kind":"node.phase","id":"panel-security-reviewer","phase":"Suspended","label":"panel-security-reviewer -\u003e Suspended"}
+{"t":0.074,"src":"ax","kind":"node.phase","id":"panel-readability-reviewer","phase":"Suspended","label":"panel-readability-reviewer -\u003e Suspended"}
+{"t":0.074,"src":"ax","kind":"node.phase","id":"panel-performance-reviewer","phase":"Suspended","label":"panel-performance-reviewer -\u003e Suspended"}
+{"t":0.086,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-security-reviewer","label":"Reconciling panel-security-reviewer"}
+{"t":0.086,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-security-reviewer","label":"Suspending actor panel-security-reviewer"}
+{"t":0.187,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-readability-reviewer","label":"Reconciling panel-readability-reviewer"}
+{"t":0.187,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-readability-reviewer","label":"Suspending actor panel-readability-reviewer"}
+{"t":0.187,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-performance-reviewer","label":"Reconciling panel-performance-reviewer"}
+{"t":0.187,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-performance-reviewer","label":"Suspending actor panel-performance-reviewer"}
+{"t":1.115,"src":"ax","kind":"node.phase","id":"panel-readability-reviewer","phase":"Running","label":"panel-readability-reviewer -\u003e Running"}
+{"t":1.115,"src":"ax","kind":"node.phase","id":"panel-security-reviewer","phase":"Running","label":"panel-security-reviewer -\u003e Running"}
+{"t":1.115,"src":"ax","kind":"node.phase","id":"panel-performance-reviewer","phase":"Running","label":"panel-performance-reviewer -\u003e Running"}
+{"t":1.196,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-readability-reviewer","label":"Reconciling panel-readability-reviewer"}
+{"t":1.196,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-readability-reviewer","label":"Resuming actor panel-readability-reviewer"}
+{"t":1.629,"src":"ax","kind":"node.ready","id":"panel-readability-reviewer","phase":"Running","workerIP":"192.168.64.116","label":"panel-readability-reviewer Ready at 192.168.64.116"}
+{"t":1.701,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-security-reviewer","label":"Reconciling panel-security-reviewer"}
+{"t":1.701,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-security-reviewer","label":"Resuming actor panel-security-reviewer"}
+{"t":2.154,"src":"ax","kind":"node.ready","id":"panel-security-reviewer","phase":"Running","workerIP":"192.168.64.117","label":"panel-security-reviewer Ready at 192.168.64.117"}
+{"t":2.203,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-performance-reviewer","label":"Reconciling panel-performance-reviewer"}
+{"t":2.203,"src":"controller","kind":"ctl.step","id":"control-plane","to":"panel-performance-reviewer","label":"Resuming actor panel-performance-reviewer"}
+{"t":2.662,"src":"ax","kind":"node.ready","id":"panel-performance-reviewer","phase":"Running","workerIP":"192.168.64.118","label":"panel-performance-reviewer Ready at 192.168.64.118"}
+{"t":2.727,"src":"recipe","kind":"edge.msg","from":"host","to":"panel-security-reviewer","label":"dispatch code snippet","meta":{"bytes":355}}
+{"t":2.737,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-security-reviewer","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":14.828,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-security-reviewer","label":"exec done (12s)","meta":{"duration":12,"exitCode":0,"state":"end"}}
+{"t":14.842,"src":"recipe","kind":"edge.msg","from":"panel-security-reviewer","to":"host","label":"review output","meta":{"bytes":702}}
+{"t":14.855,"src":"recipe","kind":"edge.msg","from":"host","to":"panel-readability-reviewer","label":"dispatch code snippet","meta":{"bytes":355}}
+{"t":14.868,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-readability-reviewer","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":20.204,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-readability-reviewer","label":"exec done (5s)","meta":{"duration":5,"exitCode":0,"state":"end"}}
+{"t":20.216,"src":"recipe","kind":"edge.msg","from":"panel-readability-reviewer","to":"host","label":"review output","meta":{"bytes":416}}
+{"t":20.227,"src":"recipe","kind":"edge.msg","from":"host","to":"panel-performance-reviewer","label":"dispatch code snippet","meta":{"bytes":355}}
+{"t":20.239,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-performance-reviewer","label":"exec python3 /usr/local/bin/agent.py","meta":{"state":"start"}}
+{"t":28.549,"src":"recipe","kind":"edge.exec","from":"host","to":"panel-performance-reviewer","label":"exec done (8s)","meta":{"duration":8,"exitCode":0,"state":"end"}}
+{"t":28.561,"src":"recipe","kind":"edge.msg","from":"panel-performance-reviewer","to":"host","label":"review output","meta":{"bytes":631}}
+{"t":28.572,"src":"recipe","kind":"run.end","id":"04-review-panel","label":"04-review-panel","meta":{"duration":28,"status":"success"}}
+{"t":28.6,"src":"ax","kind":"node.phase","id":"panel-security-reviewer","phase":"Terminating","workerIP":"192.168.64.117","label":"panel-security-reviewer -\u003e Terminating"}
+{"t":28.625,"src":"controller","kind":"node.remove","id":"panel-security-reviewer","label":"Deleted panel-security-reviewer"}
