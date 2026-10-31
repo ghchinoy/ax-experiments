@@ -1,10 +1,19 @@
 SHELL := /bin/bash
 
-.PHONY: help agent-image build-recorder viz-install viz-build viz-dev viz-preview swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+# OKF v0.2 tooling:
+#   binder:    https://github.com/ghchinoy/binder    (go install github.com/ghchinoy/binder@latest)
+#   okf-proto: https://github.com/ghchinoy/okf-proto (go install github.com/ghchinoy/okf-proto/cmd/okf-proto@latest)
+BINDER ?= binder
+OKF_PROTO ?= okf-proto
+
+.PHONY: help check okf-validate agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
+	@echo "  make check            Run all static verification gates (OKF v0.2, shell lint, Go recorder)"
+	@echo "  make okf-validate     Validate OKF v0.2 bundle with binder and okf-proto"
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
+	@echo "  make genkit-apple     Run Genkit Go runner (#538) E2E in Apple container microVM"
 	@echo "  make swarm-01         Run 01-hello-swarm (8 parallel microVMs)"
 	@echo "  make swarm-02         Run 02-repo-inspector (Workspace git clones)"
 	@echo "  make swarm-03         Run 03-seed-matrix (6-node parameter sweep)"
@@ -17,8 +26,20 @@ help:
 	@echo "  make viz-build        Typecheck and build the web visualizer"
 	@echo "  make viz-preview      Serve the built web visualizer locally"
 
+check: okf-validate
+	bash -n swarm/*.sh genkit/*.sh
+	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
+
+okf-validate:
+	$(BINDER) validate . --strict
+	$(BINDER) review . --strict --require-tier human-reviewed
+	$(OKF_PROTO) export . --format json >/dev/null
+
 agent-image:
 	container build -t ax-agent-local:latest -f swarm/agent-image/Containerfile swarm/agent-image
+
+genkit-apple:
+	./genkit/run-apple-container.sh
 
 build-recorder:
 	cd viz/recorder && go build -o ax-trace main.go

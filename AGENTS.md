@@ -10,6 +10,19 @@ generated:
 verified:
   - by: human:ghchinoy
     at: 2026-10-31T00:00:00Z
+sources:
+  - id: upstream-ax
+    resource: https://github.com/google/ax
+    title: "google/ax: Agent Executor"
+  - id: upstream-substrate
+    resource: https://github.com/agent-substrate/substrate
+    title: "agent-substrate/substrate: Agent Substrate"
+  - id: okf-binder
+    resource: https://github.com/ghchinoy/binder
+    title: "ghchinoy/binder: Open Knowledge Format (OKF) v0.2 CLI & validator"
+  - id: okf-proto
+    resource: https://github.com/ghchinoy/okf-proto
+    title: "ghchinoy/okf-proto: OKF v0.2 <-> Protocol Buffers / Buf codec"
 ---
 
 # AX Experiments — Agent Contract
@@ -57,13 +70,25 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
   web/                  Lit 3 + Force-Graph + Cytoscape CoSE replay app
 ```
 
+## Agent Roles & Folder Ownership
+
+| Assignee | Owned Folders | Scope & Responsibilities |
+|---|---|---|
+| `agent-substrate` | [`/ate-local/README.md`](/ate-local/README.md) | `ateapipb.ControlServer`, Apple `container` microVMs, `local-stack.sh`, `#526` |
+| `agent-swarm` | [`/swarm/README.md`](/swarm/README.md), [`/genkit/README.md`](/genkit/README.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`) |
+| `agent-viz` | [`/viz/README.md`](/viz/README.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC |
+| `agent-sync` | [`/README.md`](/README.md), [`/AGENTS.md`](/AGENTS.md), `index.md`, `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
+
 ## OKF v0.2 Knowledge Bundle & Optional Lineage Ruleset
 
-This repository is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`okf_version: "0.2"`):
+This repository is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`okf_version: "0.2"`), validated with [`ghchinoy/binder`](https://github.com/ghchinoy/binder) and [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto):
 
 1. **Root `index.md`**: Declares `okf_version: "0.2"` in YAML frontmatter (the **only** `index.md` allowed to carry frontmatter per OKF §8/§12) and indexes every track and concept document using bundle-relative `/path` links.
 2. **Every non-reserved `.md` file is an OKF concept**: Must begin with YAML frontmatter containing a non-empty `type` (`Experiment Track`, `Architecture Proposal`, `Verification Guide`, `Developer Guide`, `Experiment Tutorial`, `Telemetry RFC`, `Schema Specification`, etc.), `title`, `description`, `status` (`draft` | `stable` | `deprecated`), and `generated: { by: ..., at: ... }`. Never store a computed trust tier or credibility score (§5.3).
-3. **Optional `0..N` Upstream & Fork Lineage (`sources` + `experiment`)**:
+3. **Graph Hygiene (`binder review . --strict`)**:
+   - **Never markdown-link to `/index.md` from a concept file**: Because `index.md` is a reserved file (not a concept node), `[index.md](/index.md)` is flagged as an unresolved concept link. Reference `` `index.md` `` as inline code instead.
+   - **Zero orphan concepts**: Every new `.md` concept added to an experiment folder must be linked from both root `index.md` and that folder's `README.md` (via `/[folder]/[file].md`), and carry a `verified:` entry once validated so `binder review . --strict --require-tier human-reviewed` passes with 0 orphans and 0 unresolved links.
+4. **Optional `0..N` Upstream & Fork Lineage (`sources` + `experiment`)**:
    An experiment **may or may not** be associated with a fork, one or more branches in a fork, or upstream `google/ax` / `substrate` Issues and PRs. Record whatever lineage actually applies (all subfields in `experiment:` are optional):
    ```yaml
    sources:
@@ -113,26 +138,31 @@ This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`
      --acceptance="Pass/fail criteria and expected telemetry"
    ```
 
-2. **Run against an isolated AX stack**:
-   Always use isolated ports and `AX_LOCAL_DIR` in `/private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/`
-   when testing against `~/projects/ax` so you never disturb a running stack:
-   ```bash
-   AX_LOCAL_DIR=/private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/ax-exp \
-   AX_LOCAL_POSTGRES_PORT=5441 \
-   AX_LOCAL_SUBSTRATE_PORT=50061 \
-   AX_LOCAL_SERVER_PORT=8096 \
-   AX_LOCAL_POSTGRES_NAME=ax-exp-postgres \
-   ~/projects/ax/examples/ate_local/local-stack.sh up
-   ```
+2. **Isolate both `~/projects/ax` worktrees and local stack ports**:
+   - **Worktree isolation**: Never run `git checkout` or `git merge` directly in `~/projects/ax` if another session may be using it. Create a temporary worktree under `/private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/ax-wt-<name>` and pass `AX_REPO=<worktree>`:
+     ```bash
+     git -C ~/projects/ax worktree add /private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/ax-wt-exp feat/ate-local-apple-container
+     ```
+   - **Stack port & state isolation**: Always use isolated ports and `AX_LOCAL_DIR` in `/private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/` so you never disturb a running stack:
+     ```bash
+     AX_LOCAL_DIR=/private/var/folders/qs/4zfn7mrs7kq23y6rgjnd_zxc0000gn/T/opencode/ax-exp \
+     AX_LOCAL_POSTGRES_PORT=5441 \
+     AX_LOCAL_SUBSTRATE_PORT=50061 \
+     AX_LOCAL_SERVER_PORT=8096 \
+     AX_LOCAL_POSTGRES_NAME=ax-exp-postgres \
+     ~/projects/ax/examples/ate_local/local-stack.sh up
+     ```
 
 3. **Record results & lineage**:
    - Store measured timings and observations with `bd update <id> --notes="..."`.
    - When an upstream change supersedes an experiment, link the new bead with
      `bd supersede <old-id> --with=<new-id>`.
 
-## Verification Gates
+## Verification Gates (`make check`)
 
-- **OKF v0.2 bundle conformance**: `~/projects/binder/bin/binder validate . --strict` and `~/projects/binder/bin/binder review .`
+Run `make check` before committing, which executes:
+- **OKF v0.2 bundle conformance** ([`ghchinoy/binder`](https://github.com/ghchinoy/binder) & [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto)):
+  `binder validate . --strict`, `binder review . --strict --require-tier human-reviewed`, and `okf-proto export . --format json`
 - **Swarm & Genkit scripts**: `bash -n swarm/*.sh genkit/*.sh` and run non-LLM recipes (`01`, `07`, `08`) against an isolated stack.
 - **Trace recorder**: `cd viz/recorder && go build ./... && go vet ./...`
 - **Web visualizer**: `cd viz/web && pnpm typecheck && pnpm build`

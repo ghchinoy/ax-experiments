@@ -194,12 +194,16 @@ AX_LOCAL_POSTGRES_NAME=ax-exp-postgres \
 
 ### Verification Gates
 
-Before committing changes to markdown concepts, scripts, the trace recorder, or the visualizer, run the verification checks:
+Before committing changes to markdown concepts, scripts, the trace recorder, or the visualizer, run `make check` (or the individual checks below using [`ghchinoy/binder`](https://github.com/ghchinoy/binder) and [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto)):
 
 ```bash
-# 1. Validate OKF v0.2 bundle conformance & concept graph
-~/projects/binder/bin/binder validate . --strict
-~/projects/binder/bin/binder review .
+# Run all static checks (OKF v0.2 validation, shell lint, Go recorder build/vet)
+make check
+
+# 1. Validate OKF v0.2 bundle conformance, concept graph & Protobuf export
+binder validate . --strict
+binder review . --strict --require-tier human-reviewed
+okf-proto export . --format json >/dev/null
 
 # 2. Lint swarm and genkit shell scripts
 bash -n swarm/*.sh genkit/*.sh
