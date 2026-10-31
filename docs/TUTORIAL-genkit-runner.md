@@ -375,6 +375,30 @@ On **AX + Agent Substrate**, the lifecycle works as follows:
 4. **Scale-to-Zero Between Turns (`ax suspend`)**: While waiting for human review or CI results, the task suspends (`ax suspend task genkit-triage`). Substrate snapshots `/workspace` (capturing both the modified code and `.genkit/snapshots`) and tears down the worker pod.
 5. **Wake-on-Request Continuity**: Hours later, a follow-up A2A message arrives at `atenet-router` with `ate-target-actor: default/genkit-triage` and the same `contextId`. The router resumes the actor onto a worker, restores `/workspace`, waits for `/readyz`, and delivers the message. The Genkit agent continues the conversation at turn 2 with both its chat history and its uncommitted file changes intact.
 
+### Components of AX and Agent Substrate Tested in Part 2
+
+| Component | Behavior Under Test | Verification Command |
+|---|---|---|
+| **1. ActorTemplate & Digest Pinning** | AX creates `<task>-tmpl-<hash>` with `WakeupProbe: GET /readyz:80` and `SNAPSHOT_FIDELITY_VOLUMES`. | `ax describe task genkit-triage` |
+| **2. Workspace Materialization** | `spec.git` clones a repository into `/workspace`, `spec.files` writes `.agents/skills/incident-runbook/SKILL.md` and `tools/incident_mcp.py`, and `spec.mcp` declares the stdio server. | `ax ssh genkit-triage -- ls -la /workspace` |
+| **3. `atenet-router` Wake-on-Request** | Sending an HTTP request with `ate-target-actor: default/genkit-triage` while the task is `Suspended` wakes the actor and holds the request until `/readyz` returns `200`. | Send `curl` while `ax get task` shows `Suspended`; confirm the task moves to `Running` and returns the A2A reply. |
+| **4. `ax suspend` & Volume Checkpointing** | Suspending releases the worker (`workerIP` becomes empty) and snapshots `/workspace` while discarding rootfs (`/tmp`). | Write `/tmp/ephemeral` before `ax suspend`; after resume, verify `/tmp/ephemeral` is gone while `/workspace` files and `.genkit/snapshots` remain. |
+| **5. Guest Exec (`ax ssh`)** | Multiplexed `h2c` gRPC guest services run on port 80 alongside the Genkit HTTP/A2A server when `spec.debug: true`. | `ax ssh genkit-triage -- cat /workspace/TRIAGE_REPORT.md` |
+
+### Genkit Go Primitives Active in the Workspace
+
+- **Workspace MCP Server (`Workspace.spec.mcp` + `plugins/mcp`)**: `genkit/workspace.yaml` drops a zero-dependency Python stdio MCP server at `/workspace/tools/incident_mcp.py` and registers it under `spec.mcp.servers` (`name: telemetry`). On startup, `genkit-runner` connects `mcp.NewGenkitMCPClient` over stdio and exposes `telemetry_get_active_incident` to the model.
+- **Workspace Skills (`Workspace.spec.skills` + `genkit-middleware/skills`)**: `genkit/workspace.yaml` writes `.agents/skills/incident-runbook/SKILL.md`. `genkit-middleware/skills` scans `.agents/skills`, injects the skill catalog into the system prompt, and registers the `use_skill` tool so the model can load the runbook on demand.
+- **Scoped Filesystem Tools (`genkit-middleware/filesystem`)**: Confines `list_files`, `read_file`, `write_file`, and `search_and_replace` to `/workspace` using Go's `os.Root`.
+- **Durable Session Store (`localstore.NewFileSessionStore`)**: Persists `<prefix>/<snapshotID>.json` (full message transcript, tool calls, and token usage) plus `<prefix>/.pointers/<sessionID>.json` (mapping the A2A `contextId` or Genkit `sessionId` to the latest snapshot) inside `/workspace/.genkit/snapshots`.
+
+### Broader Scenarios for AX + Genkit Go
+
+1. **Scale-to-Zero Interactive Coding & Triage Agents ([google/ax#501](https://github.com/google/ax/issues/501), [#537](https://github.com/google/ax/issues/537), [#538](https://github.com/google/ax/issues/538))**: Per-incident or per-PR agents sit behind `atenet-router` at zero cost when idle, wake up when a webhook or engineer sends a message, and keep their working tree and conversation state across days.
+2. **Parallel Fleet Sweeps ([google/ax#513](https://github.com/google/ax/pull/513))**: Spinning up hundreds of isolated sandboxes in parallel across a fleet of repositories for dependency migrations, flaky test fixes, or security audits.
+3. **Multi-Agent A2A Topologies (`genkitx.DefineRemoteAgent`)**: Because every AX Task is addressable inside the cluster at `http://atenet-router.ate-system.svc.cluster.local` via `ate-target-actor: <atespace>/<task>`, a coordinator agent can delegate work to specialist tasks (`default/db-analyst`, `default/security-reviewer`, `default/test-fixer`) over A2A or Genkit's `DefineRemoteAgent`, waking each specialist only when called.
+4. **Multi-Tenant Sandboxes with Egress Credential Injection ([google/ax#475](https://github.com/google/ax/issues/475), [#516](https://github.com/google/ax/issues/516))**: Isolating tasks per tenant (`atespace`) while keeping raw API keys and Git tokens out of the container environment via Substrate's egress gateway.
+
 ### Provisioning the GCE VM with `genkit/bootstrap-gce.sh`
 
 A single **Ubuntu 24.04 LTS** GCE VM is the simplest environment for this end-to-end test: Ubuntu 24.04 ships with Linux kernel **6.8** (required by Substrate's OverlayFS `lowerdir+` image cache), and `genkit/bootstrap-gce.sh` automates installing Docker, Kind, `kubectl`, Go, Agent Substrate (`v0.6.0`), AX, and the `genkit-runner` image on first boot.
