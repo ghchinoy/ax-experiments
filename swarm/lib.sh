@@ -16,7 +16,7 @@
 # Common library for AX Swarm recipes on Apple Container.
 
 AX_REPO="${AX_REPO:-$HOME/projects/ax}"
-AX_BIN="${AX_REPO}/.ax-local/bin/ax"
+AX_BIN="${AX_BIN:-${AX_REPO}/.ax-local/bin/ax}"
 if [[ ! -x "${AX_BIN}" ]]; then
   AX_BIN="${AX_REPO}/bin/ax"
 fi

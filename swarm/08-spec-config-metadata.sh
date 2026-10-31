@@ -54,7 +54,7 @@ metadata:
   name: ${TASK_NAME}
   atespace: default
 spec:
-  image: "debian:12"
+  image: "ax-agent-local:latest"
   debug: true
   workspace:
     name: ${WS_NAME}
@@ -90,9 +90,9 @@ echo
 echo "--> Step 5: Querying loopback metadata server (127.0.0.1:8099) from INSIDE the microVM..."
 ssh_task "${TASK_NAME}" sh -c '
   echo "--- [Inside Container] /metadata/v1alpha1/ax/task ---"
-  wget -qO- http://127.0.0.1:8099/metadata/v1alpha1/ax/task || true
+  curl -s http://127.0.0.1:8099/metadata/v1alpha1/ax/task
   echo "--- [Inside Container] /metadata/v1alpha1/ax/workspace ---"
-  wget -qO- http://127.0.0.1:8099/metadata/v1alpha1/ax/workspace || true
+  curl -s http://127.0.0.1:8099/metadata/v1alpha1/ax/workspace
   echo "--- [Inside Container] Materialized Workspace File (/workspace/policy/rules.json) ---"
   cat /workspace/policy/rules.json
 '
