@@ -31,9 +31,9 @@ check: okf-validate
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
 
 okf-validate:
-	$(BINDER) validate . --strict
-	$(BINDER) review . --strict --require-tier human-reviewed
-	$(OKF_PROTO) export . --format json >/dev/null
+	$(BINDER) validate okf --strict
+	$(BINDER) review okf --strict --require-tier human-reviewed
+	$(OKF_PROTO) export okf --format json >/dev/null
 
 agent-image:
 	container build -t ax-agent-local:latest -f swarm/agent-image/Containerfile swarm/agent-image

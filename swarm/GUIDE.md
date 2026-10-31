@@ -1,37 +1,3 @@
----
-type: Developer Guide
-title: "Developer Guide: An Intro to AX on Apple Container"
-description: "Deep-dive guide to AX primitives, three swarm orchestration patterns, and measured outputs across recipes 01–08."
-status: stable
-tags: [swarm, guide, apple-container, atelocal, gemini]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-sources:
-  - id: ax-issue-479
-    resource: https://github.com/google/ax/issues/479
-    title: "google/ax#479: Loopback metadata boundary"
-  - id: ax-issue-523
-    resource: https://github.com/google/ax/issues/523
-    title: "google/ax#523: Declarative Task.spec.config"
-experiment:
-  track: swarm
-  beads:
-    - ax-experiments-c0h
-    - ax-experiments-c0h.1
-    - ax-experiments-c0h.2
-  upstream:
-    repo: google/ax
-    base_commit: f0228f1
-    issues: [479, 496, 519, 523]
-  forks:
-    - repo: ghchinoy/ax
-      branch: feat/ate-local-apple-container
----
-
 # Developer Guide: An Intro to AX on Apple Container
 
 > **Internal Review Document**  

@@ -1,19 +1,3 @@
----
-type: Architecture Proposal
-title: "Prior Proposal Draft: ate-local"
-description: "Archived initial design draft for ate-local on Apple container."
-status: deprecated
-tags: [atelocal, archive]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-experiment:
-  track: ate-local
----
-
 # Proposal: `ate-local` — Native macOS Local Substrate Control Plane backed by Apple Container
 
 ### Summary

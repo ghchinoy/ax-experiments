@@ -1,30 +1,3 @@
----
-type: Agent Contract
-title: "AX Experiments — Agent Contract"
-description: "Agent workflow contract, per-folder OKF v0.2 metadata ruleset, optional fork/branch/upstream lineage schema, and Beads (bd) experiment tracking guidelines."
-status: stable
-tags: [contract, okf, beads, workflow, governance]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-sources:
-  - id: upstream-ax
-    resource: https://github.com/google/ax
-    title: "google/ax: Agent Executor"
-  - id: upstream-substrate
-    resource: https://github.com/agent-substrate/substrate
-    title: "agent-substrate/substrate: Agent Substrate"
-  - id: okf-binder
-    resource: https://github.com/ghchinoy/binder
-    title: "ghchinoy/binder: Open Knowledge Format (OKF) v0.2 CLI & validator"
-  - id: okf-proto
-    resource: https://github.com/ghchinoy/okf-proto
-    title: "ghchinoy/okf-proto: OKF v0.2 <-> Protocol Buffers / Buf codec"
----
-
 # AX Experiments — Agent Contract
 
 Companion repository for multi-agent swarm experiments, declarative runner prototypes,
@@ -37,12 +10,20 @@ trace visualization, and local macOS Apple `container` (`ate-local`) proposals a
 ## Per-Folder Experiment Layout (No Shared `./docs/`)
 
 Every experiment track lives in its own self-contained top-level directory containing its
-`README.md`, runnable scripts/manifests, and deep-dive design docs, tutorials, or RFCs.
-Do **not** create a generic `./docs/` directory.
+human-facing `README.md` (free of YAML frontmatter so GitHub renders it cleanly), runnable
+scripts/manifests, and deep-dive design docs, tutorials, or RFCs. Machine- and agent-readable
+**Open Knowledge Format (OKF) v0.2** metadata lives in the dedicated [`okf/`](./okf/index.md)
+bundle subdirectory (per OKF v0.2 §3). Do **not** create a generic `./docs/` directory.
 
 ```
-index.md                OKF v0.2 root bundle index (the ONLY index.md carrying frontmatter)
 README.md               Repository overview, 4-track index, quickstart & verification gates
+AGENTS.md               Agent contract, OKF v0.2 ruleset & Beads (bd) tracking rules
+okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork lineage)
+  index.md              OKF v0.2 bundle root index (the ONLY index.md carrying frontmatter)
+  ate-local.md          Track 1 concept card (`type: Experiment Track`)
+  swarm.md              Track 2a concept card (`type: Experiment Track`)
+  genkit.md             Track 2b concept card (`type: Experiment Track`)
+  viz.md                Track 3 concept card (`type: Experiment Track`)
 ate-local/              Track 1: Native macOS Apple container Substrate (google/ax#526)
   README.md             Track overview & quick verification commands
   PROPOSAL.md           Architecture proposal, concept mapping & Apple Silicon benchmarks
@@ -74,22 +55,20 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
 
 | Assignee | Owned Folders | Scope & Responsibilities |
 |---|---|---|
-| `agent-substrate` | [`/ate-local/README.md`](/ate-local/README.md) | `ateapipb.ControlServer`, Apple `container` microVMs, `local-stack.sh`, `#526` |
-| `agent-swarm` | [`/swarm/README.md`](/swarm/README.md), [`/genkit/README.md`](/genkit/README.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`) |
-| `agent-viz` | [`/viz/README.md`](/viz/README.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC |
-| `agent-sync` | [`/README.md`](/README.md), [`/AGENTS.md`](/AGENTS.md), `index.md`, `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
+| `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`okf/ate-local.md`](./okf/ate-local.md) | `ateapipb.ControlServer`, Apple `container` microVMs, `local-stack.sh`, `#526` |
+| `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`) |
+| `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC |
+| `agent-sync` | [`okf/index.md`](./okf/index.md), [`README.md`](./README.md), [`AGENTS.md`](./AGENTS.md), `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
 
-## OKF v0.2 Knowledge Bundle & Optional Lineage Ruleset
+## OKF v0.2 Knowledge Bundle (`okf/`) & Optional Lineage Ruleset
 
-This repository is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`okf_version: "0.2"`), validated with [`ghchinoy/binder`](https://github.com/ghchinoy/binder) and [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto):
+The [`okf/`](./okf/index.md) directory is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`okf_version: "0.2"`), validated with [`ghchinoy/binder`](https://github.com/ghchinoy/binder) and [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto):
 
-1. **Root `index.md`**: Declares `okf_version: "0.2"` in YAML frontmatter (the **only** `index.md` allowed to carry frontmatter per OKF §8/§12) and indexes every track and concept document using bundle-relative `/path` links.
-2. **Every non-reserved `.md` file is an OKF concept**: Must begin with YAML frontmatter containing a non-empty `type` (`Experiment Track`, `Architecture Proposal`, `Verification Guide`, `Developer Guide`, `Experiment Tutorial`, `Telemetry RFC`, `Schema Specification`, etc.), `title`, `description`, `status` (`draft` | `stable` | `deprecated`), and `generated: { by: ..., at: ... }`. Never store a computed trust tier or credibility score (§5.3).
-3. **Graph Hygiene (`binder review . --strict`)**:
-   - **Never markdown-link to `/index.md` from a concept file**: Because `index.md` is a reserved file (not a concept node), `[index.md](/index.md)` is flagged as an unresolved concept link. Reference `` `index.md` `` as inline code instead.
-   - **Zero orphan concepts**: Every new `.md` concept added to an experiment folder must be linked from both root `index.md` and that folder's `README.md` (via `/[folder]/[file].md`), and carry a `verified:` entry once validated so `binder review . --strict --require-tier human-reviewed` passes with 0 orphans and 0 unresolved links.
+1. **Keep human `README.md` files frontmatter-free**: Human-facing markdown files outside `okf/` (`README.md`, `<track>/README.md`, `PROPOSAL.md`, `TUTORIAL.md`, `GUIDE.md`, `FRICTION-REPORT.md`) start directly with `# Title` (no YAML frontmatter) and include a one-line pointer to their corresponding concept card in `okf/<track>.md`.
+2. **Bundle root [`okf/index.md`](./okf/index.md)**: Declares `okf_version: "0.2"` in YAML frontmatter (the **only** `index.md` allowed to carry frontmatter per OKF §8/§12) and indexes every concept document in `okf/` using bundle-relative `/<track>.md` links.
+3. **Concept cards (`okf/*.md`)**: Every non-reserved `.md` file inside `okf/` must begin with YAML frontmatter containing a non-empty `type` (`Experiment Track`, etc.), `title`, `description`, `status` (`draft` | `stable` | `deprecated`), `generated: { by: ..., at: ... }`, and `verified:` once confirmed. Never store a computed trust tier or credibility score (§5.3).
 4. **Optional `0..N` Upstream & Fork Lineage (`sources` + `experiment`)**:
-   An experiment **may or may not** be associated with a fork, one or more branches in a fork, or upstream `google/ax` / `substrate` Issues and PRs. Record whatever lineage actually applies (all subfields in `experiment:` are optional):
+   An experiment **may or may not** be associated with a fork, one or more branches in a fork, or upstream `google/ax` / `substrate` Issues and PRs. Record whatever lineage actually applies in `okf/<track>.md` (all subfields in `experiment:` are optional):
    ```yaml
    sources:
      - id: ax-issue-538
@@ -97,6 +76,7 @@ This repository is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`ok
        title: "google/ax#538: Genkit Go runner"
    experiment:
      track: genkit
+     folder: genkit/
      beads: [ax-experiments-c0h.3, ax-experiments-c0h.4]
      entrypoints: [genkit/run-apple-container.sh]
      upstream:                     # Optional: omit if purely repo-local/companion
@@ -111,7 +91,7 @@ This repository is a conformant **Open Knowledge Format (OKF) v0.2** bundle (`ok
 
 ## Issue Tracking & Registering Experiments with `bd`
 
-This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`, `bd show <id>`; see [`/.beads/README.md`](/.beads/README.md)).
+This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`, `bd show <id>`).
 
 1. **Create the experiment bead**:
    - **Epics (`--type=epic`)**: Research tracks (`ate-local`, `swarm`, `genkit`, `viz`).
@@ -154,7 +134,7 @@ This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`
      ```
 
 3. **Record results & lineage**:
-   - Store measured timings and observations with `bd update <id> --notes="..."`.
+   - Store measured timings and observations with `bd update <id> --notes="..."` and update the corresponding `okf/<track>.md` concept card if new beads, entrypoints, or upstream issues/PRs were added.
    - When an upstream change supersedes an experiment, link the new bead with
      `bd supersede <old-id> --with=<new-id>`.
 
@@ -162,7 +142,7 @@ This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`
 
 Run `make check` before committing, which executes:
 - **OKF v0.2 bundle conformance** ([`ghchinoy/binder`](https://github.com/ghchinoy/binder) & [`ghchinoy/okf-proto`](https://github.com/ghchinoy/okf-proto)):
-  `binder validate . --strict`, `binder review . --strict --require-tier human-reviewed`, and `okf-proto export . --format json`
+  `binder validate okf --strict`, `binder review okf --strict --require-tier human-reviewed`, and `okf-proto export okf --format json`
 - **Swarm & Genkit scripts**: `bash -n swarm/*.sh genkit/*.sh` and run non-LLM recipes (`01`, `07`, `08`) against an isolated stack.
 - **Trace recorder**: `cd viz/recorder && go build ./... && go vet ./...`
 - **Web visualizer**: `cd viz/web && pnpm typecheck && pnpm build`

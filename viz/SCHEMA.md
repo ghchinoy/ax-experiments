@@ -1,22 +1,3 @@
----
-type: Schema Specification
-title: "AX Swarm Execution Trace Schema (trace.jsonl)"
-description: "JSON Lines event schema capturing AX infrastructure lifecycle transitions and inter-agent swarm messages."
-status: stable
-tags: [viz, telemetry, schema, jsonl]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-experiment:
-  track: viz
-  beads:
-    - ax-experiments-311
-    - ax-experiments-311.1
----
-
 # AX Swarm Execution Trace Schema (`trace.jsonl`)
 
 The AX Swarm Execution Trace is a stream of timestamp-ordered JSON Lines (`.jsonl`) events capturing both **infrastructure lifecycle** (from AX and Substrate) and **collaborative swarm communication** (between the host and microVM sandboxes).

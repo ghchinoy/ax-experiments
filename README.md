@@ -1,25 +1,6 @@
----
-type: Repository Overview
-title: "AX Experiments: Multi-Agent Swarms, Declarative Runners, Telemetry & Local Substrate"
-description: "Companion R&D repository for prototyping, stress-testing, and visualizing AX and Agent Substrate across local Apple container microVMs, multi-agent swarms, declarative Genkit Go runners, and trace replay."
-status: stable
-tags: [ax, substrate, atelocal, swarm, genkit, viz, okf]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-sources:
-  - id: upstream-ax
-    resource: https://github.com/google/ax
-    title: "google/ax: Agent Executor"
-  - id: upstream-substrate
-    resource: https://github.com/agent-substrate/substrate
-    title: "agent-substrate/substrate: Agent Substrate"
----
-
 # AX Experiments: Multi-Agent Swarms, Declarative Runners, Telemetry & Local Substrate
+
+> **OKF v0.2 Knowledge Bundle**: [`okf/index.md`](./okf/index.md) · **Agent Contract**: [`AGENTS.md`](./AGENTS.md)
 
 Companion R&D repository for prototyping, stress-testing, and visualizing **[AX (Agent Executor)](https://github.com/google/ax)** and **[Agent Substrate](https://github.com/agent-substrate/substrate)**—from 3-second local microVMs on Apple Silicon macOS (`ate-local`) to declarative **Genkit Go** agents (`genkit-runner`), multi-agent swarm topologies, and interactive execution trace replay.
 
@@ -29,14 +10,14 @@ Companion R&D repository for prototyping, stress-testing, and visualizing **[AX 
 
 While [`google/ax`](https://github.com/google/ax) and [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) provide the core runtime and actor control plane, this repository serves as the **experimental proving ground** where new developer workflows, multi-agent coordination patterns, and telemetry RFCs are validated before graduating upstream.
 
-Each experiment track is organized in its own self-contained top-level directory (and indexed as an **Open Knowledge Format (OKF) v0.2** bundle via root `index.md`):
+Each experiment track is organized in its own self-contained top-level directory and indexed with **Open Knowledge Format (OKF) v0.2** provenance metadata in [`okf/index.md`](./okf/index.md):
 
 | Track | Folder | Focus & Hypothesis | Upstream / Fork Alignment & Docs |
 |---|---|---|---|
-| **1. Local macOS Substrate (`ate-local`)** | [`ate-local/`](/ate-local/README.md) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [`PROPOSAL.md`](/ate-local/PROPOSAL.md) · [`TESTING.md`](/ate-local/TESTING.md) |
-| **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](/swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](/swarm/README.md) · [`swarm/GUIDE.md`](/swarm/GUIDE.md) |
-| **2b. Declarative Genkit Go Runner** | [`genkit/`](/genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](/genkit/README.md) · [`genkit/TUTORIAL.md`](/genkit/TUTORIAL.md) |
-| **3. Swarm Telemetry & Visual Replay** | [`viz/`](/viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](/viz/README.md) · [`viz/SCHEMA.md`](/viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md) |
+| **1. Local macOS Substrate (`ate-local`)** | [`ate-local/`](./ate-local/README.md) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [`PROPOSAL.md`](./ate-local/PROPOSAL.md) · [`TESTING.md`](./ate-local/TESTING.md) · [`okf/ate-local.md`](./okf/ate-local.md) |
+| **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](./swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](./swarm/README.md) · [`swarm/GUIDE.md`](./swarm/GUIDE.md) · [`okf/swarm.md`](./okf/swarm.md) |
+| **2b. Declarative Genkit Go Runner** | [`genkit/`](./genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](./genkit/README.md) · [`genkit/TUTORIAL.md`](./genkit/TUTORIAL.md) · [`okf/genkit.md`](./okf/genkit.md) |
+| **3. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](./viz/README.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](./viz/FRICTION-REPORT.md) · [`okf/viz.md`](./okf/viz.md) |
 
 ---
 
@@ -201,9 +182,9 @@ Before committing changes to markdown concepts, scripts, the trace recorder, or 
 make check
 
 # 1. Validate OKF v0.2 bundle conformance, concept graph & Protobuf export
-binder validate . --strict
-binder review . --strict --require-tier human-reviewed
-okf-proto export . --format json >/dev/null
+binder validate okf --strict
+binder review okf --strict --require-tier human-reviewed
+okf-proto export okf --format json >/dev/null
 
 # 2. Lint swarm and genkit shell scripts
 bash -n swarm/*.sh genkit/*.sh
@@ -221,10 +202,15 @@ cd viz/web && pnpm typecheck && pnpm build
 
 ```
 ax-experiments/
-├── index.md                # OKF v0.2 root bundle index (declares okf_version: "0.2")
 ├── README.md               # Repository overview, quickstart & verification gates
 ├── AGENTS.md               # Agent contract, OKF ruleset & Beads (bd) tracking rules
 ├── Makefile                # Convenience targets for images, swarm recipes, recorder & web UI
+├── okf/                    # OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork lineage)
+│   ├── index.md            # Root OKF v0.2 bundle index (declares okf_version: "0.2")
+│   ├── ate-local.md        # Track 1 concept card & lineage
+│   ├── swarm.md            # Track 2a concept card & lineage
+│   ├── genkit.md           # Track 2b concept card & lineage
+│   └── viz.md              # Track 3 concept card & lineage
 ├── ate-local/              # Track 1: Local Apple Container Substrate (google/ax#526)
 │   ├── README.md           # Track overview & quick verification
 │   ├── PROPOSAL.md         # Architecture proposal & Apple Silicon benchmarks
@@ -257,7 +243,7 @@ ax-experiments/
 
 ## Experiment Tracking & Contributing
 
-This repository uses **[Beads (`bd`)](https://github.com/steveyegge/beads)** and **Open Knowledge Format (OKF) v0.2** frontmatter to track research epics, runnable experiment spikes, and architectural decisions. Experiments may be purely repo-local or linked to `0..N` fork branches and upstream [`google/ax`](https://github.com/google/ax) / [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) issues/PRs:
+This repository uses **[Beads (`bd`)](https://github.com/steveyegge/beads)** and the **Open Knowledge Format (OKF) v0.2** bundle in [`okf/`](./okf/index.md) to track research epics, runnable experiment spikes, and architectural decisions. Experiments may be purely repo-local or linked to `0..N` fork branches and upstream [`google/ax`](https://github.com/google/ax) / [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) issues/PRs:
 
 ```bash
 bd list --all          # View all research tracks (Epics 1–3) and experiment beads
@@ -265,6 +251,6 @@ bd ready               # Show unblocked experiments ready to run
 ```
 
 When contributing a new experiment or swarm recipe:
-1. Place the experiment in its track folder (or a new self-contained top-level folder) with a conformant OKF v0.2 `README.md` and register it in root `index.md` and `bd` (see [`/AGENTS.md`](/AGENTS.md)).
+1. Place the experiment in its track folder (or a new self-contained top-level folder) with a clean `README.md`, add or update its OKF v0.2 concept card in [`okf/`](./okf/index.md), and register the experiment in `bd` (see [`AGENTS.md`](./AGENTS.md)).
 2. Run the experiment against an isolated local stack and record measured timings with `bd update <id> --notes="..."`.
 3. Open a pull request or upstream the validated change directly to [`google/ax`](https://github.com/google/ax) or [`agent-substrate/substrate`](https://github.com/agent-substrate/substrate).

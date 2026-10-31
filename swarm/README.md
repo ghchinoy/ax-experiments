@@ -1,50 +1,6 @@
----
-type: Experiment Track
-title: "AX Agent Swarm Kit on Apple Container"
-description: "Catalog and quickstart for 8 standalone multi-agent swarm and sandbox boundary recipes (01–08) on Apple container."
-status: stable
-tags: [swarm, apple-container, multi-agent, gemini, sandbox]
-generated:
-  by: human:ghchinoy
-  at: 2026-10-31T00:00:00Z
-verified:
-  - by: human:ghchinoy
-    at: 2026-10-31T00:00:00Z
-sources:
-  - id: ax-issue-479
-    resource: https://github.com/google/ax/issues/479
-    title: "google/ax#479: Loopback metadata boundary"
-  - id: ax-issue-496
-    resource: https://github.com/google/ax/issues/496
-    title: "google/ax#496: Single workspace binding"
-  - id: ax-issue-523
-    resource: https://github.com/google/ax/issues/523
-    title: "google/ax#523: Declarative Task.spec.config"
-experiment:
-  track: swarm
-  beads:
-    - ax-experiments-c0h
-    - ax-experiments-c0h.1
-    - ax-experiments-c0h.2
-  entrypoints:
-    - swarm/01-hello-swarm.sh
-    - swarm/02-repo-inspector.sh
-    - swarm/03-seed-matrix.sh
-    - swarm/04-review-panel.sh
-    - swarm/05-debate.sh
-    - swarm/06-map-reduce.sh
-    - swarm/07-suspend-resume.sh
-    - swarm/08-spec-config-metadata.sh
-  upstream:
-    repo: google/ax
-    base_commit: f0228f1
-    issues: [479, 496, 519, 523]
-  forks:
-    - repo: ghchinoy/ax
-      branch: feat/ate-local-apple-container
----
-
 # AX Agent Swarm Kit on Apple Container
+
+> **OKF v0.2 Track Metadata & Lineage**: [`okf/swarm.md`](../okf/swarm.md) · **Bundle Index**: [`okf/index.md`](../okf/index.md)
 
 This directory contains standalone recipes demonstrating **multi-agent swarms, parallel execution, and sandbox metadata boundaries** running on **Apple `container`** via [`ate-local`](/ate-local/README.md), completely outside Kubernetes. For a deep-dive walkthrough with measured outputs and the 3 swarm patterns, see [`GUIDE.md`](/swarm/GUIDE.md).
 
