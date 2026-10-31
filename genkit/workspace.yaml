@@ -1,0 +1,118 @@
+apiVersion: ax.io/v1alpha1
+kind: Workspace
+metadata:
+  name: demo-workspace
+  atespace: default
+spec:
+  files:
+    - path: "README.md"
+      content: |
+        # Payment Service (payd)
+        Handles checkout authorization and settlement retries.
+
+        ## Known Issues
+        - `TestRetryBackoff_ZeroJitter` in `retry_test.go` fails intermittently when `maxJitter == 0` because `rand.Int63n(0)` panics.
+        - `settlement.go`: batch timeout is hardcoded to 5s instead of reading `Config.BatchTimeout`.
+    - path: "retry_test.go"
+      content: |
+        package payd
+
+        import (
+            "math/rand"
+            "testing"
+        )
+
+        func ComputeJitter(maxJitter int64) int64 {
+            // BUG: panics when maxJitter <= 0
+            return rand.Int63n(maxJitter)
+        }
+
+        func TestRetryBackoff_ZeroJitter(t *testing.T) {
+            got := ComputeJitter(0)
+            if got != 0 {
+                t.Fatalf("ComputeJitter(0) = %d, want 0", got)
+            }
+        }
+    - path: ".agents/skills/incident-runbook/SKILL.md"
+      content: |
+        ---
+        name: incident-runbook
+        description: Standard operating procedure for triaging payd incidents and formatting triage reports.
+        ---
+        # Payment Service (payd) Incident Runbook
+
+        When triaging an issue in `payd`:
+        1. Inspect `README.md` and the failing test file before editing any code.
+        2. Keep code fixes minimal and guard against zero or negative bounds.
+        3. Write a concise summary to `TRIAGE_REPORT.md` with two sections:
+           - `## Summary` (what was fixed)
+           - `## Remaining Risks` (any other unaddressed known issues in `README.md`)
+    - path: "tools/incident_mcp.py"
+      content: |
+        #!/usr/bin/env python3
+        """Minimal zero-dependency stdio MCP server exposing incident telemetry."""
+        import json
+        import sys
+
+        for line in sys.stdin:
+            line = line.strip()
+            if not line:
+                continue
+            req = json.loads(line)
+            method = req.get("method", "")
+            req_id = req.get("id")
+            if method == "initialize":
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "protocolVersion": "2025-03-26",
+                        "capabilities": {"tools": {}},
+                        "serverInfo": {"name": "incident-telemetry", "version": "1.0.0"},
+                    },
+                }
+                sys.stdout.write(json.dumps(resp) + "\n")
+                sys.stdout.flush()
+            elif method == "tools/list":
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "tools": [
+                            {
+                                "name": "get_active_incident",
+                                "description": "Returns the active incident ID, severity, and error signature for payd.",
+                                "inputSchema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "service": {"type": "string"}
+                                    },
+                                },
+                            }
+                        ]
+                    },
+                }
+                sys.stdout.write(json.dumps(resp) + "\n")
+                sys.stdout.flush()
+            elif method == "tools/call":
+                resp = {
+                    "jsonrpc": "2.0",
+                    "id": req_id,
+                    "result": {
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": "INC-2026-1030 (SEV-2): panic: invalid argument to Int63n in payd.ComputeJitter",
+                            }
+                        ]
+                    },
+                }
+                sys.stdout.write(json.dumps(resp) + "\n")
+                sys.stdout.flush()
+  mcp:
+    servers:
+      - name: telemetry
+        command: "python3"
+        args: ["/workspace/tools/incident_mcp.py"]
+  skills:
+    path: ".agents/skills"

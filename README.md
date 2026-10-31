@@ -8,6 +8,10 @@ Companion repository for exploring, stress-testing, and visualizing **[AX (Agent
 
 ```
 ax-experiments/
+├── genkit/                 # Genkit Go runner (google/ax#538) manifests & GCE E2E bootstrap
+│   ├── workspace.yaml      # Workspace with files, incident-runbook SKILL.md, and stdio MCP server
+│   ├── task.yaml           # Declarative Dotprompt Task using vertexai/gemini-4-argon
+│   └── bootstrap-gce.sh    # Ubuntu 24.04 GCE startup script (Kind + Substrate v0.6.0 + AX + Genkit)
 ├── swarm/                  # 8 runnable multi-agent swarm & sandbox recipes (01–08)
 │   ├── agent-image/        # arm64 Gemini agent image (reads Task.spec.config via loopback metadata)
 │   ├── lib.sh              # Shared orchestration & opt-in trace emission library
@@ -18,6 +22,7 @@ ax-experiments/
 │   ├── traces/             # Recorded swarm execution traces (.jsonl)
 │   └── web/                # Lit 3 + Force-Graph + Cytoscape CoSE replay UI (Auto/Light/Dark mode)
 └── docs/                   # Proposals, testing guides, and architecture RFCs
+    ├── TUTORIAL-genkit-runner.md
     ├── INTRO-ax-on-apple-container.md
     ├── TESTING-ate-local.md
     ├── PROPOSAL-apple-container-substrate.md

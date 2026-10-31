@@ -23,6 +23,7 @@ For full workflow details: `bd prime`
 ## Layout
 
 ```
+genkit/                 Genkit Go runner (google/ax#538) manifests & GCE E2E bootstrap
 swarm/                  Runnable multi-agent swarm & sandbox recipes (01–08)
   agent-image/          arm64 Gemini agent image (reads Task.spec.config via loopback metadata)
   lib.sh                Shared orchestration & opt-in trace emission helpers

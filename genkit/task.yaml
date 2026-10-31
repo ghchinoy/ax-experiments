@@ -1,0 +1,32 @@
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: genkit-triage
+  atespace: default
+spec:
+  # When running in an AX + Agent Substrate cluster, pin the pushed digest from
+  # `make push-genkit-image`. When testing locally with `--task-file`, the image
+  # field is unused.
+  image: "localhost:5001/genkit-runner@sha256:REPLACE_WITH_PUSHED_DIGEST"
+  config:
+    name: triage_agent
+    description: Triages failing tests and writes reports to the workspace.
+    model: vertexai/gemini-4-argon
+    instruction: |
+      You are a careful Go engineer triaging a repository in your workspace.
+      Always use the filesystem tools (list_files, read_file, write_file,
+      search_and_replace) to inspect files before answering or making changes.
+      Keep your answers concise.
+    config:
+      maxOutputTokens: 2048
+      temperature: 0.2
+    maxTurns: 10
+    use:
+      - name: genkit-middleware/filesystem
+        config:
+          allowWriteAccess: true
+      - name: genkit-middleware/skills
+  workspace:
+    name: demo-workspace
+    path: "/home/hussain/projects/ax-experiments/genkit/sandbox-workspace"
+  debug: true
