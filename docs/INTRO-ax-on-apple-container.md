@@ -3,7 +3,7 @@
 > **Internal Review Document**  
 > **Target Audience**: Developers, committers, and colleagues exploring AX prior to Kubernetes / Agent Substrate  
 > **Prerequisites**: Apple Silicon Mac, Apple `container` CLI 1.0+, Go 1.26+  
-> **Companion Files**: [`TESTING-ate-local.md`](./TESTING-ate-local.md), [`PROPOSAL-apple-container-substrate.md`](./PROPOSAL-apple-container-substrate.md), [`FRICTION-REPORT-correlation-and-swarm-telemetry.md`](./FRICTION-REPORT-correlation-and-swarm-telemetry.md), [`swarm/`](./swarm/), [`viz/`](./viz/)  
+> **Companion Files**: [`TESTING-ate-local.md`](./TESTING-ate-local.md), [`PROPOSAL-apple-container-substrate.md`](./PROPOSAL-apple-container-substrate.md), [`FRICTION-REPORT-correlation-and-swarm-telemetry.md`](./FRICTION-REPORT-correlation-and-swarm-telemetry.md), [`swarm/`](../swarm/), [`viz/`](../viz/)  
 
 ---
 
@@ -50,13 +50,13 @@ make local-up
 source .ax-local/env
 ```
 
-This starts Valkey in an Apple container, `ate-local` on port 50051, and `ax-server` on port 8090 in dependency order (reconciliation runs directly in `ax-server`).
+This starts `postgres:17-alpine` in an Apple container, `ate-local` on port 50051, and `ax-server` on port 8090 in dependency order (reconciliation runs directly in `ax-server`).
 
 ### Step 2: Build the Local Swarm Agent Image
 For AI agent recipes, build our local arm64 agent image (bundles Python 3.10, git, ca-certificates, and the `google-genai` SDK):
 
 ```bash
-container build -t ax-agent-local:latest ~/projects/tmp/ax/swarm/agent-image
+container build -t ax-agent-local:latest -f ~/projects/ax-experiments/swarm/agent-image/Containerfile ~/projects/ax-experiments/swarm/agent-image
 ```
 *(Takes ~10 seconds on Apple Silicon).*
 
@@ -94,14 +94,14 @@ Task 1      Task 2 ...    Task N           Agent 1     Agent 2 ...   Agent N    
 
 ## 5. Hands-On Swarm Recipes
 
-The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recipes. All timings below were empirically measured on this Mac.
+The [`~/projects/ax-experiments/swarm/`](../swarm/) directory contains 8 executable recipes. All timings below were empirically measured on this Mac.
 
 ### Recipe 01: Hello Swarm (8 Parallel MicroVMs)
 * **Goal**: Spin up 8 isolated tasks simultaneously. Each microVM reports its dynamic `vmnet` IP, internal hostname, and kernel architecture.
 * **API Key Needed**: No.
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/01-hello-swarm.sh
+  ~/projects/ax-experiments/swarm/01-hello-swarm.sh
   ```
 * **Real Output (9 seconds total)**:
   ```text
@@ -130,7 +130,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: No.
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/02-repo-inspector.sh
+  ~/projects/ax-experiments/swarm/02-repo-inspector.sh
   ```
 * **Real Output (13 seconds total)**:
   ```text
@@ -153,7 +153,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: No.
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/03-seed-matrix.sh
+  ~/projects/ax-experiments/swarm/03-seed-matrix.sh
   ```
 * **Real Output (6 seconds total)**:
   ```text
@@ -180,7 +180,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: **Yes** (`gemini-3.8-flash`).
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/04-review-panel.sh
+  ~/projects/ax-experiments/swarm/04-review-panel.sh
   ```
 * **Real Output (26 seconds total)**:
   ```text
@@ -216,7 +216,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: **Yes** (`gemini-3.8-flash`).
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/05-debate.sh
+  ~/projects/ax-experiments/swarm/05-debate.sh
   ```
 * **Real Output (11 seconds total)**:
   ```text
@@ -240,7 +240,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: **Yes** (`gemini-3.8-flash`).
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/06-map-reduce.sh
+  ~/projects/ax-experiments/swarm/06-map-reduce.sh
   ```
 * **Real Output (20 seconds total)**:
   ```text
@@ -271,7 +271,7 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 * **API Key Needed**: No.
 * **Execution**:
   ```bash
-  ~/projects/tmp/ax/swarm/07-suspend-resume.sh
+  ~/projects/ax-experiments/swarm/07-suspend-resume.sh
   ```
 * **Real Output (5 seconds total)**:
   ```text
@@ -290,11 +290,21 @@ The [`~/projects/tmp/ax/swarm/`](./swarm/) directory contains 7 executable recip
 
 ---
 
+### Recipe 08: Declarative `Task.spec.config` & Loopback Metadata
+* **Goal**: Exercises structured `Task.spec.config` (`google.protobuf.Struct`, `#523`), single-Workspace file materialization (`#496`), and the loopback-only metadata boundary (`127.0.0.1:8099`, `#479`). Verifies that `/metadata/v1alpha1/ax/task` is readable inside the microVM over loopback while external requests to port 80 on the `vmnet` bridge IP return `404`.
+* **API Key Needed**: No.
+* **Execution**:
+  ```bash
+  ~/projects/ax-experiments/swarm/08-spec-config-metadata.sh
+  ```
+
+---
+
 ### Interactive Replay: The AX Swarm Visualizer
-Recorded execution traces from these recipes can be replayed in real time using the interactive visualizer in [`viz/`](./viz/):
+Recorded execution traces from these recipes can be replayed in real time using the interactive visualizer in [`viz/`](../viz/):
 
 ```bash
-cd ~/projects/tmp/ax/viz/web
+cd ~/projects/ax-experiments/viz/web
 pnpm build && pnpm preview
 ```
 

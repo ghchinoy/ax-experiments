@@ -339,7 +339,7 @@ Should `ate-local` automatically provision a local host bind mount (e.g., `~/.ax
 ## 13. Quick Links & Reproduction
 
 - **Full Fork Branch Diff**: [`google/ax:main...ghchinoy:ax:feat/ate-local-apple-container`](https://github.com/google/ax/compare/main...ghchinoy:ax:feat/ate-local-apple-container)
-- **Local Testing Guide**: [`~/projects/tmp/ax/TESTING-ate-local.md`](./TESTING-ate-local.md)
+- **Local Testing Guide**: [`TESTING-ate-local.md`](./TESTING-ate-local.md)
 - **Quick Test Commands**:
   ```bash
   git clone https://github.com/ghchinoy/ax.git && cd ax

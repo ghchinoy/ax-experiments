@@ -1,0 +1,52 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# A Task for running genkit-runner inside an Apple container microVM on macOS
+# via ate-local (see genkit/run-apple-container.sh).
+#
+# Uses ax-agent-local:latest (which includes python3 for the stdio MCP server
+# in genkit/workspace.yaml) with the linux/arm64 genkit-runner mounted at
+# /usr/local/bin/ax-task-runner.
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: genkit-triage
+  atespace: default
+spec:
+  image: "ax-agent-local:latest"
+  config:
+    name: triage_agent
+    description: Triages failing tests and writes reports to the workspace.
+    model: googleai/gemini-3.8-flash
+    instruction: |
+      You are a careful Go engineer triaging a repository in your workspace.
+      Always use the filesystem tools (list_files, read_file, write_file,
+      search_and_replace) and any available MCP telemetry tools to inspect
+      files before answering or making changes. Keep your answers concise.
+    config:
+      maxOutputTokens: 2048
+      temperature: 0.2
+    maxTurns: 10
+    use:
+      - name: genkit-middleware/filesystem
+        config:
+          rootDirectory: /workspace
+          allowWriteAccess: true
+      - name: genkit-middleware/skills
+  env:
+    - name: GEMINI_API_KEY
+      value: "${GEMINI_API_KEY}"
+  workspace:
+    name: demo-workspace
+  debug: true

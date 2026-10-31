@@ -11,7 +11,7 @@ Built with **Vite 8**, **Lit 3**, **Force-Graph** (dynamic force-directed partic
 ### 1. Build and Preview
 
 ```bash
-cd ~/projects/tmp/ax/viz/web
+cd ~/projects/ax-experiments/viz/web
 pnpm install
 pnpm build
 pnpm preview
@@ -52,12 +52,12 @@ Traces adhere to [`SCHEMA.md`](./SCHEMA.md) and can be captured using the Go rec
 
 ```bash
 # Build the recorder
-cd ~/projects/tmp/ax/viz/recorder
+cd ~/projects/ax-experiments/viz/recorder
 go build -o ax-trace main.go
 
 # Capture a trace while running a swarm recipe
 AX_TRACE_RECIPE=1 ./ax-trace -out ../traces/my-run.jsonl &
 RECORDER_PID=$!
-~/projects/tmp/ax/swarm/05-debate.sh
+~/projects/ax-experiments/swarm/05-debate.sh
 kill $RECORDER_PID
 ```

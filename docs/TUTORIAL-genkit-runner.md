@@ -422,3 +422,49 @@ gcloud compute images create ax-substrate-v0-6-0-ubuntu2404 \
   --source-disk=ax-genkit-e2e \
   --source-disk-zone=$(gcloud config get-value compute/zone)
 ```
+
+---
+
+## Part 3: Full-Stack MicroVM Verification on macOS with `ate-local` & Apple `container`
+
+On Apple Silicon macOS, you can exercise the complete **`ax` CLI + `ax-server` + `ate-local` + `genkit-runner`** lifecycle inside a real Linux microVM (`container` 1.0) in ~3 seconds—without spinning up a GCE VM or Kind cluster.
+
+Because the microVM mounts the workspace at `/workspace`, the Python stdio MCP server (`tools/incident_mcp.py` in `genkit/workspace.yaml`) connects automatically at `/workspace/tools/incident_mcp.py` (`mcpTools=1`), and the container's `vmnet` bridge IP (`192.168.64.x:80`) exposes the A2A and Genkit HTTP routes directly to your Mac.
+
+### Running the Automated E2E Script (`genkit/run-apple-container.sh`)
+
+```bash
+# 1. Start the local AX + ate-local stack in ~/projects/ax (feat/ate-local-apple-container)
+cd ~/projects/ax
+make local-up
+source .ax-local/env
+
+# 2. Run the Genkit microVM lifecycle test
+cd ~/projects/ax-experiments
+export GEMINI_API_KEY="AIzaSy..."
+./genkit/run-apple-container.sh
+```
+
+**Verified MicroVM Output (`googleai/gemini-3.8-flash`):**
+
+1. **Turn 1 (A2A JSON-RPC on `192.168.64.220:80`, `contextId: "incident-42"`) — Calls `telemetry_get_active_incident` over MCP, fixes `retry_test.go`, and writes `TRIAGE_REPORT.md`:**
+   ```json
+   {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "result": {
+       "kind": "message",
+       "contextId": "incident-42",
+       "parts": [
+         {
+           "kind": "text",
+           "text": "### Active Incident\n- **ID & Severity:** INC-2026-1030 (SEV-2)\n- **Error:** `panic: invalid argument to Int63n in payd.ComputeJitter`\n\n### Resolution\n- **Fixed `retry_test.go`:** Added a guard in `ComputeJitter` to return `0` when `maxJitter <= 0`, preventing invalid arguments to `rand.Int63n`.\n- **Created `TRIAGE_REPORT.md`:** Documented the fix in `## Summary` and noted the unaddressed `settlement.go` hardcoded batch timeout under `## Remaining Risks`."
+         }
+       ],
+       "role": "agent"
+     }
+   }
+   ```
+2. **Real `ax suspend` → `ax resume` (Stops microVM at `.220` and cold-boots fresh microVM at `.221` with `/workspace/.genkit/snapshots` preserved):**
+   - **Turn 2 (A2A JSON-RPC on `192.168.64.221:80`)**: Recalls the fixed file (`retry_test.go`) and remaining risk (`settlement.go`) directly from the restored session snapshot without reading files.
+   - **Turn 3 (Genkit HTTP `POST http://192.168.64.221:80/agents/triage_agent`, `sessionId: "incident-42"`)**: Confirms all 3 user turns across the microVM suspend/resume cycle.
