@@ -17,6 +17,9 @@ sources:
   - id: ax-issue-526
     resource: https://github.com/google/ax/issues/526
     title: "google/ax#526: ax local start/status/stop"
+  - id: genkit-pr-6988
+    resource: https://github.com/firebase/genkit/pull/6988
+    title: "firebase/genkit#6988: Register MCP tools in GetActiveTools(ctx, g)"
   - id: fork-genkit-runner
     resource: https://github.com/ghchinoy/ax/tree/feat/genkit-runner
     title: "ghchinoy/ax:feat/genkit-runner"
@@ -31,6 +34,8 @@ experiment:
     - ax-experiments-c0h.3
     - ax-experiments-c0h.4
     - ax-experiments-c0h.5
+    - ax-experiments-c0h.6
+    - ax-experiments-c0h.7
   entrypoints:
     - genkit/run-apple-container.sh
     - genkit/bootstrap-gce.sh
