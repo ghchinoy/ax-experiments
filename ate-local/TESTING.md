@@ -30,18 +30,16 @@ without Kubernetes, `kind`, gVisor, GCS, or cloud infrastructure:
 ```
 ax CLI ──gRPC──> ax-server ──Control gRPC──> ate-local ──> Apple container
                     │
-                    └──> Valkey (resource store, locks, pubsub)
+                    └──> PostgreSQL (resource store, locks)
 ```
 
 | Component | Role | Default Port |
 |---|---|---|
 | `ax-server` | Direct-execution AX API server; manages locks, reconciles with Substrate | 8090 |
-| Valkey | Redis-compatible resource store and lock coordinator (runs in Apple container) | 6379 |
-| `ate-local` | Implements Substrate Control API using Apple `container` | 50051 |
+| PostgreSQL | Relational resource store and lock coordinator (`postgres:17-alpine` in Apple container) | 5432 |
+| `ate-local` | Implements Substrate Control API (`v0.6.0`) using Apple `container` | 50051 |
 
-Upstream transitioned AX from asynchronous Redis Streams worker pools (`ax-controller`)
-to direct, synchronous reconciliation inside `ax-server` guarded by fine-grained distributed
-locks. The local stack runs three components: Valkey, `ate-local`, and `ax-server`.
+Upstream migrated AX's metadata store to PostgreSQL (#515) and performs direct, synchronous reconciliation inside `ax-server` (#532, #536) while reading live actor state (`GetActor`/`ListActors`) from Substrate. The local stack runs three components: PostgreSQL, `ate-local`, and `ax-server`.
 
 ---
 
@@ -51,9 +49,9 @@ locks. The local stack runs three components: Valkey, `ate-local`, and `ax-serve
 2. **Apple `container` CLI** version 1.0 or later installed (`/usr/local/bin/container`).
    Verify with `container --version` and ensure `container list` responds.
    (If it does not respond, run `container system start`).
-3. **Go toolchain** (Go 1.26+; matches `go.mod`).
+3. **Go toolchain** (`export GOTOOLCHAIN=auto` automatically downloads Go 1.27.1 per `go.mod`).
 4. **`git` and `nc`** (standard macOS preinstalls).
-5. Ensure ports **6379**, **50051**, and **8090** are free. (The startup helper automatically checks and warns if another process holds them).
+5. Ensure ports **5432**, **50051**, and **8090** are free. (The startup helper automatically checks and warns if another process holds them, or you can override them via `AX_LOCAL_*_PORT`).
 
 *No Kubernetes, Docker Desktop, `kind`, or cloud accounts are needed.*
 
@@ -80,10 +78,11 @@ go test -v ./internal/atelocal/...
 | Test | What it exercises | Requires Apple container |
 |---|---|---|
 | `TestControlServer_AtespaceLifecycle` | Atespace create, get, list, and delete state machines | No (mock) |
-| `TestControlServer_ActorLifecycle` | Actor create, duplicate rejection, mock resume, suspend, delete | No (mock) |
+| `TestControlServer_ActorLifecycle` | Actor create (`CreateTime`/`UpdateTime`), duplicate rejection, mock resume (`WorkerPodIps`), suspend, delete | No (mock) |
+| `TestControlServer_RevertActor` | `RevertActor` (Substrate `v0.6.0` RPC for reverting crashed/running actors to `SUSPENDED`) | No (mock) |
 | `TestCleanIPv4` | CIDR stripping and IP normalization | No |
 | `TestControlServer_TemplateDeduplicationAndEgressPolicy` | Template deduplication and full egress-policy CRUD | No (mock) |
-| `TestControlServer_ReconcilerIntegration` | Real AX `controller.TaskReconciler` against `ate-local` | No (mock) |
+| `TestControlServer_ReconcilerIntegration` | Real AX `controller.TaskReconciler` (`Resume`/`Suspend`/`Delete`) against `ate-local` | No (mock) |
 | `TestControlServer_LiveAppleContainer` | Provisions, inspects IP, suspends, and removes real Apple container | **Yes** (live) |
 | `TestControlServer_LiveReconcilerAndGuestExec` | Full end-to-end: compiles arm64 `ax-task-runner`, reconciles real `Task`, launches container, dials guest on `:80`, and executes `uname -sm` (`ax ssh` protocol) | **Yes** (live) |
 
@@ -109,7 +108,7 @@ make local-up
 This helper automatically:
 1. Validates prerequisites and verifies ports are free.
 2. Builds all binaries (`ax`, `ax-server`, `ate-local`, and an arm64 `ax-task-runner`).
-3. Starts Valkey in an isolated Apple container (`valkey/valkey:8-alpine`).
+3. Starts PostgreSQL in an isolated Apple container (`postgres:17-alpine`).
 4. Starts `ate-local` on port 50051.
 5. Starts `ax-server` on port 8090 (with direct Substrate reconciliation).
 6. Generates environment settings in `.ax-local/env`.
@@ -195,21 +194,51 @@ make local-down 2>/dev/null || true
 
 ---
 
+## 4. Multi-Agent Swarm Recipes (`01`–`08`) & Declarative Genkit Runner (`#538`)
+
+With `make local-up` running and `source .ax-local/env` loaded in your shell, you can run the companion experiment suites in this repository directly against `ate-local`:
+
+### 4.1 Multi-Agent Swarm Recipes ([`/swarm/README.md`](/swarm/README.md))
+```bash
+# Recipes that do NOT require an API key:
+~/projects/ax-experiments/swarm/01-hello-swarm.sh          # 8 parallel microVMs
+~/projects/ax-experiments/swarm/02-repo-inspector.sh       # 3 parallel Workspace git clones
+~/projects/ax-experiments/swarm/03-seed-matrix.sh          # 6-way parameter sweep
+~/projects/ax-experiments/swarm/07-suspend-resume.sh       # Rootfs persistence across suspend/resume
+~/projects/ax-experiments/swarm/08-spec-config-metadata.sh # Task.spec.config (#523) + 127.0.0.1:8099 metadata (#479)
+
+# Recipes powered by Gemini (requires `make agent-image` in ~/projects/ax and GEMINI_API_KEY):
+export GEMINI_API_KEY="your-key"
+~/projects/ax-experiments/swarm/04-review-panel.sh         # 3-agent code review panel
+~/projects/ax-experiments/swarm/05-debate.sh               # 2-agent adversarial debate
+~/projects/ax-experiments/swarm/06-map-reduce.sh           # 3 mappers + 1 reducer
+```
+
+### 4.2 Declarative Genkit Go Runner inside an Apple `container` MicroVM ([`/genkit/README.md`](/genkit/README.md))
+Runs `cmd/runners/genkit-runner` ([`google/ax#538`](https://github.com/google/ax/issues/538)) inside an Apple `container` microVM on `ate-local` — exercising A2A JSON-RPC Agent Card discovery, stdio MCP tool calls (`incident_mcp.py`), workspace file edits, `ax suspend` → `ax resume` cold-boot, and multi-turn session snapshot recovery:
+```bash
+export GEMINI_API_KEY="your-key"
+~/projects/ax-experiments/genkit/run-apple-container.sh
+```
+*(Note: `run-apple-container.sh` automatically creates a temporary git worktree from `origin/feat/genkit-runner` to cross-compile the `linux/arm64` `genkit-runner` binary without switching your main `~/projects/ax` checkout).*
+
+---
+
 ## Helper Script Reference (`local-stack.sh`)
 
 | Command | Purpose |
 |---|---|
-| `make local-up` | Starts Valkey, `ate-local`, and `ax-server` in strict dependency order. Safe to run multiple times (idempotent). |
+| `make local-up` | Starts PostgreSQL (`postgres:17-alpine`), `ate-local`, and `ax-server` in strict dependency order. Safe to run multiple times (idempotent). |
 | `make local-status` | Displays running status, PIDs, listening ports, reachability, and active `ate-*` containers. |
 | `make local-logs` | Follows logs from all components (`.ax-local/logs/*.log`). |
-| `./examples/ate_local/local-stack.sh logs ate-local` | Follows the log of a specific component (`ate-local`, `ax-server`, or `valkey`). |
-| `make local-down` | Gracefully stops components in reverse dependency order and removes the Valkey container. |
-| `make local-down --keep-valkey` | Stops AX processes but keeps the Valkey container running to preserve task history. |
+| `./examples/ate_local/local-stack.sh logs ate-local` | Follows the log of a specific component (`ate-local`, `ax-server`, or `postgres`). |
+| `make local-down` | Gracefully stops components in reverse dependency order and removes the PostgreSQL container. |
+| `./examples/ate_local/local-stack.sh down --keep-postgres` | Stops AX processes but keeps the PostgreSQL container running to preserve task history. |
 | `make local-reset` | Stops all processes, force-removes any leftover `ate-*` containers, and restarts the stack fresh. |
 
-You can override default ports using environment variables:
+You can override default ports and state directory using environment variables:
 ```bash
-export AX_LOCAL_REDIS_PORT=6380
+export AX_LOCAL_POSTGRES_PORT=5433
 export AX_LOCAL_SUBSTRATE_PORT=50052
 export AX_LOCAL_SERVER_PORT=8091
 make local-up
@@ -221,13 +250,13 @@ make local-up
 
 | Symptom | Cause & Fix |
 |---|---|
-| `port N (needed by X) is in use by ...` | Another process is holding port 6379, 50051, or 8090. Stop the competing process or specify an alternate port via `AX_LOCAL_*_PORT`. |
+| `port N (needed by X) is in use by ...` | Another process is holding port 5432, 50051, or 8090. Stop the competing process or specify an alternate port via `AX_LOCAL_*_PORT`. |
 | `http2: frame too large ... looked like an HTTP/1.1 header` | `ax` was executed without `--server` or without `AX_SERVER` set, causing it to fall back to `localhost:8080` (which is often held by local web/inference servers like diffgemma). Run `source .ax-local/env` or pass `--server localhost:8090`. |
 | Task status stays `Suspended` | Upstream AX tasks default to `Suspended` upon creation. Run `ax resume <task-name>`. |
 | Task phase is `Pending` with `SubstrateUnavailable` | `ate-local` was not yet listening when `ax-server` attempted reconciliation. `ax-server` automatically retries transient Substrate transport errors with backoff. Run `ax resume <task-name>` once `ate-local` is up. |
 | `ax ssh <task> -- uname -a` | Fixed upstream in PR #411 / #413. Flags after `--` are now passed untouched to the guest command. |
 | Upstream `examples/simple.yaml` fails to run | The official `ax-task-runner` image is published only for `linux/amd64`. On Apple Silicon, use `examples/ate_local/task-local.yaml` (which uses `debian:12` and mounts our arm64 runner). |
-| Stale state between Valkey and `ate-local` | Run `make local-reset` to clean up and re-initialize both simultaneously. |
+| Stale state between PostgreSQL and `ate-local` | Run `make local-reset` to clean up and re-initialize both simultaneously. |
 
 ---
 
@@ -250,8 +279,8 @@ make local-up
    - Option A: Live in **`google/ax`** (e.g. `cmd/ate-local/` or `internal/substrate/local/`) as the official zero-cluster local developer runtime.
    - Option B: Live in **`agent-substrate/substrate`** as a native macOS local control-plane driver alongside the existing `kind` cluster setup.
    - Option C: Standalone companion repo (`ate-local` or `ax-local`).
-2. **Eliminating the Redis Requirement**:
-   - Would an in-process `ax dev` command (combining `ax-server` and `ax-controller` using AX's existing in-memory store) be preferable to avoid running Valkey locally?
+2. **In-Memory Store Option for `ax-server`**:
+   - Would an `--in-memory-store` flag on `ax-server` (using AX's existing `internal/store/memory` and in-memory locker) be useful for lightweight local development when persistence across restarts isn't needed, avoiding even the PostgreSQL container?
 3. **Persistent Volume Binding**:
    - Should `ate-local` automatically provision a host directory bind (e.g. `~/.ax/volumes/<actor-id>/workspace`) so that workspace edits persist across `SuspendActor` and `ResumeActor` cycles?
 

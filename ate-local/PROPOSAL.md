@@ -95,7 +95,7 @@ AX is designed to be compute-decoupled: the server never interacts directly with
      │  gRPC (pkg/apis/v1alpha1.AX)
      ▼
    ax-server (:8090)
-     ├── Valkey (:6379, runs in Apple container for resource store & distributed locks)
+     ├── PostgreSQL (:5432, runs `postgres:17-alpine` in Apple container for resource store & locks)
      │
      └── gRPC (ateapipb.ControlServer)
            │
@@ -109,7 +109,7 @@ AX is designed to be compute-decoupled: the server never interacts directly with
            └── ax-task-runner (linux/arm64)
 ```
 
-> **Note on Redis / Valkey**: While `ate-local` itself has zero dependencies beyond the macOS `container` CLI, running the full AX stack currently requires a Redis-protocol store for task state and event streaming. In our local stack, Valkey runs inside an Apple container, avoiding any host package installation.
+> **Note on PostgreSQL**: While `ate-local` itself has zero dependencies beyond the macOS `container` CLI, running the full AX stack uses PostgreSQL (`postgres:17-alpine`) for resource storage and locks (or `--in-memory-store` for ephemeral runs). In our local stack, PostgreSQL runs inside an Apple container, avoiding any host package installation.
 
 ### Substrate Architectural Mapping
 
@@ -153,10 +153,10 @@ All code has been implemented, formatted to Google Go Readability standards, and
    - Uses `signal.NotifyContext` for graceful shutdown, safely stopping active containers on `SIGINT`/`SIGTERM`.
 
 3. **`examples/ate_local/local-stack.sh` (Local Orchestration Helper)**:
-   - Manages the entire local AX stack: **Valkey → `ate-local` → `ax-controller` → `ax-server`**.
+   - Manages the entire local AX stack: **PostgreSQL (`postgres:17-alpine`) → `ate-local` → `ax-server`**.
    - Subcommands: `up`, `down`, `status`, `logs`, `reset`.
    - **Strict Dependency Ordering**: Waits for each service's port to accept TCP connections before starting dependent components, completely eliminating gRPC reconnect backoff stalls.
-   - **Pre-flight Port Conflict Detection**: Fails cleanly with descriptive errors if another host process holds port 6379, 50051, or 8090.
+   - **Pre-flight Port Conflict Detection**: Fails cleanly with descriptive errors if another host process holds port 5432, 50051, or 8090.
    - Cross-compiles a `linux/arm64` build of `ax-task-runner` and mounts it into task containers.
    - Emits `.ax-local/env` for simple `source .ax-local/env` CLI configuration.
 
@@ -328,8 +328,8 @@ Given Issue #526 (`ax local start / status / stop`):
 - **Option B (`agent-substrate/substrate`)**: Should `ate-local` live in `agent-substrate/substrate` (`go.ate.dev/substrate`) as an official macOS local control plane for emulating Substrate?
 - **Option C (Companion / Standalone Repository)**: Maintained as a dedicated open-source bridge tool (`ate-local` or `ax-local`).
 
-### Question 2: In-Process `ax dev` Mode
-Currently, `ax-server` requires Valkey/Redis for locking and task storage. Would maintainers welcome an in-process local development command (e.g., `ax dev` or `ax-server --dev`) that runs `ax-server` against AX's existing in-memory store (`internal/store/memory`) and in-memory locker? This would reduce the local macOS prerequisites strictly to the `ax` binary and Apple `container`.
+### Question 2: In-Memory Store Mode for `ax local`
+`ax-server` supports `--in-memory-store` (`internal/store/memory`) alongside PostgreSQL (`internal/store/postgres`). For `ax local start` (#526), should the default store be `postgres:17-alpine` (preserving task history across restarts) with an optional `--in-memory` flag for zero-container control-plane runs?
 
 ### Question 3: Workspace Directory Binding
 Should `ate-local` automatically provision a local host bind mount (e.g., `~/.ax/volumes/<actor-id>/workspace` mapped into `/workspace`) so that file edits and git checkouts persist across `SuspendActor` and `ResumeActor` turns without manual volume configuration?
