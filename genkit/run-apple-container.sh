@@ -43,8 +43,16 @@ if [[ -z "${GEMINI_API_KEY:-}" ]]; then
   exit 1
 fi
 
-if [[ ! -x "${AX_BIN}" ]]; then
-  echo "Error: ax binary not found at ${AX_BIN}. Start the local stack ('make local-up' in ${AX_REPO}) first." >&2
+if [[ ! -x "${AX_BIN}" ]] || ! "${AX_BIN}" get tasks >/dev/null 2>&1; then
+  cat >&2 <<EOF
+Error: Cannot reach ax-server at ${AX_SERVER} (or ax binary missing at ${AX_BIN}).
+
+Start the local AX + ate-local stack first:
+  make stack-up
+
+Or from your ax checkout (${AX_REPO}, branch feat/ate-local-apple-container):
+  cd ${AX_REPO} && make local-up
+EOF
   exit 1
 fi
 

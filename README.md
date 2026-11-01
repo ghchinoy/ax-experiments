@@ -68,14 +68,13 @@ To run the swarm recipes (`swarm/01..08`), the Genkit microVM runner (`genkit/ru
    - **Go 1.26+**
    - **`GEMINI_API_KEY`** exported in your shell *(only required for AI swarm recipes `04`, `05`, `06` and `genkit/run-apple-container.sh`)*
 
-2. **Start the local AX stack** from the [`ghchinoy/ax`](https://github.com/ghchinoy/ax) checkout (`feat/ate-local-apple-container` branch):
+2. **Start the local AX stack** from [`ghchinoy/ax`](https://github.com/ghchinoy/ax) (`feat/ate-local-apple-container` branch):
    ```bash
    git clone -b feat/ate-local-apple-container https://github.com/ghchinoy/ax.git ~/projects/ax
-   cd ~/projects/ax
-   make local-up
-   source .ax-local/env
+   cd ~/projects/ax-experiments
+   make stack-up
    ```
-   This launches `postgres:17-alpine` in an Apple container, starts `ate-local` on `:50051`, and starts `ax-server` on `:8090` in ~3 seconds.
+   *(Or directly inside `~/projects/ax`: `make local-up && source .ax-local/env`)*. This launches `postgres:17-alpine` in an Apple container, starts `ate-local` on `:50051`, and starts `ax-server` on `:8090` in ~3 seconds.
 
 3. **Build the local arm64 Gemini agent image** *(needed for recipes `02`, `04`, `05`, `06`, `08`, and `genkit/run-apple-container.sh`)*:
    ```bash

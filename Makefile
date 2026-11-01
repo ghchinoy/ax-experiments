@@ -5,11 +5,15 @@ SHELL := /bin/bash
 #   okf-proto: https://github.com/ghchinoy/okf-proto (go install github.com/ghchinoy/okf-proto/cmd/okf-proto@latest)
 BINDER ?= binder
 OKF_PROTO ?= okf-proto
+AX_REPO ?= $(HOME)/projects/ax
 
-.PHONY: help check okf-validate agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
+	@echo "  make stack-up         Start local AX + ate-local stack (in $(AX_REPO))"
+	@echo "  make stack-status     Show status of local AX + ate-local stack"
+	@echo "  make stack-down       Stop local AX + ate-local stack"
 	@echo "  make check            Run all static verification gates (OKF v0.2, shell lint, Go recorder)"
 	@echo "  make okf-validate     Validate OKF v0.2 bundle with binder and okf-proto"
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
@@ -25,6 +29,20 @@ help:
 	@echo "  make build-recorder   Build viz/recorder/ax-trace"
 	@echo "  make viz-build        Typecheck and build the web visualizer"
 	@echo "  make viz-preview      Serve the built web visualizer locally"
+
+stack-up:
+	@if [[ ! -x "$(AX_REPO)/examples/ate_local/local-stack.sh" ]]; then \
+		echo "Error: $(AX_REPO)/examples/ate_local/local-stack.sh not found." >&2; \
+		echo "Ensure $(AX_REPO) is checked out on branch 'feat/ate-local-apple-container'." >&2; \
+		exit 1; \
+	fi
+	"$(AX_REPO)/examples/ate_local/local-stack.sh" up
+
+stack-status:
+	@"$(AX_REPO)/examples/ate_local/local-stack.sh" status
+
+stack-down:
+	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
 	bash -n swarm/*.sh genkit/*.sh

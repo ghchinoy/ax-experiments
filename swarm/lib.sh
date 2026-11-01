@@ -58,8 +58,34 @@ trace_note() {
 }
 
 require_tools() {
-  command -v container >/dev/null 2>&1 || { echo "Error: Apple 'container' CLI not found" >&2; exit 1; }
-  [[ -x "${AX_BIN}" ]] || { echo "Error: ax binary not found at ${AX_BIN}. Run 'make local-up' first." >&2; exit 1; }
+  if ! command -v container >/dev/null 2>&1; then
+    echo "Error: Apple 'container' CLI not found (/usr/local/bin/container)." >&2
+    exit 1
+  fi
+  if [[ ! -x "${AX_BIN}" ]]; then
+    cat >&2 <<EOF
+Error: ax binary not found at ${AX_BIN}.
+
+Start the local AX + ate-local stack first:
+  make stack-up
+
+Or from your ax checkout (${AX_REPO}, branch feat/ate-local-apple-container):
+  cd ${AX_REPO} && make local-up
+EOF
+    exit 1
+  fi
+  if ! "${AX_BIN}" get tasks >/dev/null 2>&1; then
+    cat >&2 <<EOF
+Error: Cannot reach ax-server at ${AX_SERVER} (the local AX stack is not running).
+
+Start the local AX + ate-local stack first:
+  make stack-up
+
+Or from your ax checkout (${AX_REPO}, branch feat/ate-local-apple-container):
+  cd ${AX_REPO} && make local-up
+EOF
+    exit 1
+  fi
 }
 
 apply_task() {
