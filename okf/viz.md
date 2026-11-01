@@ -16,6 +16,7 @@ sources:
     title: "google/ax#346: Task status lifecycle after command exit"
 experiment:
   track: viz
+  location: in-tree
   folder: viz/
   beads:
     - ax-experiments-311
@@ -48,5 +49,6 @@ Expose the observability blind spots in AX when running multi-agent swarms (`ax 
 ## Related Experiment Tracks
 
 - Records and replays execution traces from [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) running on [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md).
+- Complements the desktop control plane in [Track 4: AX Central — Desktop Control Plane, Task Designer & Podman Shim](/ax-central.md).
 
 [^ax-issue-346]: google/ax#346: Task status lifecycle after command exit

@@ -25,6 +25,7 @@ sources:
     title: "ghchinoy/ax:feat/ate-local-apple-container"
 experiment:
   track: genkit
+  location: in-tree
   folder: genkit/
   beads:
     - ax-experiments-c0h.3

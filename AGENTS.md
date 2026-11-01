@@ -7,23 +7,25 @@ trace visualization, and local macOS Apple `container` (`ate-local`) proposals a
 
 `CLAUDE.md` and `GEMINI.md` are symlinks to this file.
 
-## Per-Folder Experiment Layout (No Shared `./docs/`)
+## Per-Folder & External Experiment Layout (No Shared `./docs/`)
 
-Every experiment track lives in its own self-contained top-level directory containing its
+In-tree experiment tracks live in their own self-contained top-level directories containing their
 human-facing `README.md` (free of YAML frontmatter so GitHub renders it cleanly), runnable
-scripts/manifests, and deep-dive design docs, tutorials, or RFCs. Machine- and agent-readable
-**Open Knowledge Format (OKF) v0.2** metadata lives in the dedicated [`okf/`](./okf/index.md)
-bundle subdirectory (per OKF v0.2 §3). Do **not** create a generic `./docs/` directory.
+scripts/manifests, and deep-dive design docs, tutorials, or RFCs. Standalone experimental
+projects that live outside this repository (such as `~/projects/ax-central`) are tracked via
+first-class concept cards in [`okf/`](./okf/index.md) (`type: External Experiment`,
+`experiment.location: external`) and `bd` epics. Do **not** create a generic `./docs/` directory.
 
 ```
-README.md               Repository overview, 4-track index, quickstart & verification gates
+README.md               Repository overview, track index, quickstart & verification gates
 AGENTS.md               Agent contract, OKF v0.2 ruleset & Beads (bd) tracking rules
-okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork lineage)
+okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork/external lineage)
   index.md              OKF v0.2 bundle root index (the ONLY index.md carrying frontmatter)
-  ate-local.md          Track 1 concept card (`type: Experiment Track`)
-  swarm.md              Track 2a concept card (`type: Experiment Track`)
-  genkit.md             Track 2b concept card (`type: Experiment Track`)
-  viz.md                Track 3 concept card (`type: Experiment Track`)
+  ate-local.md          Track 1 concept card (`type: Experiment Track`, in-tree)
+  swarm.md              Track 2a concept card (`type: Experiment Track`, in-tree)
+  genkit.md             Track 2b concept card (`type: Experiment Track`, in-tree)
+  viz.md                Track 3 concept card (`type: Experiment Track`, in-tree)
+  ax-central.md         Track 4 concept card (`type: External Experiment`, ~/projects/ax-central)
 ate-local/              Track 1: Native macOS Apple container Substrate (google/ax#526)
   README.md             Track overview & quick verification commands
   PROPOSAL.md           Architecture proposal, concept mapping & Apple Silicon benchmarks
@@ -57,7 +59,7 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
 |---|---|---|
 | `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`okf/ate-local.md`](./okf/ate-local.md) | `ateapipb.ControlServer`, Apple `container` microVMs, `local-stack.sh`, `#526` |
 | `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`) |
-| `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC |
+| `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md), [`okf/ax-central.md`](./okf/ax-central.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC, `~/projects/ax-central` |
 | `agent-sync` | [`okf/index.md`](./okf/index.md), [`README.md`](./README.md), [`AGENTS.md`](./AGENTS.md), `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
 
 ## OKF v0.2 Knowledge Bundle (`okf/`) & Optional Lineage Ruleset
@@ -66,9 +68,9 @@ The [`okf/`](./okf/index.md) directory is a conformant **Open Knowledge Format (
 
 1. **Keep human `README.md` files frontmatter-free**: Human-facing markdown files outside `okf/` (`README.md`, `<track>/README.md`, `PROPOSAL.md`, `TUTORIAL.md`, `GUIDE.md`, `FRICTION-REPORT.md`) start directly with `# Title` (no YAML frontmatter) and include a one-line pointer to their corresponding concept card in `okf/<track>.md`.
 2. **Bundle root [`okf/index.md`](./okf/index.md)**: Declares `okf_version: "0.2"` in YAML frontmatter (the **only** `index.md` allowed to carry frontmatter per OKF §8/§12) and indexes every concept document in `okf/` using bundle-relative `/<track>.md` links.
-3. **Concept cards (`okf/*.md`)**: Every non-reserved `.md` file inside `okf/` must begin with YAML frontmatter containing a non-empty `type` (`Experiment Track`, etc.), `title`, `description`, `status` (`draft` | `stable` | `deprecated`), `generated: { by: ..., at: ... }`, and `verified:` once confirmed. Never store a computed trust tier or credibility score (§5.3).
-4. **Optional `0..N` Upstream & Fork Lineage (`sources` + `experiment`)**:
-   An experiment **may or may not** be associated with a fork, one or more branches in a fork, or upstream `google/ax` / `substrate` Issues and PRs. Record whatever lineage actually applies in `okf/<track>.md` (all subfields in `experiment:` are optional):
+3. **Concept cards (`okf/*.md`)**: Every non-reserved `.md` file inside `okf/` must begin with YAML frontmatter containing a non-empty `type` (`Experiment Track` for in-tree tracks, `External Experiment` for out-of-tree projects like `~/projects/ax-central`), `title`, `description`, `status` (`draft` | `stable` | `deprecated`), `generated: { by: ..., at: ... }`, and `verified:` once confirmed. Never store a computed trust tier or credibility score (§5.3).
+4. **Optional `0..N` Upstream, Fork & External Location Lineage (`sources` + `experiment`)**:
+   An experiment **may or may not** live in this monorepo (`location: in-tree | external`), and **may or may not** be associated with a fork, one or more branches in a fork, or upstream `google/ax` / `substrate` Issues and PRs. Record whatever lineage actually applies in `okf/<track>.md` (all subfields in `experiment:` are optional):
    ```yaml
    sources:
      - id: ax-issue-538
@@ -76,7 +78,8 @@ The [`okf/`](./okf/index.md) directory is a conformant **Open Knowledge Format (
        title: "google/ax#538: Genkit Go runner"
    experiment:
      track: genkit
-     folder: genkit/
+     location: in-tree             # in-tree | external
+     folder: genkit/               # For in-tree tracks (use local_path: ~/projects/<name> for external)
      beads: [ax-experiments-c0h.3, ax-experiments-c0h.4]
      entrypoints: [genkit/run-apple-container.sh]
      upstream:                     # Optional: omit if purely repo-local/companion
@@ -94,15 +97,15 @@ The [`okf/`](./okf/index.md) directory is a conformant **Open Knowledge Format (
 This project uses **bd (beads)** for issue tracking (`bd ready`, `bd list --all`, `bd show <id>`).
 
 1. **Create the experiment bead**:
-   - **Epics (`--type=epic`)**: Research tracks (`ate-local`, `swarm`, `genkit`, `viz`).
+   - **Epics (`--type=epic`)**: Research tracks (`ate-local`, `swarm`, `genkit`, `viz`, or external projects like `ax-central`).
    - **Experiments (`--type=spike` or `--type=feature`, `--parent=<epic-id>`)**: Individual runnable experiments or prototype branches.
    - **Decisions (`--type=decision`)**: Architectural outcomes and upstream alignment choices.
    - **Association flags (include fork/branch/upstream fields when applicable)**:
-     - `--labels`: `repo:companion|fork|upstream|substrate`, `area:atelocal|swarm|genkit|viz|telemetry`, plus optional `branch:<name>` and `upstream:<issue-or-pr>`
+     - `--labels`: `repo:companion|external|fork|upstream|substrate`, `area:atelocal|swarm|genkit|viz|telemetry`, plus optional `branch:<name>` and `upstream:<issue-or-pr>`
      - `--external-ref`: *(Optional)* Primary upstream issue/PR or fork branch (e.g., `google/ax#538` or `ghchinoy/ax:feat/ate-local-apple-container`)
-     - `--spec-id`: Per-folder relative path to the experiment's doc/spec (e.g., `ate-local/PROPOSAL.md`, `genkit/TUTORIAL.md`, `swarm/GUIDE.md`, `viz/FRICTION-REPORT.md`)
+     - `--spec-id`: Relative path to the experiment's doc/spec or OKF card (e.g., `ate-local/PROPOSAL.md`, `genkit/TUTORIAL.md`, `swarm/GUIDE.md`, `viz/FRICTION-REPORT.md`, `okf/ax-central.md`)
      - `--assignee`: Target experiment agent (`agent-substrate`, `agent-swarm`, `agent-viz`, `agent-sync`)
-     - `--metadata`: JSON pin with `entrypoint` and optional `ax_repo`, `target_remote`, `target_branch` (or `target_branches`), `upstream_base`, `trace`
+     - `--metadata`: JSON pin with `entrypoint` and optional `local_path` (for `repo:external` projects), `ax_repo`, `target_remote`, `target_branch` (or `target_branches`), `upstream_base`, `trace`
 
    Example:
    ```bash

@@ -25,6 +25,7 @@ sources:
     title: "agent-substrate/substrate: Agent Substrate v0.6.0 Control API"
 experiment:
   track: ate-local
+  location: in-tree
   folder: ate-local/
   beads:
     - ax-experiments-1rx

@@ -10,14 +10,15 @@ Companion R&D repository for prototyping, stress-testing, and visualizing **[AX 
 
 While [`google/ax`](https://github.com/google/ax) and [`go.ate.dev/substrate`](https://github.com/agent-substrate/substrate) provide the core runtime and actor control plane, this repository serves as the **experimental proving ground** where new developer workflows, multi-agent coordination patterns, and telemetry RFCs are validated before graduating upstream.
 
-Each experiment track is organized in its own self-contained top-level directory and indexed with **Open Knowledge Format (OKF) v0.2** provenance metadata in [`okf/index.md`](./okf/index.md):
+Each experiment track is organized either in its own self-contained top-level directory or in an external companion project (`~/projects/*`), and indexed with **Open Knowledge Format (OKF) v0.2** provenance metadata in [`okf/index.md`](./okf/index.md):
 
-| Track | Folder | Focus & Hypothesis | Upstream / Fork Alignment & Docs |
+| Track | Location | Focus & Hypothesis | Upstream / Fork Alignment & Docs |
 |---|---|---|---|
 | **1. Local macOS Substrate (`ate-local`)** | [`ate-local/`](./ate-local/README.md) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [`PROPOSAL.md`](./ate-local/PROPOSAL.md) · [`TESTING.md`](./ate-local/TESTING.md) · [`okf/ate-local.md`](./okf/ate-local.md) |
 | **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](./swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](./swarm/README.md) · [`swarm/GUIDE.md`](./swarm/GUIDE.md) · [`okf/swarm.md`](./okf/swarm.md) |
 | **2b. Declarative Genkit Go Runner** | [`genkit/`](./genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](./genkit/README.md) · [`genkit/TUTORIAL.md`](./genkit/TUTORIAL.md) · [`okf/genkit.md`](./okf/genkit.md) |
 | **3. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](./viz/README.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](./viz/FRICTION-REPORT.md) · [`okf/viz.md`](./okf/viz.md) |
+| **4. AX Central (External Desktop App)** | `~/projects/ax-central` *(external)* | Standalone **Wails v2 + Go + Lit 3 + `@xterm/xterm` + WebMCP** desktop app for designing, deploying, and inspecting AX `Task`/`Workspace`/`Model` resources, managing clusters, and shimming `docker`-to-`podman` (`docker-shim.sh` with `buildx` digest preservation). | [`okf/ax-central.md`](./okf/ax-central.md) · `bd show ax-experiments-bxv` |
 
 ---
 
@@ -210,7 +211,8 @@ ax-experiments/
 │   ├── ate-local.md        # Track 1 concept card & lineage
 │   ├── swarm.md            # Track 2a concept card & lineage
 │   ├── genkit.md           # Track 2b concept card & lineage
-│   └── viz.md              # Track 3 concept card & lineage
+│   ├── viz.md              # Track 3 concept card & lineage
+│   └── ax-central.md       # Track 4 external project concept card (~/projects/ax-central)
 ├── ate-local/              # Track 1: Local Apple Container Substrate (google/ax#526)
 │   ├── README.md           # Track overview & quick verification
 │   ├── PROPOSAL.md         # Architecture proposal & Apple Silicon benchmarks

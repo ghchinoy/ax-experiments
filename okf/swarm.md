@@ -22,6 +22,7 @@ sources:
     title: "google/ax#523: Declarative Task.spec.config (google.protobuf.Struct)"
 experiment:
   track: swarm
+  location: in-tree
   folder: swarm/
   beads:
     - ax-experiments-c0h
