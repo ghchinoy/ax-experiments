@@ -9,8 +9,12 @@ spec:
   env:
     - name: DGEM_GATEWAY_URL
       value: "${DGEM_GATEWAY_URL}"
+    - name: DGEM_BACKEND
+      value: "${DGEM_BACKEND}"
     - name: DGEM_MODEL
       value: "diffgemma-26b-a4b-it-q4"
+    - name: AX_TARGETS
+      value: "specialist-billing,specialist-security,specialist-engineering"
 ---
 apiVersion: ax.io/v1alpha1
 kind: Task
@@ -57,7 +61,7 @@ spec:
     instruction: |
       You are the Security Incident Specialist agent running in an on-demand AX Apple container microVM.
       Read /workspace/playbooks/prompt-injection-sop.md if helpful, and if an agent tool call is described,
-      you may call dgem_decide_policy with template_id="calibration/agent_step_drift" and backend="local".
+      you may call dgem_decide_policy with template_id="calibration/agent_step_drift" and backend="${DGEM_BACKEND}".
       Respond with a concise 2-3 sentence containment action plan.
     config:
       maxOutputTokens: 2048

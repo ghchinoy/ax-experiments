@@ -71,7 +71,7 @@ import os, sys
 src, dst = sys.argv[1], sys.argv[2]
 with open(src) as f:
     text = f.read()
-for k in ("GEMINI_API_KEY", "DGEM_GATEWAY_URL", "DGEM_MCP_URL"):
+for k in ("GEMINI_API_KEY", "DGEM_GATEWAY_URL", "DGEM_MCP_URL", "DGEM_BACKEND"):
     text = text.replace("${" + k + "}", os.environ.get(k, ""))
 with open(dst, "w") as f:
     f.write(text)
@@ -82,7 +82,7 @@ import os, sys
 src, dst = sys.argv[1], sys.argv[2]
 with open(src) as f:
     text = f.read()
-for k in ("GEMINI_API_KEY", "DGEM_GATEWAY_URL", "DGEM_MCP_URL"):
+for k in ("GEMINI_API_KEY", "DGEM_GATEWAY_URL", "DGEM_MCP_URL", "DGEM_BACKEND"):
     text = text.replace("${" + k + "}", os.environ.get(k, ""))
 with open(dst, "w") as f:
     f.write(text)

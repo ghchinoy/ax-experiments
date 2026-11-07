@@ -63,4 +63,23 @@ make dgem-03
 make dgem-down
 ```
 
+### Demo Mode: Temporary Cloud Run GPU (~200 ms Decisions vs. 3–8 s Local Metal)
+
+To record a fast demo without running the 19.5 GiB local Metal `diffgemma` engine on your laptop, deploy a temporary Cloud Run GPU service (`dgemma`) in `~/projects/dgem`, pass `DGEM_CLOUDRUN_URL` to `make dgem-up` / `make dgem-03` (which points the local `:8095` gateway at Cloud Run with `--gcp-auth` and `DGEM_BACKEND=cloudrun`), and tear down the Cloud Run GPU immediately afterward:
+
+```bash
+# 1. Deploy temporary Cloud Run GPU service (in ~/projects/dgem)
+GCP_PROJECT=<PROJECT> ALLOW_GROUP=<USER_OR_GROUP_EMAIL> make -C ~/projects/dgem cloudrun-deploy
+export DGEM_CLOUDRUN_URL="$(gcloud run services describe dgemma --region=us-central1 --format='value(status.url)')/v1"
+
+# 2. Restart the local :8095 gateway backed by Cloud Run GPU (skips local diffgemma :8080) and run the demo
+cd ~/projects/ax-experiments
+make dgem-down
+DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-up
+GEMINI_API_KEY="your-key" DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-03
+
+# 3. Tear down the Cloud Run GPU service immediately after recording to eliminate idle GPU cost
+make -C ~/projects/dgem cloudrun-teardown
+```
+
 See [`GUIDE.md`](./GUIDE.md) for the full architectural walkthrough, empirical measurements, alternatives considered, and operational constraints.

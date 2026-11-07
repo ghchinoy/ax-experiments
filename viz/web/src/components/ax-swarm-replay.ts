@@ -406,6 +406,7 @@ export class AxSwarmReplay extends LitElement {
           <option value="traces/04-review-panel.jsonl">04. AI Code Review Panel (3 agents)</option>
           <option value="traces/05-debate.jsonl">05. AI Red-Team Debate (Proposer & Critic)</option>
           <option value="traces/06-map-reduce.jsonl">06. Map-Reduce Synthesis (3 Mappers + Reducer)</option>
+          <option value="traces/09-dgem-specialist-router.jsonl">09. dgem Scale-to-Zero Specialist Router (1-to-3)</option>
         </select>
 
         <select @change=${this.onRendererChange} .value=${this.rendererType}>

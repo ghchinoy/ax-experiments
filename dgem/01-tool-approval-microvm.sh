@@ -42,6 +42,8 @@ spec:
   env:
     - name: DGEM_GATEWAY_URL
       value: "${DGEM_GATEWAY_URL}"
+    - name: DGEM_BACKEND
+      value: "${DGEM_BACKEND}"
     - name: DGEM_MODEL
       value: "diffgemma-26b-a4b-it-q4"
 EOF

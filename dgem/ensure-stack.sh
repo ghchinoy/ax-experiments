@@ -32,10 +32,16 @@ DGEM_GATEWAY_HOST="${DGEM_GATEWAY_HOST:-0.0.0.0}"
 DGEM_BRIDGE_HOST="${DGEM_BRIDGE_HOST:-192.168.64.1}"
 DGEM_ALLOWED_HOSTS="${DGEM_ALLOWED_HOSTS:-${DGEM_BRIDGE_HOST}}"
 DGEM_CTX="${DIFFGEMMA_CTX:-4096}"
+DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL:-}"
+if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
+  DGEM_BACKEND="${DGEM_BACKEND:-cloudrun}"
+else
+  DGEM_BACKEND="${DGEM_BACKEND:-local}"
+fi
 DGEM_GATEWAY_URL="${DGEM_GATEWAY_URL:-http://${DGEM_BRIDGE_HOST}:${DGEM_GATEWAY_PORT}}"
 DGEM_MCP_URL="${DGEM_MCP_URL:-${DGEM_GATEWAY_URL}/mcp}"
 
-export DGEM_REPO DGEM_GATEWAY_PORT DGEM_GATEWAY_HOST DGEM_ALLOWED_HOSTS DGEM_GATEWAY_URL DGEM_MCP_URL
+export DGEM_REPO DGEM_GATEWAY_PORT DGEM_GATEWAY_HOST DGEM_ALLOWED_HOSTS DGEM_CLOUDRUN_URL DGEM_BACKEND DGEM_GATEWAY_URL DGEM_MCP_URL
 
 ensure_dgem_stack() {
   if [[ ! -d "${DGEM_REPO}" ]]; then
@@ -54,25 +60,55 @@ ensure_dgem_stack() {
     container system start
   fi
 
-  # 2. Local diffgemma Metal server (:8080)
-  if ! curl -fsSL -m 2 "http://127.0.0.1:8080/v1/models" >/dev/null 2>&1; then
-    if [[ ! -f "${DGEM_REPO}/model/diffgemma-26b-a4b-it-q4/model.dgq.bin" ]] && [[ -d "$HOME/projects/diffusiongemma/model" ]]; then
-      ln -sfn "$HOME/projects/diffusiongemma/model" "${DGEM_REPO}/model"
+  # 2. Upstream dgem inference backend: either remote Cloud Run GPU (when DGEM_CLOUDRUN_URL is set)
+  #    or local Apple Silicon Metal diffgemma (:8080)
+  if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
+    echo "==> Using remote Cloud Run GPU upstream (${DGEM_CLOUDRUN_URL}, backend=${DGEM_BACKEND}); skipping local diffgemma (:8080)..."
+  else
+    if ! curl -fsSL -m 2 "http://127.0.0.1:8080/v1/models" >/dev/null 2>&1; then
+      if [[ ! -f "${DGEM_REPO}/model/diffgemma-26b-a4b-it-q4/model.dgq.bin" ]] && [[ -d "$HOME/projects/diffusiongemma/model" ]]; then
+        ln -sfn "$HOME/projects/diffusiongemma/model" "${DGEM_REPO}/model"
+      fi
+      echo "==> Starting local diffgemma Metal server (CTX=${DGEM_CTX})..."
+      (cd "${DGEM_REPO}" && DIFFGEMMA_CTX="${DGEM_CTX}" ./scripts/serve.sh)
     fi
-    echo "==> Starting local diffgemma Metal server (CTX=${DGEM_CTX})..."
-    (cd "${DGEM_REPO}" && DIFFGEMMA_CTX="${DGEM_CTX}" ./scripts/serve.sh)
   fi
 
   # 3. dgem serve gateway (:8095 bound on 0.0.0.0 with DGEM_ALLOWED_HOSTS=192.168.64.1)
   if ! curl -fsSL -m 2 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/health" >/dev/null 2>&1; then
-    echo "==> Starting dgem serve gateway on ${DGEM_GATEWAY_HOST}:${DGEM_GATEWAY_PORT} (allowed-hosts=${DGEM_ALLOWED_HOSTS})..."
-    (
-      cd "${DGEM_REPO}"
-      DGEM_GATEWAY_PORT="${DGEM_GATEWAY_PORT}" \
-      DGEM_GATEWAY_HOST="${DGEM_GATEWAY_HOST}" \
-      DGEM_ALLOWED_HOSTS="${DGEM_ALLOWED_HOSTS}" \
-      ./scripts/serve_gateway.sh
-    )
+    if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
+      echo "==> Starting dgem serve gateway on ${DGEM_GATEWAY_HOST}:${DGEM_GATEWAY_PORT} -> Cloud Run GPU (${DGEM_CLOUDRUN_URL})..."
+      (
+        cd "${DGEM_REPO}"
+        if [[ ! -x "./bin/dgem" ]]; then
+          go build -o "./bin/dgem" .
+        fi
+        nohup ./bin/dgem serve \
+          -u "${DGEM_CLOUDRUN_URL}" \
+          --gcp-auth \
+          --default-backend "${DGEM_BACKEND}" \
+          --host "${DGEM_GATEWAY_HOST}" \
+          --port "${DGEM_GATEWAY_PORT}" \
+          --allowed-hosts "${DGEM_ALLOWED_HOSTS}" \
+          --templates-dir "./templates" > gateway.log 2>&1 &
+        echo $! > dgem-gateway.pid
+        for _ in $(seq 1 30); do
+          if curl -fsSL -m 1 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/health" >/dev/null 2>&1; then
+            break
+          fi
+          sleep 0.5
+        done
+      )
+    else
+      echo "==> Starting dgem serve gateway on ${DGEM_GATEWAY_HOST}:${DGEM_GATEWAY_PORT} (allowed-hosts=${DGEM_ALLOWED_HOSTS})..."
+      (
+        cd "${DGEM_REPO}"
+        DGEM_GATEWAY_PORT="${DGEM_GATEWAY_PORT}" \
+        DGEM_GATEWAY_HOST="${DGEM_GATEWAY_HOST}" \
+        DGEM_ALLOWED_HOSTS="${DGEM_ALLOWED_HOSTS}" \
+        ./scripts/serve_gateway.sh
+      )
+    fi
   fi
 
   # 4. AX + ate-local control plane (:8090)

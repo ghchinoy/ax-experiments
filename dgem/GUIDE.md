@@ -60,6 +60,29 @@ If you prefer to start each daemon manually:
    ```
    *Note on `~/projects/ax` branches:* `make stack-up` runs against `ghchinoy/ax` on branch `feat/ate-local-apple-container`. When Recipes 02 and 03 need `genkit-runner` (`google/ax#538`), `ensure_genkit_runner` in [`../swarm/lib.sh`](../swarm/lib.sh) automatically creates a temporary detached git worktree from `origin/feat/genkit-runner`, cross-compiles `genkit-runner` (`linux/arm64`), backs up the original `.ax-local/bin/linux_arm64/ax-task-runner` to `ax-task-runner.orig`, and restores `ax-task-runner.orig` in the script's `EXIT` trap so other tracks (`swarm/01..08`) are unaffected.
 
+### Demo Mode: Using a Temporary Cloud Run GPU (`DGEM_CLOUDRUN_URL`)
+
+On local M5 Metal (`diffgemma`), cold prefill takes ~4–8s and warm KV-cached decisions take ~2.3–3.0s. For live demos where ~180–250ms decision latency is preferred—and freeing ~19.5 GiB of laptop RAM is helpful while running `ax-central` and screen recording—`ensure-stack.sh` supports `DGEM_CLOUDRUN_URL`:
+
+```bash
+# 1. Provision temporary Cloud Run GPU service (1x NVIDIA RTX PRO 6000 or L4)
+GCP_PROJECT=<PROJECT> ALLOW_GROUP=<USER_OR_GROUP_EMAIL> make -C ~/projects/dgem cloudrun-deploy
+export DGEM_CLOUDRUN_URL="$(gcloud run services describe dgemma --region=us-central1 --format='value(status.url)')/v1"
+
+# 2. Switch local :8095 gateway to Cloud Run upstream (skips local diffgemma :8080)
+cd ~/projects/ax-experiments
+make dgem-down
+DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-up
+
+# 3. Run the 1-to-3 specialist router demo (microVMs still dial http://192.168.64.1:8095 with zero cloud keys inside containers)
+GEMINI_API_KEY="your-key" DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-03
+
+# 4. Delete the Cloud Run GPU service immediately after recording
+make -C ~/projects/dgem cloudrun-teardown
+```
+
+When `DGEM_CLOUDRUN_URL` is set, `dgem/ensure-stack.sh` skips launching local `diffgemma` (`:8080`), sets `DGEM_BACKEND=cloudrun`, and starts `dgem serve` on `0.0.0.0:8095` with `-u "${DGEM_CLOUDRUN_URL}" --gcp-auth --default-backend cloudrun --allowed-hosts 192.168.64.1`. The Apple `container` microVMs continue calling `http://192.168.64.1:8095` (`/v1/systemone` and `/mcp`) with no GCP credentials inside the guest containers, while `dgem serve` on the Mac host handles IAM token refresh and GPU keepalive.
+
 ---
 
 ## 3. Host $\leftrightarrow$ Apple `container` MicroVM Network Topology

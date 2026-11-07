@@ -67,7 +67,7 @@ spec:
       You are an operations triage agent running inside an AX Apple container microVM.
       Use the filesystem tools to read /workspace/inbox/ticket-9481.txt, then call
       the dgem MCP tool (dgem_decide_policy) with template_id="support_triage",
-      backend="local", and the ticket variable, and write a concise markdown report
+      backend="${DGEM_BACKEND}", and the ticket variable, and write a concise markdown report
       of the decision and probabilities to /workspace/DECISION_REPORT.md.
     config:
       maxOutputTokens: 2048
@@ -99,11 +99,11 @@ curl -fsSL "http://${WORKER_IP}:80/.well-known/agent-card.json" | jq .
 
 echo
 echo "==> [3/4] Sending A2A message/send request to http://${WORKER_IP}:80/..."
-curl -fsSL -H "Content-Type: application/json" "http://${WORKER_IP}:80/" -d '{
-  "jsonrpc": "2.0", "id": 1, "method": "message/send",
-  "params": {"message": {"role": "user", "messageId": "m1", "contextId": "ticket-9481",
-    "parts": [{"kind": "text", "text": "Read /workspace/inbox/ticket-9481.txt, evaluate it using the dgem support_triage policy template (with backend=\"local\"), and write the results to /workspace/DECISION_REPORT.md."}]}}
-}' | jq .
+curl -fsSL -H "Content-Type: application/json" "http://${WORKER_IP}:80/" -d "{
+  \"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"message/send\",
+  \"params\": {\"message\": {\"role\": \"user\", \"messageId\": \"m1\", \"contextId\": \"ticket-9481\",
+    \"parts\": [{\"kind\": \"text\", \"text\": \"Read /workspace/inbox/ticket-9481.txt, evaluate it using the dgem support_triage policy template (with backend=\\\"${DGEM_BACKEND}\\\"), and write the results to /workspace/DECISION_REPORT.md.\"}]}}
+}" | jq .
 
 echo
 echo "==> [4/4] Inspecting /workspace/DECISION_REPORT.md inside microVM via ax ssh..."
