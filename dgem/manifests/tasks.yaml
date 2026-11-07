@@ -1,0 +1,107 @@
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: dgem-router
+  atespace: default
+spec:
+  image: "dgem-genkit-task:latest"
+  debug: true
+  env:
+    - name: DGEM_GATEWAY_URL
+      value: "${DGEM_GATEWAY_URL}"
+    - name: DGEM_MODEL
+      value: "diffgemma-26b-a4b-it-q4"
+---
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: specialist-billing
+  atespace: default
+spec:
+  image: "ax-agent-local:latest"
+  config:
+    name: billing_specialist
+    description: Billing & ledger operations specialist for refunds, duplicate charges, and vendor payouts.
+    model: googleai/gemini-3.8-flash
+    instruction: |
+      You are the Billing Operations Specialist agent running in an on-demand AX Apple container microVM.
+      Always inspect /workspace/ledger/invoices.json using read_file before answering.
+      Provide a concise, actionable 2-3 sentence resolution referencing exact transaction IDs and dollar amounts.
+    config:
+      maxOutputTokens: 2048
+      temperature: 0.2
+    maxTurns: 10
+    use:
+      - name: genkit-middleware/filesystem
+        config:
+          rootDirectory: /workspace
+          allowWriteAccess: true
+  env:
+    - name: GEMINI_API_KEY
+      value: "${GEMINI_API_KEY}"
+  workspace:
+    name: billing-ws
+  debug: true
+---
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: specialist-security
+  atespace: default
+spec:
+  image: "ax-agent-local:latest"
+  config:
+    name: security_specialist
+    description: Security incident & prompt-injection specialist with dgem MCP policy verification.
+    model: googleai/gemini-3.8-flash
+    instruction: |
+      You are the Security Incident Specialist agent running in an on-demand AX Apple container microVM.
+      Read /workspace/playbooks/prompt-injection-sop.md if helpful, and if an agent tool call is described,
+      you may call dgem_decide_policy with template_id="calibration/agent_step_drift" and backend="local".
+      Respond with a concise 2-3 sentence containment action plan.
+    config:
+      maxOutputTokens: 2048
+      temperature: 0.2
+    maxTurns: 10
+    use:
+      - name: genkit-middleware/filesystem
+        config:
+          rootDirectory: /workspace
+          allowWriteAccess: true
+  env:
+    - name: GEMINI_API_KEY
+      value: "${GEMINI_API_KEY}"
+  workspace:
+    name: security-ws
+  debug: true
+---
+apiVersion: ax.io/v1alpha1
+kind: Task
+metadata:
+  name: specialist-engineering
+  atespace: default
+spec:
+  image: "ax-agent-local:latest"
+  config:
+    name: engineering_specialist
+    description: Go software engineering specialist for diagnosing panics, inspecting code, and patching bugs.
+    model: googleai/gemini-3.8-flash
+    instruction: |
+      You are the Go Engineering Specialist agent running in an on-demand AX Apple container microVM.
+      Use read_file and search_and_replace on /workspace/retry_test.go to diagnose and fix code bugs,
+      and reply with a concise 2-3 sentence summary of the root cause and fix.
+    config:
+      maxOutputTokens: 2048
+      temperature: 0.2
+    maxTurns: 10
+    use:
+      - name: genkit-middleware/filesystem
+        config:
+          rootDirectory: /workspace
+          allowWriteAccess: true
+  env:
+    - name: GEMINI_API_KEY
+      value: "${GEMINI_API_KEY}"
+  workspace:
+    name: engineering-ws
+  debug: true

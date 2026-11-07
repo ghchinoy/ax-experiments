@@ -1,0 +1,37 @@
+{
+  "schema": {
+    "instructions": "You are the front-door routing policy for a multi-agent engineering and operations organization. Classify the incoming user request to select the right specialist agent, determine whether immediate same-hour escalation is required, and score the operational severity.",
+    "questions": [
+      {
+        "id": "specialist",
+        "type": "choice",
+        "instructions": "Which specialist agent owns resolving this request?",
+        "options": [
+          {"name": "billing_ops", "description": "Invoices, double charges, refunds, vendor payouts, subscription renewals, and ledger discrepancies"},
+          {"name": "sec_incident", "description": "Prompt injection, untrusted tool observations, data exfiltration attempts, command injection, or credential leaks"},
+          {"name": "code_triage", "description": "Go panics, failing unit tests, bug fixes, timeouts, repository inspection, and code patches"}
+        ]
+      },
+      {
+        "id": "cross_domain",
+        "type": "boolean",
+        "instructions": "Does this request combine two distinct domains (for example, both a billing/refund issue AND a code bug or security attack) so that two specialist agents should be consulted?"
+      },
+      {
+        "id": "urgent",
+        "type": "boolean",
+        "instructions": "Does this request require immediate same-hour action to stop active financial loss, security compromise, or production crashes?"
+      },
+      {
+        "id": "severity",
+        "type": "score",
+        "instructions": "Operational severity level of the reported issue",
+        "levels": ["low", "medium", "high", "critical"]
+      }
+    ],
+    "samples": {{ default 1 .samples | toJson }}
+  },
+  "state": {
+    "request": {{ default "" .query | toJson }}
+  }
+}

@@ -162,3 +162,63 @@ delete_tasks() {
 count_apple_containers() {
   container list 2>/dev/null | awk 'NR>1 {count++} END {print count+0}'
 }
+
+task_ip() {
+  local task_name="$1"
+  "${AX_BIN}" describe task "${task_name}" 2>/dev/null | awk '/Worker IP:/{print $3}'
+}
+
+wait_a2a_ready() {
+  local ip="$1"
+  local max_wait="${2:-15}"
+  local attempts=$(( max_wait * 5 ))
+  for _ in $(seq 1 "${attempts}"); do
+    if curl -fsSL "http://${ip}:80/.well-known/agent-card.json" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "Timed out waiting for A2A agent-card at http://${ip}:80/.well-known/agent-card.json" >&2
+  return 1
+}
+
+ensure_genkit_runner() {
+  local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
+  local genkit_cache="${state_dir}/bin/linux_arm64/genkit-runner"
+  local runner_target="${state_dir}/bin/linux_arm64/ax-task-runner"
+  local runner_orig="${state_dir}/bin/linux_arm64/ax-task-runner.orig"
+
+  mkdir -p "${state_dir}/bin/linux_arm64"
+  if [[ ! -x "${runner_orig}" ]]; then
+    if [[ -x "${runner_target}" ]] && { [[ ! -x "${genkit_cache}" ]] || ! cmp -s "${runner_target}" "${genkit_cache}"; }; then
+      cp -p "${runner_target}" "${runner_orig}"
+    elif [[ -d "${AX_REPO}/cmd/ax-task-runner" ]]; then
+      GOOS=linux GOARCH=arm64 CGO_ENABLED=0 \
+        go -C "${AX_REPO}" build -trimpath -ldflags="-s -w" \
+        -o "${runner_orig}" ./cmd/ax-task-runner
+    fi
+  fi
+
+  if [[ ! -x "${genkit_cache}" ]]; then
+    echo "==> Cross-compiling genkit-runner (linux/arm64) from origin/feat/genkit-runner..."
+    local wt_dir
+    wt_dir="$(mktemp -d /tmp/ax-genkit-wt-XXXXXX)"
+    (
+      cd "${AX_REPO}"
+      git worktree add --detach "${wt_dir}" origin/feat/genkit-runner >/dev/null 2>&1
+      trap 'git -C "${AX_REPO}" worktree remove --force "${wt_dir}" >/dev/null 2>&1 || true' EXIT
+      cd "${wt_dir}"
+      GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "${genkit_cache}" ./cmd/runners/genkit-runner
+    )
+  fi
+  cp "${genkit_cache}" "${runner_target}"
+}
+
+restore_default_runner() {
+  local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
+  local runner_target="${state_dir}/bin/linux_arm64/ax-task-runner"
+  local runner_orig="${state_dir}/bin/linux_arm64/ax-task-runner.orig"
+  if [[ -x "${runner_orig}" ]]; then
+    cp -p "${runner_orig}" "${runner_target}"
+  fi
+}

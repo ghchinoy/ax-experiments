@@ -7,7 +7,7 @@ BINDER ?= binder
 OKF_PROTO ?= okf-proto
 AX_REPO ?= $(HOME)/projects/ax
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-01 dgem-02 dgem-03 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -18,6 +18,12 @@ help:
 	@echo "  make okf-validate     Validate OKF v0.2 bundle with binder and okf-proto"
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
 	@echo "  make genkit-apple     Run Genkit Go runner (#538) E2E in Apple container microVM"
+	@echo "  make dgem-up          Ensure both dgem (:8080/:8095) and AX (:8090) local stacks are up"
+	@echo "  make dgem-status      Show status of both dgem and AX local stacks"
+	@echo "  make dgem-down        Stop both dgem and AX local stacks"
+	@echo "  make dgem-01          Run dgem + Genkit systemonex & ToolApproval inside Apple container"
+	@echo "  make dgem-02          Run declarative genkit-runner + dgem Streamable HTTP MCP in Apple container"
+	@echo "  make dgem-03          Run 1-to-3 Hesitation-gated scale-to-zero specialist router swarm"
 	@echo "  make swarm-01         Run 01-hello-swarm (8 parallel microVMs)"
 	@echo "  make swarm-02         Run 02-repo-inspector (Workspace git clones)"
 	@echo "  make swarm-03         Run 03-seed-matrix (6-node parameter sweep)"
@@ -45,9 +51,10 @@ stack-down:
 	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
-	bash -n swarm/*.sh genkit/*.sh crostini/*.sh crostini/samples/*.sh
+	bash -n swarm/*.sh genkit/*.sh dgem/*.sh crostini/*.sh crostini/samples/*.sh
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
 	cd crostini/samples/a2a-duo && go build -o /dev/null ./... && go vet ./...
+	cd dgem/router && go build -o /dev/null ./... && go vet ./...
 
 okf-validate:
 	$(BINDER) validate okf --strict
@@ -59,6 +66,24 @@ agent-image:
 
 genkit-apple:
 	./genkit/run-apple-container.sh
+
+dgem-up:
+	./dgem/ensure-stack.sh up
+
+dgem-status:
+	./dgem/ensure-stack.sh status
+
+dgem-down:
+	./dgem/ensure-stack.sh down
+
+dgem-01:
+	./dgem/01-tool-approval-microvm.sh
+
+dgem-02:
+	./dgem/02-mcp-triage-agent.sh
+
+dgem-03:
+	./dgem/03-specialist-router.sh
 
 build-recorder:
 	cd viz/recorder && go build -o ax-trace main.go

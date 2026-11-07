@@ -70,7 +70,7 @@ Prove that a single static Go binary (`cmd/runners/genkit-runner`, `google/ax#53
 ## Related Experiment Tracks
 
 - Runs locally inside Apple `container` microVMs via [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) and inside gVisor sandboxes on ChromeOS via [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md).
-- Extends the `Task.spec.config` and workspace boundaries tested in [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md).
+- Extends the `Task.spec.config` and workspace boundaries tested in [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) and pairs with System-1 decision routing in [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md).
 
 [^ax-issue-538]: google/ax#538: Genkit Go runner
 [^fork-genkit-runner]: ghchinoy/ax:feat/genkit-runner

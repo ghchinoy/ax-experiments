@@ -1,0 +1,32 @@
+{"t":1794086220.036,"src":"recipe","kind":"run.start","id":"09-dgem-specialist-router","label":"09-dgem-specialist-router","meta":{"pattern":"dgem-scale-to-zero-router","tasks":4}}
+{"t":1794086220.225,"src":"recipe","kind":"node.add","id":"dgem-router","from":"host","to":"dgem-router","role":"coordinator","label":"dgem-router (System-1)"}
+{"t":1794086220.235,"src":"recipe","kind":"node.add","id":"specialist-billing","from":"host","to":"specialist-billing","role":"worker","label":"specialist-billing (Suspended)"}
+{"t":1794086220.245,"src":"recipe","kind":"node.add","id":"specialist-security","from":"host","to":"specialist-security","role":"worker","label":"specialist-security (Suspended)"}
+{"t":1794086220.255,"src":"recipe","kind":"node.add","id":"specialist-engineering","from":"host","to":"specialist-engineering","role":"worker","label":"specialist-engineering (Suspended)"}
+{"t":1794086221.213,"src":"recipe","kind":"edge.msg","from":"host","to":"dgem-router","label":"query #1","meta":{"bytes":167}}
+{"t":1794086221.226,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec dgem-router -query Customer Acme Robotic","meta":{"state":"start"}}
+{"t":1794086231.136,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec done (10s)","meta":{"state":"end","exitCode":0,"duration":10}}
+{"t":1794086231.198,"src":"recipe","kind":"note","label":"Q1 dgem: specialist=billing_ops hes=0% (Clear) targets=specialist-billing"}
+{"t":1794086232.480,"src":"recipe","kind":"edge.msg","from":"dgem-router","to":"specialist-billing","label":"A2A dispatch (billing_ops, hes=0%)","meta":{"bytes":308}}
+{"t":1794086245.620,"src":"recipe","kind":"edge.msg","from":"specialist-billing","to":"dgem-router","label":"A2A reply","meta":{"bytes":399}}
+{"t":1794086245.860,"src":"recipe","kind":"edge.msg","from":"host","to":"dgem-router","label":"query #2","meta":{"bytes":128}}
+{"t":1794086245.875,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec dgem-router -query TestRetryBackoff_Zero","meta":{"state":"start"}}
+{"t":1794086248.961,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec done (3s)","meta":{"state":"end","exitCode":0,"duration":3}}
+{"t":1794086249.001,"src":"recipe","kind":"note","label":"Q2 dgem: specialist=code_triage hes=0% (Clear) targets=specialist-engineering"}
+{"t":1794086249.830,"src":"recipe","kind":"edge.msg","from":"dgem-router","to":"specialist-engineering","label":"A2A dispatch (code_triage, hes=0%)","meta":{"bytes":269}}
+{"t":1794086257.760,"src":"recipe","kind":"edge.msg","from":"specialist-engineering","to":"dgem-router","label":"A2A reply","meta":{"bytes":0}}
+{"t":1794086257.945,"src":"recipe","kind":"edge.msg","from":"host","to":"dgem-router","label":"query #3","meta":{"bytes":206}}
+{"t":1794086257.959,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec dgem-router -query Security alert: an in","meta":{"state":"start"}}
+{"t":1794086261.194,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec done (4s)","meta":{"state":"end","exitCode":0,"duration":4}}
+{"t":1794086261.236,"src":"recipe","kind":"note","label":"Q3 dgem: specialist=sec_incident hes=0% (Clear) targets=specialist-security"}
+{"t":1794086262.044,"src":"recipe","kind":"edge.msg","from":"dgem-router","to":"specialist-security","label":"A2A dispatch (sec_incident, hes=0%)","meta":{"bytes":347}}
+{"t":1794086287.120,"src":"recipe","kind":"edge.msg","from":"specialist-security","to":"dgem-router","label":"A2A reply","meta":{"bytes":529}}
+{"t":1794086287.394,"src":"recipe","kind":"edge.msg","from":"host","to":"dgem-router","label":"query #4","meta":{"bytes":100}}
+{"t":1794086287.407,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec dgem-router -query Acme Robotics (acct-4","meta":{"state":"start"}}
+{"t":1794086293.566,"src":"recipe","kind":"edge.exec","from":"host","to":"dgem-router","label":"exec done (6s)","meta":{"state":"end","exitCode":0,"duration":6}}
+{"t":1794086293.606,"src":"recipe","kind":"note","label":"Q4 dgem: specialist=billing_ops hes=18.6% (Unsure) targets=specialist-billing specialist-engineering"}
+{"t":1794086295.686,"src":"recipe","kind":"edge.msg","from":"dgem-router","to":"specialist-billing","label":"A2A dispatch (billing_ops, hes=18.6%)","meta":{"bytes":244}}
+{"t":1794086295.735,"src":"recipe","kind":"edge.msg","from":"dgem-router","to":"specialist-engineering","label":"A2A dispatch (billing_ops, hes=18.6%)","meta":{"bytes":244}}
+{"t":1794086323.757,"src":"recipe","kind":"edge.msg","from":"specialist-billing","to":"dgem-router","label":"A2A reply","meta":{"bytes":427}}
+{"t":1794086323.781,"src":"recipe","kind":"edge.msg","from":"specialist-engineering","to":"dgem-router","label":"A2A reply","meta":{"bytes":311}}
+{"t":1794086324.195,"src":"recipe","kind":"run.end","id":"09-dgem-specialist-router","label":"09-dgem-specialist-router","meta":{"status":"ok","duration":104}}

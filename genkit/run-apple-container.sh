@@ -31,48 +31,18 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-AX_REPO="${AX_REPO:-$HOME/projects/ax}"
-STATE_DIR="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
-AX_BIN="${AX_BIN:-${STATE_DIR}/bin/ax}"
-RUNNER_TARGET="${STATE_DIR}/bin/linux_arm64/ax-task-runner"
-AX_SERVER="${AX_SERVER:-127.0.0.1:8090}"
-export AX_SERVER
+source "${DIR}/../swarm/lib.sh"
 
 if [[ -z "${GEMINI_API_KEY:-}" ]]; then
   echo "Error: GEMINI_API_KEY environment variable is required." >&2
   exit 1
 fi
 
-if [[ ! -x "${AX_BIN}" ]] || ! "${AX_BIN}" get tasks >/dev/null 2>&1; then
-  cat >&2 <<EOF
-Error: Cannot reach ax-server at ${AX_SERVER} (or ax binary missing at ${AX_BIN}).
-
-Start the local AX + ate-local stack first:
-  make stack-up
-
-Or from your ax checkout (${AX_REPO}, branch feat/ate-local-apple-container):
-  cd ${AX_REPO} && make local-up
-EOF
-  exit 1
-fi
-
-# Cross-compile genkit-runner for linux/arm64 from origin/feat/genkit-runner if not already built
-GENKIT_CACHE="${STATE_DIR}/bin/linux_arm64/genkit-runner"
-if [[ ! -x "${GENKIT_CACHE}" ]]; then
-  echo "==> [0/6] Cross-compiling genkit-runner (linux/arm64) from origin/feat/genkit-runner..."
-  WT_DIR="$(mktemp -d /tmp/ax-genkit-wt-XXXXXX)"
-  (
-    cd "${AX_REPO}"
-    git worktree add --detach "${WT_DIR}" origin/feat/genkit-runner >/dev/null 2>&1
-    trap 'git -C "${AX_REPO}" worktree remove --force "${WT_DIR}" >/dev/null 2>&1 || true' EXIT
-    cd "${WT_DIR}"
-    GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "${GENKIT_CACHE}" ./cmd/runners/genkit-runner
-  )
-fi
-cp "${GENKIT_CACHE}" "${RUNNER_TARGET}"
+require_tools
+ensure_genkit_runner
 
 TMP_MANIFEST="$(mktemp /tmp/genkit-task-XXXXXX.yaml)"
-trap 'rm -f "${TMP_MANIFEST}"; "${AX_BIN}" delete task genkit-triage >/dev/null 2>&1 || true; "${AX_BIN}" delete workspace demo-workspace >/dev/null 2>&1 || true' EXIT
+trap 'rm -f "${TMP_MANIFEST}"; delete_tasks genkit-triage; "${AX_BIN}" delete workspace demo-workspace >/dev/null 2>&1 || true; restore_default_runner' EXIT
 
 sed "s|\${GEMINI_API_KEY}|${GEMINI_API_KEY}|g" "${DIR}/task-apple-container.yaml" > "${TMP_MANIFEST}"
 

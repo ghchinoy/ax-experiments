@@ -25,6 +25,7 @@ okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/
   crostini.md           Track 1b concept card (`type: Experiment Track`, in-tree)
   swarm.md              Track 2a concept card (`type: Experiment Track`, in-tree)
   genkit.md             Track 2b concept card (`type: Experiment Track`, in-tree)
+  dgem.md               Track 2c concept card (`type: Experiment Track`, in-tree)
   viz.md                Track 3 concept card (`type: Experiment Track`, in-tree)
   ax-central.md         Track 4 concept card (`type: External Experiment`, ~/projects/ax-central)
 ate-local/              Track 1: Native macOS Apple container Substrate (google/ax#526)
@@ -49,6 +50,15 @@ genkit/                 Track 2b: Declarative Genkit Go runner (google/ax#538)
   task-apple-container.yaml  Apple container microVM Task manifest
   run-apple-container.sh     E2E Apple container runner (A2A + MCP + Suspend/Resume)
   bootstrap-gce.sh      Ubuntu 24.04 GCE startup script (Kind + Substrate v0.6.0 + AX + Genkit)
+dgem/                   Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit
+  README.md             Track overview, recipe catalog & quickstart
+  GUIDE.md              Setup guide, EndpointConfig reference & empirical M5 report
+  01-tool-approval-microvm.sh  Recipe 01: systemonex + ToolApproval interrupt guardrail in microVM
+  02-mcp-triage-agent.sh       Recipe 02: Declarative genkit-runner + dgem Streamable HTTP MCP
+  03-specialist-router.sh      Recipe 03: 1-to-3 Hesitation-gated scale-to-zero specialist router
+  router/               Standalone Go router CLI (dgem-router)
+  templates/            specialist_router.json.tmpl policy
+  manifests/            Declarative Workspace & Task manifests for router + 3 specialists
 viz/                    Track 3: Swarm trace recorder, web visualizer & telemetry RFC
   README.md             Visualizer & recorder quickstart
   SCHEMA.md             JSONL trace event schema
@@ -62,8 +72,8 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
 
 | Assignee | Owned Folders | Scope & Responsibilities |
 |---|---|---|
-| `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`okf/ate-local.md`](./okf/ate-local.md) | `ateapipb.ControlServer`, Apple `container` microVMs, `local-stack.sh`, `#526` |
-| `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`) |
+| `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`crostini/`](./crostini/README.md), [`okf/ate-local.md`](./okf/ate-local.md), [`okf/crostini.md`](./okf/crostini.md) | `ateapipb.ControlServer`, Apple `container` microVMs, Crostini Kind + gVisor stack, `local-stack.sh`, `#526`, `#553` |
+| `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`dgem/`](./dgem/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md), [`okf/dgem.md`](./okf/dgem.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`), `dgem` + Genkit System-1 routing (`dgem/01..03`) |
 | `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md), [`okf/ax-central.md`](./okf/ax-central.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC, `~/projects/ax-central` |
 | `agent-sync` | [`okf/index.md`](./okf/index.md), [`README.md`](./README.md), [`AGENTS.md`](./AGENTS.md), `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
 
@@ -154,3 +164,47 @@ Run `make check` before committing, which executes:
 - **Swarm & Genkit scripts**: `bash -n swarm/*.sh genkit/*.sh` and run non-LLM recipes (`01`, `07`, `08`) against an isolated stack.
 - **Trace recorder**: `cd viz/recorder && go build ./... && go vet ./...`
 - **Web visualizer**: `cd viz/web && pnpm typecheck && pnpm build`
+
+
+<!-- headroom:rtk-instructions -->
+# RTK (Rust Token Killer) - Token-Optimized Commands
+
+When running shell commands, **always prefix with `rtk`**. This reduces context
+usage by 60-90% with zero behavior change. If rtk has no filter for a command,
+it passes through unchanged — so it is always safe to use.
+
+## Key Commands
+```bash
+# Git (59-80% savings)
+rtk git status          rtk git diff            rtk git log
+
+# Files & Search (60-75% savings)
+rtk ls <path>           rtk read <file>         rtk grep <pattern>
+rtk find <pattern>      rtk diff <file>
+
+# Test (90-99% savings) — shows failures only
+rtk pytest tests/       rtk cargo test          rtk test <cmd>
+
+# Build & Lint (80-90% savings) — shows errors only
+rtk tsc                 rtk lint                rtk cargo build
+rtk prettier --check    rtk mypy                rtk ruff check
+
+# Analysis (70-90% savings)
+rtk err <cmd>           rtk log <file>          rtk json <file>
+rtk summary <cmd>       rtk deps                rtk env
+
+# GitHub (26-87% savings)
+rtk gh pr view <n>      rtk gh run list         rtk gh issue list
+
+# Infrastructure (85% savings)
+rtk docker ps           rtk kubectl get         rtk docker logs <c>
+
+# Package managers (70-90% savings)
+rtk pip list            rtk pnpm install        rtk npm run <script>
+```
+
+## Rules
+- In command chains, prefix each segment: `rtk git add . && rtk git commit -m "msg"`
+- For debugging, use raw command without rtk prefix
+- `rtk proxy <cmd>` runs command without filtering but tracks usage
+<!-- /headroom:rtk-instructions -->

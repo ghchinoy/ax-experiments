@@ -18,6 +18,7 @@ Each experiment track is organized either in its own self-contained top-level di
 | **1b. Chromebook / Crostini Kind + Substrate (`crostini`)** | [`crostini/`](./crostini/README.md) | Run the full upstream AX control plane + Agent Substrate (`v1.0.0-rc.1`) with real gVisor (`runsc`) sandboxes, `atenet-router`, and RustFS snapshots locally on a ChromeOS Linux (Crostini / Bagels KVM) VM running Debian 13 (`trixie`). | [`google/ax#553`](https://github.com/google/ax/pull/553) · [`crostini/README.md`](./crostini/README.md) · [`crostini/GUIDE.md`](./crostini/GUIDE.md) · [`okf/crostini.md`](./okf/crostini.md) |
 | **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](./swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](./swarm/README.md) · [`swarm/GUIDE.md`](./swarm/GUIDE.md) · [`okf/swarm.md`](./okf/swarm.md) |
 | **2b. Declarative Genkit Go Runner** | [`genkit/`](./genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](./genkit/README.md) · [`genkit/TUTORIAL.md`](./genkit/TUTORIAL.md) · [`okf/genkit.md`](./okf/genkit.md) |
+| **2c. System-1 Decision Routing & Guardrails (`dgem` + Genkit)** | [`dgem/`](./dgem/README.md) | Combine **DiffusionGemma (`dgem`)** `.json.tmpl` decision policies with Genkit Go `v1.14.0` (`systemonex.SystemOne`, `ToolApproval`, Streamable HTTP MCP) inside Apple `container` microVMs, including a **1-to-3 Hesitation-gated scale-to-zero specialist router swarm**. | [`GoogleCloudPlatform/dgem`](https://github.com/GoogleCloudPlatform/dgem), [`google/ax#538`](https://github.com/google/ax/issues/538) · [`dgem/README.md`](./dgem/README.md) · [`dgem/GUIDE.md`](./dgem/GUIDE.md) · [`okf/dgem.md`](./okf/dgem.md) |
 | **3. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](./viz/README.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](./viz/FRICTION-REPORT.md) · [`okf/viz.md`](./okf/viz.md) |
 | **4. AX Central (External Desktop App)** | `~/projects/ax-central` *(external)* | Standalone **Wails v2 + Go + Lit 3 + `@xterm/xterm` + WebMCP** desktop app for designing, deploying, and inspecting AX `Task`/`Workspace`/`Model` resources, managing clusters, and shimming `docker`-to-`podman` (`docker-shim.sh` with `buildx` digest preservation). | [`okf/ax-central.md`](./okf/ax-central.md) · `bd show ax-experiments-bxv` |
 
@@ -57,7 +58,7 @@ make viz-install
 make viz-dev
 ```
 
-Open the local URL shown by Vite (`http://localhost:5173`) to scrub through pre-recorded traces (`01-hello-swarm`, `04-review-panel`, `05-debate`, `06-map-reduce`) in **Force-Graph** or **Cytoscape CoSE** mode.
+Open the local URL shown by Vite (`http://localhost:5173`) to scrub through pre-recorded traces (`01-hello-swarm`, `04-review-panel`, `05-debate`, `06-map-reduce`, `09-dgem-specialist-router`) in **Force-Graph** or **Cytoscape CoSE** mode.
 
 ### Option B: Full Local AX + `ate-local` Stack on macOS
 
@@ -138,7 +139,20 @@ export GEMINI_API_KEY="your-key"
 
 See [`/genkit/README.md`](/genkit/README.md) and the 3-part [`/genkit/TUTORIAL.md`](/genkit/TUTORIAL.md) for full details.
 
-### 4. Record & Replay Swarm Execution Traces (`viz/`)
+### 4. Run System-1 Decision Routing & Guardrails (`dgem/`)
+
+To run **DiffusionGemma (`dgem`)** `.json.tmpl` decision policies + **Genkit Go `v1.14.0`** inside Apple `container` microVMs—including tool-approval interrupt guardrails (`make dgem-01`), Streamable HTTP MCP triage (`make dgem-02`), and the 1-to-3 Hesitation-gated scale-to-zero specialist router swarm (`make dgem-03`):
+
+```bash
+make dgem-01
+export GEMINI_API_KEY="your-key"
+make dgem-02
+make dgem-03
+```
+
+See [`/dgem/README.md`](/dgem/README.md) and [`/dgem/GUIDE.md`](/dgem/GUIDE.md) for the full walkthrough.
+
+### 5. Record & Replay Swarm Execution Traces (`viz/`)
 
 Capture a live `.jsonl` trace (conforming to [`/viz/SCHEMA.md`](/viz/SCHEMA.md)) while running any swarm recipe:
 
@@ -187,11 +201,13 @@ binder validate okf --strict
 binder review okf --strict --require-tier human-reviewed
 okf-proto export okf --format json >/dev/null
 
-# 2. Lint swarm and genkit shell scripts
-bash -n swarm/*.sh genkit/*.sh
+# 2. Lint swarm, genkit, dgem, and crostini shell scripts
+bash -n swarm/*.sh genkit/*.sh dgem/*.sh crostini/*.sh crostini/samples/*.sh
 
-# 3. Build and vet the Go trace recorder
+# 3. Build and vet Go modules (trace recorder, crostini sample, and dgem router)
 cd viz/recorder && go build ./... && go vet ./...
+cd crostini/samples/a2a-duo && go build ./... && go vet ./...
+cd dgem/router && go build ./... && go vet ./...
 
 # 4. Typecheck and build the Lit 3 + Vite web visualizer
 cd viz/web && pnpm typecheck && pnpm build
@@ -212,6 +228,7 @@ ax-experiments/
 │   ├── crostini.md         # Track 1b Chromebook / Crostini Kind + Substrate concept card
 │   ├── swarm.md            # Track 2a concept card & lineage
 │   ├── genkit.md           # Track 2b concept card & lineage
+│   ├── dgem.md             # Track 2c System-1 dgem + Genkit routing concept card
 │   ├── viz.md              # Track 3 concept card & lineage
 │   └── ax-central.md       # Track 4 external project concept card (~/projects/ax-central)
 ├── ate-local/              # Track 1: Local Apple Container Substrate (google/ax#526)
@@ -237,6 +254,14 @@ ax-experiments/
 │   ├── task-apple-container.yaml # Apple container microVM Task manifest
 │   ├── run-apple-container.sh    # Automated Apple container E2E script
 │   └── bootstrap-gce.sh    # Ubuntu 24.04 GCE startup script (Kind + Substrate v0.6.0 + AX + Genkit)
+├── dgem/                   # Track 2c: System-1 Decision Routing & Guardrails (dgem + Genkit)
+│   ├── README.md           # Track overview, prerequisites & quickstart
+│   ├── GUIDE.md            # Setup guide, EndpointConfig, empirical report, alternatives & limits
+│   ├── ensure-stack.sh     # Pre-flight verification, cold-start bootstrap & teardown helper
+│   ├── 01..03-*.sh         # ToolApproval interrupt guardrail, MCP triage & 1-to-3 specialist router
+│   ├── router/             # Standalone Go router CLI (dgem-router) & package contract
+│   ├── templates/          # 4-slot specialist_router.json.tmpl decision policy
+│   └── manifests/          # Declarative Workspace & Task manifests for router + 3 specialists
 └── viz/                    # Track 3: Interactive Swarm Trace Recorder & Web Visualizer
     ├── README.md           # Visualizer & recorder quickstart
     ├── SCHEMA.md           # JSONL trace event schema
