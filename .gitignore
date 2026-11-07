@@ -1,6 +1,7 @@
 node_modules/
 viz/web/dist/
 viz/recorder/ax-trace
+crostini/samples/a2a-duo/a2a-duo
 genkit/sandbox-workspace/
 genkit/ax-state/
 .DS_Store

@@ -22,6 +22,7 @@ AGENTS.md               Agent contract, OKF v0.2 ruleset & Beads (bd) tracking r
 okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork/external lineage)
   index.md              OKF v0.2 bundle root index (the ONLY index.md carrying frontmatter)
   ate-local.md          Track 1 concept card (`type: Experiment Track`, in-tree)
+  crostini.md           Track 1b concept card (`type: Experiment Track`, in-tree)
   swarm.md              Track 2a concept card (`type: Experiment Track`, in-tree)
   genkit.md             Track 2b concept card (`type: Experiment Track`, in-tree)
   viz.md                Track 3 concept card (`type: Experiment Track`, in-tree)
@@ -31,6 +32,10 @@ ate-local/              Track 1: Native macOS Apple container Substrate (google/
   PROPOSAL.md           Architecture proposal, concept mapping & Apple Silicon benchmarks
   TESTING.md            Automated unit/live microVM test suite & local stack walkthrough
   archive/              Archived early proposal and glidepath drafts
+crostini/               Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack
+  README.md             Track overview & quickstart
+  GUIDE.md              Debian 13 (trixie) audit, Docker/Kind setup, resource tuning & benchmarks
+  setup-crostini.sh     Idempotent setup script for Crostini / Bagels KVM VM
 swarm/                  Track 2a: Runnable multi-agent swarm & sandbox recipes (01–08)
   README.md             Recipe catalog (01–08) & quickstart
   GUIDE.md              Developer guide, 3 swarm patterns & empirical timings

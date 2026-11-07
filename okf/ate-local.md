@@ -68,6 +68,7 @@ Implement the **Agent Substrate Control gRPC API** (`go.ate.dev/substrate/pkg/pr
 ## Related Experiment Tracks
 
 - Provides the local microVM substrate for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) and [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md).
+- Complements [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md), which runs the full upstream Kind + gVisor Substrate stack on ChromeOS / Linux.
 - Emits control-plane lifecycle logs consumed by [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md).
 
 [^ax-issue-526]: google/ax#526: ax local start/status/stop

@@ -1,9 +1,9 @@
 ---
 type: Experiment Track
 title: "Track 2b: Declarative Genkit Go Runner (genkit-runner)"
-description: "Declarative Dotprompt agents on AX with A2A JSON-RPC, Genkit HTTP, MCP, skills, and suspend/resume session snapshots (google/ax#538)."
+description: "Declarative Dotprompt agents on AX with A2A gRPC, A2A JSON-RPC, Genkit HTTP, MCP, skills, and suspend/resume session snapshots (google/ax#538)."
 status: stable
-tags: [genkit, runner, dotprompt, a2a, mcp, skills, atelocal, gce]
+tags: [genkit, runner, dotprompt, a2a, a2a-grpc, mcp, skills, atelocal, gce, crostini]
 generated:
   by: human:ghchinoy
   at: 2026-10-31T00:00:00Z
@@ -44,7 +44,7 @@ experiment:
     - genkit/task-apple-container.yaml
   upstream:
     repo: google/ax
-    base_commit: f0228f1
+    base_commit: 241bc4d
     issues: [538, 526, 523]
   forks:
     - repo: ghchinoy/ax
@@ -57,7 +57,7 @@ experiment:
 
 ## Hypothesis & Goal
 
-Prove that a single static Go binary (`cmd/runners/genkit-runner`, `google/ax#538`) embedding AX's `runner` package and Genkit Go (`v1.14.0`) can turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (inline files, `.agents/skills/*/SKILL.md`, and `Workspace.spec.mcp` stdio/HTTP servers) into a dual-protocol **A2A JSON-RPC + Genkit HTTP** agent server whose multi-turn session state (`/workspace/.genkit/snapshots`) survives across `ax suspend` and `ax resume`.[^ax-issue-538][^fork-genkit-runner]
+Prove that a single static Go binary (`cmd/runners/genkit-runner`, `google/ax#538`) embedding AX's `runner` package and Genkit Go (`v1.14.0`) can turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (inline files, `.agents/skills/*/SKILL.md`, and `Workspace.spec.mcp` stdio/HTTP servers) into a multi-protocol **A2A gRPC (`lf.a2a.v1.A2AService`) + A2A JSON-RPC + Genkit HTTP** agent server whose multi-turn session state (`/workspace/.genkit/snapshots`) survives across `ax suspend` and `ax resume`.[^ax-issue-538][^fork-genkit-runner]
 
 ## Repository Artifacts (`genkit/`)
 
@@ -69,7 +69,7 @@ Prove that a single static Go binary (`cmd/runners/genkit-runner`, `google/ax#53
 
 ## Related Experiment Tracks
 
-- Runs locally inside Apple `container` microVMs via [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md).
+- Runs locally inside Apple `container` microVMs via [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) and inside gVisor sandboxes on ChromeOS via [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md).
 - Extends the `Task.spec.config` and workspace boundaries tested in [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md).
 
 [^ax-issue-538]: google/ax#538: Genkit Go runner

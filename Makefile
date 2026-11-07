@@ -45,8 +45,9 @@ stack-down:
 	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
-	bash -n swarm/*.sh genkit/*.sh
+	bash -n swarm/*.sh genkit/*.sh crostini/*.sh crostini/samples/*.sh
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
+	cd crostini/samples/a2a-duo && go build -o /dev/null ./... && go vet ./...
 
 okf-validate:
 	$(BINDER) validate okf --strict

@@ -2,7 +2,7 @@
 
 > **OKF v0.2 Track Metadata & Lineage**: [`okf/genkit.md`](../okf/genkit.md) · **Bundle Index**: [`okf/index.md`](../okf/index.md)
 
-This experiment folder contains the manifests, automation scripts, and end-to-end tutorial for **`cmd/runners/genkit-runner`** ([`google/ax#538`](https://github.com/google/ax/issues/538)), which turns a declarative `Task.spec.config` [Dotprompt](https://genkit.dev/docs/go/dotprompt/) configuration and `Workspace` into a dual-protocol **A2A JSON-RPC + Genkit HTTP** agent server with durable session snapshots across `ax suspend` and `ax resume`.
+This experiment folder contains the manifests, automation scripts, and end-to-end tutorial for **`cmd/runners/genkit-runner`** ([`google/ax#538`](https://github.com/google/ax/issues/538)), which turns a declarative `Task.spec.config` [Dotprompt](https://genkit.dev/docs/go/dotprompt/) configuration and `Workspace` into a multi-protocol **A2A gRPC (`lf.a2a.v1.A2AService`) + A2A JSON-RPC + Genkit HTTP** agent server with durable session snapshots across `ax suspend` and `ax resume`.
 
 ---
 

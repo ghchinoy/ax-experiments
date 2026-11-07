@@ -15,6 +15,7 @@ Each experiment track is organized either in its own self-contained top-level di
 | Track | Location | Focus & Hypothesis | Upstream / Fork Alignment & Docs |
 |---|---|---|---|
 | **1. Local macOS Substrate (`ate-local`)** | [`ate-local/`](./ate-local/README.md) | Run the full AX control plane + `ateapipb.ControlServer` on Apple Silicon using native macOS **Apple `container`** microVMs (`192.168.64.x` `vmnet` bridge) and PostgreSQL—zero Kubernetes, `kind`, or Docker Desktop required. | [`google/ax#526`](https://github.com/google/ax/issues/526), [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) · [`PROPOSAL.md`](./ate-local/PROPOSAL.md) · [`TESTING.md`](./ate-local/TESTING.md) · [`okf/ate-local.md`](./okf/ate-local.md) |
+| **1b. Chromebook / Crostini Kind + Substrate (`crostini`)** | [`crostini/`](./crostini/README.md) | Run the full upstream AX control plane + Agent Substrate (`v1.0.0-rc.1`) with real gVisor (`runsc`) sandboxes, `atenet-router`, and RustFS snapshots locally on a ChromeOS Linux (Crostini / Bagels KVM) VM running Debian 13 (`trixie`). | [`google/ax#553`](https://github.com/google/ax/pull/553) · [`crostini/README.md`](./crostini/README.md) · [`crostini/GUIDE.md`](./crostini/GUIDE.md) · [`okf/crostini.md`](./okf/crostini.md) |
 | **2a. Multi-Agent Swarms (`01`–`08`)** | [`swarm/`](./swarm/README.md) | Stress-test parallel microVM fan-out, Workspace git clones, stochastic parameter sweeps, Gemini code review panels, adversarial red-team debates, map-reduce synthesis, volume persistence across `suspend`/`resume`, and `Task.spec.config` loopback metadata (`127.0.0.1:8099`). | [`#479`](https://github.com/google/ax/issues/479), [`#496`](https://github.com/google/ax/issues/496), [`#523`](https://github.com/google/ax/issues/523) · [`swarm/README.md`](./swarm/README.md) · [`swarm/GUIDE.md`](./swarm/GUIDE.md) · [`okf/swarm.md`](./okf/swarm.md) |
 | **2b. Declarative Genkit Go Runner** | [`genkit/`](./genkit/README.md) | Turn a declarative `Task.spec.config` Dotprompt manifest + `Workspace` (files, `SKILL.md`, stdio MCP servers) into a dual-protocol A2A + Genkit HTTP agent server that preserves multi-turn sessions across `ax suspend` and `ax resume`. | [`google/ax#538`](https://github.com/google/ax/issues/538), [`ghchinoy/ax:feat/genkit-runner`](https://github.com/ghchinoy/ax/tree/feat/genkit-runner) · [`genkit/README.md`](./genkit/README.md) · [`genkit/TUTORIAL.md`](./genkit/TUTORIAL.md) · [`okf/genkit.md`](./okf/genkit.md) |
 | **3. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](./viz/README.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](./viz/FRICTION-REPORT.md) · [`okf/viz.md`](./okf/viz.md) |
@@ -208,6 +209,7 @@ ax-experiments/
 ├── okf/                    # OKF v0.2 Knowledge Bundle (provenance, trust & upstream/fork lineage)
 │   ├── index.md            # Root OKF v0.2 bundle index (declares okf_version: "0.2")
 │   ├── ate-local.md        # Track 1 concept card & lineage
+│   ├── crostini.md         # Track 1b Chromebook / Crostini Kind + Substrate concept card
 │   ├── swarm.md            # Track 2a concept card & lineage
 │   ├── genkit.md           # Track 2b concept card & lineage
 │   ├── viz.md              # Track 3 concept card & lineage
@@ -217,6 +219,10 @@ ax-experiments/
 │   ├── PROPOSAL.md         # Architecture proposal & Apple Silicon benchmarks
 │   ├── TESTING.md          # Automated unit/live microVM test suite & stack walkthrough
 │   └── archive/            # Archived early proposal and glidepath drafts
+├── crostini/               # Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack
+│   ├── README.md           # Track overview & quickstart
+│   ├── GUIDE.md            # Step-by-step Debian 13 (trixie) guide, gotchas & empirical benchmarks
+│   └── setup-crostini.sh   # Idempotent Crostini prerequisite installer & cluster setup script
 ├── swarm/                  # Track 2a: Multi-Agent Swarm Recipes (01–08)
 │   ├── README.md           # Recipe catalog & quickstart
 │   ├── GUIDE.md            # Developer guide, 3 swarm patterns & empirical timings
