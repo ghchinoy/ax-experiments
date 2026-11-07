@@ -20,7 +20,8 @@ Standalone Genkit Go `v1.14.0` CLI (`dgem-router`) that runs inside the `dgem-ro
 - Exits non-zero if `-query` is empty, the `specialist` slot is missing from the rendered template, or no AX Task maps to the winning choice.
 
 ## Side Effects
-- Sends a single `POST /v1/systemone` HTTP request to the configured `dgem` gateway or in-process `/v1` adapter. Performs no local disk writes.
+- Sends a single `POST /v1/systemone` HTTP request to the configured `dgem` gateway or in-process `/v1` adapter.
+- Appends a single structured `"genkit otel span"` log line to `/proc/1/fd/2` (container PID 1 stderr) when present so `container logs -f` in AX Central captures live System-1 routing spans executed over `ax ssh`. Performs no other local disk writes.
 
 ## Verification
 - Run: `go -C dgem/router vet ./... && go -C dgem/router build -o /dev/null ./...`

@@ -27,12 +27,18 @@ package main
 import (
 	"cmp"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
+	"log/slog"
 	"math"
 	"os"
 	"slices"
+	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/dgem/examples/dgemgenkit"
 	"github.com/firebase/genkit/go/genkit"
@@ -180,4 +186,39 @@ func main() {
 	if err := enc.Encode(out); err != nil {
 		log.Fatalf("encode JSON: %v", err)
 	}
+	emitContainerOTelSpan(out)
+}
+
+func randomHex(nBytes int) string {
+	b := make([]byte, nBytes)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
+}
+
+// emitContainerOTelSpan writes a structured Genkit OTel span log line to the
+// container's PID 1 stdout/stderr (/proc/1/fd/2) so `container logs -f` in AX
+// Central captures System-1 routing decisions executed over `ax ssh`.
+func emitContainerOTelSpan(out RouteDecision) {
+	f, err := os.OpenFile("/proc/1/fd/2", os.O_WRONLY|os.O_APPEND, 0)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	endNano := time.Now().UnixNano()
+	startNano := endNano - out.WallTimeMs*1e6
+	traceID := randomHex(16)
+	spanID := randomHex(8)
+	logger := slog.New(slog.NewTextHandler(f, nil))
+	logger.Info("genkit otel span",
+		"trace_id", traceID,
+		"span_id", spanID,
+		"span", fmt.Sprintf("dgem/%s->%s", out.Specialist, strings.Join(out.Targets, ",")),
+		"agent", "dgem-router",
+		"subtype", fmt.Sprintf("hes=%.1f%%(%s)", out.Hesitation*100, out.Band),
+		"status", "ok",
+		"start_unix_nano", startNano,
+		"end_unix_nano", endNano,
+		"duration_ms", out.WallTimeMs,
+	)
 }

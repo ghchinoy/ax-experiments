@@ -29,6 +29,9 @@ experiment:
     - app.go
     - shell.go
     - docker-shim.sh
+    - hack/doctor.sh
+    - hack/smoke-local.sh
+    - docs/index.md
   upstream:
     repo: google/ax
     base_commit: f0228f1
@@ -51,8 +54,9 @@ Provide a native desktop control center (**Wails v2 + Go + Lit 3 WebComponents +
 
 ```bash
 cd ~/projects/ax-central
-make test           # go vet + go test -race + frontend Vitest (headless Chromium)
-make lint           # gofmt, go vet, tsc --noEmit, prettier --check
+make doctor         # audit go, Apple container, ax ate-local variant, ax-experiments & kind
+make check          # gofmt, go vet, golangci-lint, bash -n, tsc, prettier, npm audit, Go & Vitest tests
+make smoke-local    # E2E debian:12 task smoke test against local Apple container stack
 make build          # npm run build + go build -o ax-central .
 make dev            # wails dev live-reload session
 ```
