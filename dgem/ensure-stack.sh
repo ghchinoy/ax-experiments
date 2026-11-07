@@ -77,6 +77,10 @@ ensure_dgem_stack() {
   # 3. dgem serve gateway (:8095 bound on 0.0.0.0 with DGEM_ALLOWED_HOSTS=192.168.64.1)
   if ! curl -fsSL -m 2 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/health" >/dev/null 2>&1; then
     if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
+      if [[ -z "${DGEM_SERVER_KEY:-}" ]] && command -v gcloud >/dev/null 2>&1; then
+        DGEM_SERVER_KEY="$(gcloud secrets versions access latest --secret="${SERVER_KEY_SECRET:-dgem-server-key}" 2>/dev/null || true)"
+        export DGEM_SERVER_KEY
+      fi
       echo "==> Starting dgem serve gateway on ${DGEM_GATEWAY_HOST}:${DGEM_GATEWAY_PORT} -> Cloud Run GPU (${DGEM_CLOUDRUN_URL})..."
       (
         cd "${DGEM_REPO}"
