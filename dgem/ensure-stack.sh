@@ -63,6 +63,17 @@ ensure_dgem_stack() {
   # 2. Upstream dgem inference backend: either remote Cloud Run GPU (when DGEM_CLOUDRUN_URL is set)
   #    or local Apple Silicon Metal diffgemma (:8080)
   if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
+    local cr_health_code
+    cr_health_code="$(curl -s -m 3 -o /dev/null -w "%{http_code}" "${DGEM_CLOUDRUN_URL%/v1}/health" 2>/dev/null || echo "000")"
+    if [[ "${cr_health_code}" == "404" ]]; then
+      echo "==> Warning: DGEM_CLOUDRUN_URL (${DGEM_CLOUDRUN_URL}) returned HTTP 404 (service torn down); falling back to local Metal diffgemma (:8080)..."
+      DGEM_CLOUDRUN_URL=""
+      DGEM_BACKEND="local"
+      export DGEM_CLOUDRUN_URL DGEM_BACKEND
+    fi
+  fi
+
+  if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
     echo "==> Using remote Cloud Run GPU upstream (${DGEM_CLOUDRUN_URL}, backend=${DGEM_BACKEND})..."
     if [[ -f "${DGEM_REPO}/diffgemma.pid" ]] || lsof -i :8080 >/dev/null 2>&1; then
       echo "==> Stopping local diffgemma (:8080) to free unified memory..."
