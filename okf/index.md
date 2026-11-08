@@ -17,3 +17,4 @@ okf_version: "0.2"
 ## External Companion Projects (`~/projects/*`)
 
 * [Track 4: AX Central — Desktop Control Plane, Task Designer & Podman Shim](/ax-central.md) - Standalone Wails v2 + Lit 3 + xterm.js + WebMCP desktop app (`~/projects/ax-central`) for designing, deploying, and visualizing AX Tasks/Workspaces/Models and shimming `docker`-to-`podman`.
+* [Track 5: AX Images — Multi-Arch Task Image Repository (ghcr.io/ghchinoy/ax-images)](/ax-images.md) - Standalone multi-arch (`linux/amd64` + `linux/arm64`) task image repository (`~/projects/ax-images`, `https://github.com/ghchinoy/ax-images`) publishing `swarm-agent`, `genkit-runner`, `dgem-agent`, and `agy-agent` with hard-linked `/usr/local/bin/ax-task-runner` and digest-pinned release manifests.

@@ -147,10 +147,14 @@ ensure_dgem_stack() {
     make -C "${AX_EXP_ROOT}" stack-up
   fi
 
-  # 5. Base Apple container image (ax-agent-local:latest)
+  # 5. Base Apple container images (ax-agent-local:latest + ghcr.io/ghchinoy/ax-images/* when ~/projects/ax-images is present)
   if ! container image list 2>/dev/null | awk 'NR>1 {print $1":"$2}' | grep -qx "ax-agent-local:latest"; then
     echo "==> Building base image ax-agent-local:latest..."
     make -C "${AX_EXP_ROOT}" agent-image
+  fi
+  if [[ -d "${HOME}/projects/ax-images" ]] && ! container image list 2>/dev/null | awk 'NR>1 {print $1":"$2}' | grep -qx "ghcr.io/ghchinoy/ax-images/agy-agent:latest"; then
+    echo "==> Building ghcr.io/ghchinoy/ax-images/* via ~/projects/ax-images..."
+    make -C "${HOME}/projects/ax-images" apple-local
   fi
 }
 

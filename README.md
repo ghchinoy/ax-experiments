@@ -22,6 +22,7 @@ Each experiment track is organized either in its own self-contained top-level di
 | **2d. Antigravity Coding Agents + Cascading `dgem` Safety Gates (`agy`)** | [`agy/`](./agy/README.md) | Run Google Antigravity (`ghcr.io/rakyll/ax-images/antigravity` and `agy` CLI/Python SDK) on AX (`ate-local` & `Kind + Agent Substrate`) in two phases: **Phase 1** non-decision baseline and **Phase 2** 4-stage cascading `dgem` `PreToolUse` safety gate (`tool_safety_gate.json.tmpl`) with live `ax ssh` HITL approval. | [`rakyll/ax-images`](https://github.com/rakyll/ax-images), [`GoogleCloudPlatform/dgem`](https://github.com/GoogleCloudPlatform/dgem) · [`agy/README.md`](./agy/README.md) · [`agy/GUIDE.md`](./agy/GUIDE.md) · [`agy/CONCEPTS_BRIEF.md`](./agy/CONCEPTS_BRIEF.md) · [`okf/agy.md`](./okf/agy.md) |
 | **3. Swarm Telemetry & Visual Replay** | [`viz/`](./viz/README.md) | Expose observability gaps in multi-agent runs (control-plane blind spots during `ax ssh`, flat task storage without `parent_task_id`/`correlation_id`, missing W3C `traceparent`) and prototype a JSONL trace schema, Go recorder (`ax-trace`), and Lit 3 + Force-Graph + Cytoscape CoSE replay UI. | [`viz/README.md`](./viz/README.md) · [`viz/SCHEMA.md`](./viz/SCHEMA.md) · [`viz/FRICTION-REPORT.md`](./viz/FRICTION-REPORT.md) · [`okf/viz.md`](./okf/viz.md) |
 | **4. AX Central (External Desktop App)** | `~/projects/ax-central` *(external)* | Standalone **Wails v2 + Go + Lit 3 + `@xterm/xterm` + WebMCP** desktop app for designing, deploying, and inspecting AX `Task`/`Workspace`/`Model` resources, managing clusters, and shimming `docker`-to-`podman` (`docker-shim.sh` with `buildx` digest preservation). | [`okf/ax-central.md`](./okf/ax-central.md) · `bd show ax-experiments-bxv` |
+| **5. AX Images (`ghcr.io/ghchinoy/ax-images`)** | `~/projects/ax-images` *(external)* | Standalone multi-arch (`linux/amd64` + `linux/arm64`) task image repository publishing `swarm-agent`, `genkit-runner`, `dgem-agent`, and `agy-agent` with hard-linked `/usr/local/bin/ax-task-runner` (`rakyll/ax-images#2`) and `@sha256:` digest-pinned release manifests. | [`ghchinoy/ax-images`](https://github.com/ghchinoy/ax-images) · [`okf/ax-images.md`](./okf/ax-images.md) · `bd show ax-experiments-632` |
 
 ---
 
@@ -230,8 +231,10 @@ ax-experiments/
 │   ├── swarm.md            # Track 2a concept card & lineage
 │   ├── genkit.md           # Track 2b concept card & lineage
 │   ├── dgem.md             # Track 2c System-1 dgem + Genkit routing concept card
+│   ├── agy.md              # Track 2d Antigravity + cascading dgem safety gates concept card
 │   ├── viz.md              # Track 3 concept card & lineage
-│   └── ax-central.md       # Track 4 external project concept card (~/projects/ax-central)
+│   ├── ax-central.md       # Track 4 external project concept card (~/projects/ax-central)
+│   └── ax-images.md        # Track 5 external project concept card (~/projects/ax-images)
 ├── ate-local/              # Track 1: Local Apple Container Substrate (google/ax#526)
 │   ├── README.md           # Track overview & quick verification
 │   ├── PROPOSAL.md         # Architecture proposal & Apple Silicon benchmarks

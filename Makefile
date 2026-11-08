@@ -6,8 +6,9 @@ SHELL := /bin/bash
 BINDER ?= $(shell command -v binder 2>/dev/null || echo $(HOME)/go/bin/binder)
 OKF_PROTO ?= $(shell command -v okf-proto 2>/dev/null || echo $(HOME)/go/bin/okf-proto)
 AX_REPO ?= $(HOME)/projects/ax
+AX_IMAGES_REPO ?= $(HOME)/projects/ax-images
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -17,6 +18,7 @@ help:
 	@echo "  make check            Run all static verification gates (OKF v0.2, shell lint, Go recorder)"
 	@echo "  make okf-validate     Validate OKF v0.2 bundle with binder and okf-proto"
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
+	@echo "  make ax-images-local  Build ghcr.io/ghchinoy/ax-images/* in Apple container (via $(AX_IMAGES_REPO))"
 	@echo "  make genkit-apple     Run Genkit Go runner (#538) E2E in Apple container microVM"
 	@echo "  make dgem-up          Ensure both dgem (:8080/:8095) and AX (:8090) local stacks are up"
 	@echo "  make dgem-status      Show status of both dgem and AX local stacks"
@@ -67,6 +69,14 @@ okf-validate:
 
 agent-image:
 	container build -t ax-agent-local:latest -f swarm/agent-image/Containerfile swarm/agent-image
+
+ax-images-local:
+	@if [[ -d "$(AX_IMAGES_REPO)" ]]; then \
+		$(MAKE) -C "$(AX_IMAGES_REPO)" apple-local; \
+	else \
+		echo "Warning: $(AX_IMAGES_REPO) not found; building local fallback ax-agent-local:latest..."; \
+		$(MAKE) agent-image; \
+	fi
 
 genkit-apple:
 	./genkit/run-apple-container.sh
