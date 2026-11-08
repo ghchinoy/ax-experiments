@@ -37,6 +37,11 @@ experiment:
     - ax-experiments-c0h.6
     - ax-experiments-c0h.7
   entrypoints:
+    - genkit/CONCEPTS_BRIEF.md
+    - genkit/01-egm-review-panel.sh
+    - genkit/02-in-cluster-delegation.sh
+    - genkit/cmd/a2a-mcp-bridge/main.go
+    - genkit/cmd/egm-orchestrator/main.go
     - genkit/run-apple-container.sh
     - genkit/bootstrap-gce.sh
     - genkit/workspace.yaml
@@ -61,11 +66,14 @@ Prove that a single static Go binary (`cmd/runners/genkit-runner`, `google/ax#53
 
 ## Repository Artifacts (`genkit/`)
 
-- `genkit/README.md` — Track overview, manifest catalog, and Apple container quickstart.
-- `genkit/TUTORIAL.md` — Three-part tutorial covering (1) local Linux/Crostini execution, (2) GCE Ubuntu 24.04 Kind + Agent Substrate v0.6.0 wake-on-request E2E, and (3) macOS Apple `container` microVM verification.
+- `genkit/README.md` — Track overview, manifest catalog, and quickstarts for Kind + Substrate and Apple `container`.
+- `genkit/CONCEPTS_BRIEF.md` — EGM Concepts Brief and 7-lens Goldfish review synthesis for the multi-agent examples.
+- `genkit/01-egm-review-panel.sh` & `genkit/cmd/egm-orchestrator/main.go` — Sandboxed Elephant-Goldfish design & review loop (`1m 10.9s` on 3 gVisor workers) over A2A gRPC `SendStreamingMessage` with Dotprompt `output.schema` and residency inversion.
+- `genkit/02-in-cluster-delegation.sh` & `genkit/cmd/a2a-mcp-bridge/main.go` — Autonomous in-cluster agent-to-agent delegation (`45.1s` total; `10.77s` in-sandbox A2A gRPC wake + audit) where `lead-engineer` wakes `security-specialist` directly from inside its gVisor sandbox via `atenet-router.ate-system.svc.cluster.local:443` mTLS.
+- `genkit/TUTORIAL.md` — Three-part tutorial covering (1) local Linux/Crostini execution, (2) GCE Ubuntu 24.04 Kind + Agent Substrate wake-on-request E2E, and (3) macOS Apple `container` microVM verification.
 - `genkit/workspace.yaml` — Sample `Workspace` with `retry_test.go`, `incident-runbook/SKILL.md`, and `tools/incident_mcp.py`.
 - `genkit/task-apple-container.yaml` & `genkit/run-apple-container.sh` — Automated 6-step microVM verification on macOS.
-- `genkit/task.yaml` & `genkit/bootstrap-gce.sh` — GCE Ubuntu 24.04 Kind + Substrate v0.6.0 E2E bootstrap.
+- `genkit/task.yaml` & `genkit/bootstrap-gce.sh` — GCE Ubuntu 24.04 Kind + Substrate E2E bootstrap.
 
 ## Related Experiment Tracks
 

@@ -43,8 +43,13 @@ swarm/                  Track 2a: Runnable multi-agent swarm & sandbox recipes (
   agent-image/          arm64 Gemini agent image (reads Task.spec.config via loopback metadata)
   lib.sh                Shared orchestration & opt-in trace emission helpers
 genkit/                 Track 2b: Declarative Genkit Go runner (google/ax#538)
-  README.md             Track overview, manifest catalog & Apple container quickstart
-  TUTORIAL.md           3-part tutorial (local Linux, GCE Kind + Substrate v0.6.0, Apple container)
+  README.md             Track overview, manifest catalog & multi-agent quickstarts
+  CONCEPTS_BRIEF.md     EGM Concepts Brief & 7-lens Goldfish synthesis for multi-agent examples
+  TUTORIAL.md           4-part tutorial (local Linux, GCE Kind + Substrate, Apple container, multi-agent EGM/MCP)
+  01-egm-review-panel.sh     Example 01: 1 Elephant + 3 parallel Goldfish reviewers over A2A gRPC
+  02-in-cluster-delegation.sh Example 02: Autonomous in-sandbox MCP -> A2A gRPC delegation via atenet-router
+  cmd/                  egm-orchestrator & static a2a-mcp-bridge stdio MCP server
+  internal/axclient/    Shared EgressPolicy, router mTLS & A2A gRPC client package
   workspace.yaml        Workspace with inline files, incident-runbook SKILL.md & stdio MCP server
   task.yaml             Vertex AI / Linux & GCE Task manifest
   task-apple-container.yaml  Apple container microVM Task manifest

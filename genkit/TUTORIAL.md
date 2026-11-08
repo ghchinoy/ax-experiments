@@ -468,3 +468,32 @@ export GEMINI_API_KEY="AIzaSy..."
 2. **Real `ax suspend` → `ax resume` (Stops microVM at `.220` and cold-boots fresh microVM at `.221` with `/workspace/.genkit/snapshots` preserved):**
    - **Turn 2 (A2A JSON-RPC on `192.168.64.221:80`)**: Recalls the fixed file (`retry_test.go`) and remaining risk (`settlement.go`) directly from the restored session snapshot without reading files.
    - **Turn 3 (Genkit HTTP `POST http://192.168.64.221:80/agents/triage_agent`, `sessionId: "incident-42"`)**: Confirms all 3 user turns across the microVM suspend/resume cycle.
+
+---
+
+## Part 4: Multi-Agent Genkit Examples on Agent Substrate (`01-egm-review-panel.sh` & `02-in-cluster-delegation.sh`)
+
+Beyond single-task triage, `genkit/` includes two multi-agent examples designed using the **[Elephant-Goldfish Model (EGM)](./CONCEPTS_BRIEF.md)** and verified on a local Kind + Agent Substrate (`v1.0.0-rc.1`) cluster over the **A2A gRPC transport (`lf.a2a.v1.A2AService/SendStreamingMessage`)**:
+
+### Example 01: Sandboxed Elephant-Goldfish Design & Review Loop (`./genkit/01-egm-review-panel.sh`)
+
+Demonstrates stateful vs. stateless context isolation across 4 `genkit-runner` tasks on a 3-worker gVisor pool (`1m 10.95s` total):
+
+1. **Elephant Turn 1 (`5.87s`)**: `elephant-architect` (`allowWriteAccess: true`, `contextId: "elephant-session-1"`) reads `CONTEXT.md` and drafts `/workspace/DESIGN_SPEC.md` over A2A gRPC `SendStreamingMessage`.
+2. **Residency Inversion (`ax suspend task elephant-architect`)**: Frees the Elephant's gVisor worker slot before dispatching the 3-way review wave.
+3. **3-Way Parallel Goldfish Wave (`10.58s` / `12.60s` / `15.45s`)**:
+   - `goldfish-design`, `goldfish-catalyst`, and `goldfish-comprehension` (`allowWriteAccess: false`) mount reviewer skills from `~/projects/elephant-goldfish-model/agents/*.md` at `.agents/skills/<persona>/SKILL.md` and declare a Dotprompt Picoschema `output.schema` (`reviewer`, `verdict`, `summary`, `findings`).
+   - All 3 Goldfish tasks wake concurrently across the 3 gVisor workers, stream structured JSON findings over A2A gRPC `SendStreamingMessage` with wave-scoped `contextId` (`wave-1-goldfish-...`), and immediately suspend (`ax suspend`) back to zero compute.
+4. **Elephant Turn 2 (`28.53s` including wake-on-request + RustFS restore)**:
+   - `atenet-router` wakes `elephant-architect` on demand (`contextId: "elephant-session-1"`), restores its Turn 1 session snapshot, updates `/workspace/DESIGN_SPEC.md`, and writes `/workspace/RESOLUTION_LOG.md`.
+
+### Example 02: Autonomous In-Cluster Agent-to-Agent Delegation (`./genkit/02-in-cluster-delegation.sh`)
+
+Demonstrates true autonomous in-sandbox delegation without a host relay (`45.14s` total; `18.89s` coordinator turn):
+
+1. **In-Sandbox A2A gRPC MCP Bridge (`/usr/local/bin/a2a-mcp-bridge`)**:
+   - `lead-engineer`'s `Workspace.spec.mcp` registers `/usr/local/bin/a2a-mcp-bridge` ([`cmd/a2a-mcp-bridge/main.go`](./cmd/a2a-mcp-bridge/main.go)), which exposes the `delegate_to_actor(actor, prompt, context_id)` MCP tool.
+   - `lead-engineer`'s Substrate `EgressPolicy` permits `TlsPassthrough` on port `443` to both `*.googleapis.com` and `atenet-router.ate-system.svc.cluster.local` / `atenet-router.ate-system.svc`.
+2. **Wake-on-Request from Inside a gVisor Sandbox (`10.77s` specialist wake + audit)**:
+   - `security-specialist` starts in the `Suspended` phase (`WORKER-IP: <none>`).
+   - Sending **one** A2A gRPC `SendStreamingMessage` request to `lead-engineer` causes its Genkit tool loop to call `a2abridge_delegate_to_actor(actor="security-specialist", ...)`, which dials `atenet-router.ate-system.svc.cluster.local:443` over mTLS directly from inside `lead-engineer`'s gVisor sandbox, wakes `security-specialist` on a second gVisor worker, receives the security audit over A2A gRPC, patches `/workspace/webhook_handler.go`, and logs telemetry to `/workspace/.genkit/mcp-delegation.jsonl`.

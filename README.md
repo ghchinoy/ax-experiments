@@ -248,7 +248,12 @@ ax-experiments/
 │   └── 01..08-*.sh         # Fan-out, git workspaces, code review panel, debate, map-reduce, spec.config
 ├── genkit/                 # Track 2b: Declarative Genkit Go Runner (google/ax#538)
 │   ├── README.md           # Track overview & manifest catalog
-│   ├── TUTORIAL.md         # 3-part tutorial (local Linux, GCE Kind + Substrate, Apple container)
+│   ├── CONCEPTS_BRIEF.md   # EGM Concepts Brief & 7-lens Goldfish synthesis for multi-agent examples
+│   ├── TUTORIAL.md         # 4-part tutorial (local Linux, GCE Kind + Substrate, Apple container, multi-agent EGM/MCP)
+│   ├── 01-egm-review-panel.sh     # Example 01: 1 Elephant + 3 parallel Goldfish reviewers over A2A gRPC
+│   ├── 02-in-cluster-delegation.sh # Example 02: Autonomous in-sandbox MCP -> A2A gRPC delegation via atenet-router
+│   ├── cmd/                # egm-orchestrator & static a2a-mcp-bridge stdio MCP server
+│   ├── internal/axclient/  # Shared EgressPolicy, router mTLS & A2A gRPC client package
 │   ├── workspace.yaml      # Workspace with files, incident-runbook SKILL.md, and stdio MCP server
 │   ├── task.yaml           # Vertex AI / Linux & GCE Task manifest
 │   ├── task-apple-container.yaml # Apple container microVM Task manifest
