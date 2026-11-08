@@ -26,6 +26,7 @@ okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/
   swarm.md              Track 2a concept card (`type: Experiment Track`, in-tree)
   genkit.md             Track 2b concept card (`type: Experiment Track`, in-tree)
   dgem.md               Track 2c concept card (`type: Experiment Track`, in-tree)
+  agy.md                Track 2d concept card (`type: Experiment Track`, in-tree)
   viz.md                Track 3 concept card (`type: Experiment Track`, in-tree)
   ax-central.md         Track 4 concept card (`type: External Experiment`, ~/projects/ax-central)
 ate-local/              Track 1: Native macOS Apple container Substrate (google/ax#526)
@@ -64,6 +65,12 @@ dgem/                   Track 2c: System-1 Decision Routing & Guardrails with dg
   router/               Standalone Go router CLI (dgem-router)
   templates/            specialist_router.json.tmpl policy
   manifests/            Declarative Workspace & Task manifests for router + 3 specialists
+agy/                    Track 2d: Antigravity (agy) coding agents + cascading dgem safety gates
+  README.md             Track overview, Surface x Phase matrix & quickstart
+  GUIDE.md              4-stage cascading safety gate guide, HITL flow & empirical M5 report
+  CONCEPTS_BRIEF.md     7-lens EGM Goldfish brainstorm synthesis
+  01-phase1-baseline.sh Phase 1: Non-decision baseline coding agent on AX
+  02-phase2-dgem-safety-gate.sh Phase 2: Cascading dgem PreToolUse safety gate + ax ssh HITL
 viz/                    Track 3: Swarm trace recorder, web visualizer & telemetry RFC
   README.md             Visualizer & recorder quickstart
   SCHEMA.md             JSONL trace event schema
@@ -78,7 +85,7 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
 | Assignee | Owned Folders | Scope & Responsibilities |
 |---|---|---|
 | `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`crostini/`](./crostini/README.md), [`okf/ate-local.md`](./okf/ate-local.md), [`okf/crostini.md`](./okf/crostini.md) | `ateapipb.ControlServer`, Apple `container` microVMs, Crostini Kind + gVisor stack, `local-stack.sh`, `#526`, `#553` |
-| `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`dgem/`](./dgem/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md), [`okf/dgem.md`](./okf/dgem.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`), `dgem` + Genkit System-1 routing (`dgem/01..03`) |
+| `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`dgem/`](./dgem/README.md), [`agy/`](./agy/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md), [`okf/dgem.md`](./okf/dgem.md), [`okf/agy.md`](./okf/agy.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` image, `genkit-runner` (`#538`), `dgem` + Genkit System-1 routing (`dgem/01..03`), Antigravity + `dgem` safety gates (`agy/01..02`) |
 | `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md), [`okf/ax-central.md`](./okf/ax-central.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC, `~/projects/ax-central` |
 | `agent-sync` | [`okf/index.md`](./okf/index.md), [`README.md`](./README.md), [`AGENTS.md`](./AGENTS.md), `.beads/` | Upstream `google/ax` & `substrate` rebase checks, OKF v0.2 bundle conformance, `bd` hygiene |
 

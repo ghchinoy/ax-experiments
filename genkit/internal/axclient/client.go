@@ -234,10 +234,30 @@ func ExtractJSON(raw string, out any) error {
 	return json.Unmarshal([]byte(trimmed), out)
 }
 
+// EgressOptions configures optional additional TLS and HTTP hostnames on an
+// actor's Substrate EgressPolicy.
+type EgressOptions struct {
+	IncludeRouter  bool
+	IncludeGitHub  bool
+	IncludeDGem    bool
+	ExtraTLSHosts  []string
+	ExtraHTTPHosts []string
+	HTTPPorts      []int32
+}
+
 // EnsureActorEgress configures the Substrate "default" EgressPolicy on each
 // actor in actors to allow TlsPassthrough on port 443 to Google APIs, and
 // optionally to in-cluster atenet-router when includeRouter is true.
 func EnsureActorEgress(ctx context.Context, kubeContext, axNamespace, atespace string, actors []string, includeRouter bool) error {
+	return EnsureActorEgressWithOptions(ctx, kubeContext, axNamespace, atespace, actors, EgressOptions{
+		IncludeRouter: includeRouter,
+	})
+}
+
+// EnsureActorEgressWithOptions configures the Substrate "default" EgressPolicy
+// on each actor in actors with the specified TLS passthrough (port 443) and
+// cleartext HTTP rules.
+func EnsureActorEgressWithOptions(ctx context.Context, kubeContext, axNamespace, atespace string, actors []string, opts EgressOptions) error {
 	apiPort, stopPF, err := StartPortForward(ctx, kubeContext, ATESystemNamespace, "svc/api", 443)
 	if err != nil {
 		return err
@@ -275,12 +295,24 @@ func EnsureActorEgress(ctx context.Context, kubeContext, axNamespace, atespace s
 		"*.google.com",
 		"accounts.google.com",
 	}
-	if includeRouter {
+	if opts.IncludeRouter {
 		hosts = append(hosts,
 			"atenet-router.ate-system.svc",
 			"atenet-router.ate-system.svc.cluster.local",
 		)
 	}
+	if opts.IncludeGitHub {
+		hosts = append(hosts,
+			"github.com",
+			"*.githubusercontent.com",
+			"pypi.org",
+			"files.pythonhosted.org",
+		)
+	}
+	if opts.IncludeDGem {
+		hosts = append(hosts, "*.a.run.app")
+	}
+	hosts = append(hosts, opts.ExtraTLSHosts...)
 
 	ctrl := ateapipb.NewControlClient(conn)
 	rules := []*ateapipb.EgressRule{{
@@ -291,6 +323,30 @@ func EnsureActorEgress(ctx context.Context, kubeContext, axNamespace, atespace s
 			},
 		},
 	}}
+
+	httpHosts := append([]string(nil), opts.ExtraHTTPHosts...)
+	if opts.IncludeDGem {
+		httpHosts = append(httpHosts,
+			"host.docker.internal",
+			"host.containers.internal",
+			"dgem-gateway.default.svc.cluster.local",
+			"dgem-gateway.default.svc",
+		)
+	}
+	if len(httpHosts) > 0 {
+		ports := opts.HTTPPorts
+		if len(ports) == 0 {
+			ports = []int32{8095, 8080, 80}
+		}
+		rules = append(rules, &ateapipb.EgressRule{
+			Http: &ateapipb.HttpRule{
+				Hostnames: httpHosts,
+				Ports: &ateapipb.Ports{
+					Numbers: ports,
+				},
+			},
+		})
+	}
 
 	for _, actor := range actors {
 		ref := &ateapipb.ObjectRef{Atespace: atespace, Name: actor}

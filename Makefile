@@ -3,11 +3,11 @@ SHELL := /bin/bash
 # OKF v0.2 tooling:
 #   binder:    https://github.com/ghchinoy/binder    (go install github.com/ghchinoy/binder@latest)
 #   okf-proto: https://github.com/ghchinoy/okf-proto (go install github.com/ghchinoy/okf-proto/cmd/okf-proto@latest)
-BINDER ?= binder
-OKF_PROTO ?= okf-proto
+BINDER ?= $(shell command -v binder 2>/dev/null || echo $(HOME)/go/bin/binder)
+OKF_PROTO ?= $(shell command -v okf-proto 2>/dev/null || echo $(HOME)/go/bin/okf-proto)
 AX_REPO ?= $(HOME)/projects/ax
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -25,6 +25,8 @@ help:
 	@echo "  make dgem-01          Run dgem + Genkit systemonex & ToolApproval inside Apple container"
 	@echo "  make dgem-02          Run declarative genkit-runner + dgem Streamable HTTP MCP in Apple container"
 	@echo "  make dgem-03          Run 1-to-3 Hesitation-gated scale-to-zero specialist router swarm"
+	@echo "  make agy-01           Run Antigravity (agy) Phase 1 non-decision baseline on AX"
+	@echo "  make agy-02           Run Antigravity (agy) Phase 2 cascading dgem PreToolUse safety gate + ax ssh HITL"
 	@echo "  make swarm-01         Run 01-hello-swarm (8 parallel microVMs)"
 	@echo "  make swarm-02         Run 02-repo-inspector (Workspace git clones)"
 	@echo "  make swarm-03         Run 03-seed-matrix (6-node parameter sweep)"
@@ -52,7 +54,7 @@ stack-down:
 	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
-	bash -n swarm/*.sh genkit/*.sh dgem/*.sh crostini/*.sh crostini/samples/*.sh
+	bash -n swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh crostini/*.sh crostini/samples/*.sh
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
 	cd crostini/samples/a2a-duo && go build -o /dev/null ./... && go vet ./...
 	cd dgem/router && go build -o /dev/null ./... && go vet ./...
@@ -89,6 +91,12 @@ dgem-02:
 
 dgem-03:
 	./dgem/03-specialist-router.sh
+
+agy-01:
+	./agy/01-phase1-baseline.sh
+
+agy-02:
+	./agy/02-phase2-dgem-safety-gate.sh
 
 build-recorder:
 	cd viz/recorder && go build -o ax-trace main.go

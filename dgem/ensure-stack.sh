@@ -30,7 +30,7 @@ DGEM_REPO="${DGEM_REPO:-$HOME/projects/dgem}"
 DGEM_GATEWAY_PORT="${DGEM_GATEWAY_PORT:-8095}"
 DGEM_GATEWAY_HOST="${DGEM_GATEWAY_HOST:-0.0.0.0}"
 DGEM_BRIDGE_HOST="${DGEM_BRIDGE_HOST:-192.168.64.1}"
-DGEM_ALLOWED_HOSTS="${DGEM_ALLOWED_HOSTS:-${DGEM_BRIDGE_HOST}}"
+DGEM_ALLOWED_HOSTS="${DGEM_ALLOWED_HOSTS:-${DGEM_BRIDGE_HOST},host.docker.internal,host.containers.internal}"
 DGEM_CTX="${DIFFGEMMA_CTX:-4096}"
 DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL:-}"
 if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
@@ -176,14 +176,18 @@ ensure_dgem_task_image() {
   cp "${DGEM_REPO}"/templates/*.json.tmpl "${stage_dir}/templates/"
   cp "${DGEM_REPO}"/templates/calibration/*.json.tmpl "${stage_dir}/templates/calibration/"
   cp "${DGEM_DIR}/templates/specialist_router.json.tmpl" "${stage_dir}/templates/"
+  mkdir -p "${stage_dir}/agy-safety-gate"
+  cp "${DGEM_REPO}/examples/agy-safety-gate/dgem_gate.py" "${stage_dir}/agy-safety-gate/"
+  cp "${DGEM_REPO}/examples/agy-safety-gate/sdk_demo.py" "${stage_dir}/agy-safety-gate/"
 
   cat > "${stage_dir}/Containerfile" <<'EOF'
 FROM ax-agent-local:latest
 COPY genkit-tool-approval /usr/local/bin/genkit-tool-approval
 COPY genkit-bulk-synth /usr/local/bin/genkit-bulk-synth
 COPY dgem-router /usr/local/bin/dgem-router
+COPY agy-safety-gate /opt/dgem/agy-safety-gate
 COPY templates /opt/dgem/templates
-RUN chmod +x /usr/local/bin/genkit-tool-approval /usr/local/bin/genkit-bulk-synth /usr/local/bin/dgem-router
+RUN chmod +x /usr/local/bin/genkit-tool-approval /usr/local/bin/genkit-bulk-synth /usr/local/bin/dgem-router /opt/dgem/agy-safety-gate/dgem_gate.py /opt/dgem/agy-safety-gate/sdk_demo.py
 EOF
 
   container build -t dgem-genkit-task:latest -f "${stage_dir}/Containerfile" "${stage_dir}" >/dev/null

@@ -73,7 +73,7 @@ Prove that **[`dgem` (DiffusionGemma `26B-A4B-it`)](https://github.com/GoogleClo
 
 - Builds on [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) for microVM lifecycle (`ax resume` / `ax suspend`) and `vmnet` networking.
 - Extends [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md) and [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) with System-1 diffusion routing and hesitation-gated fan-out.
-- Emits replayable JSONL traces for [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md).
+- Emits replayable JSONL traces for [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md) and powers the 4-stage `PreToolUse` safety gate in [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md).
 
 [^dgem-repo]: GoogleCloudPlatform/dgem: DiffusionGemma as a Zero-Shot Decision Model
 [^ax-issue-538]: google/ax#538: Genkit Go runner
