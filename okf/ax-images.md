@@ -29,6 +29,7 @@ experiment:
   entrypoints:
     - Makefile
     - internal/taskrunner/taskrunner.go
+    - internal/agent/tools.go
     - images/swarm-agent/Dockerfile
     - images/genkit-runner/Dockerfile
     - images/dgem-agent/Dockerfile
@@ -52,7 +53,7 @@ Every image installs its entrypoint at `/usr/local/bin/ax-agent` with `/usr/loca
 - `swarm-agent` (`images/swarm-agent/`, `cmd/swarm-agent/`) — Multi-agent Gemini worker (`python:3.12-slim` + `google-genai` + `pyyaml` + `jq`) reading `Task.spec.config` via loopback metadata (`127.0.0.1:8099`) for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md).
 - `genkit-runner` (`images/genkit-runner/`, `cmd/genkit-runner/`) — Declarative **Genkit Go** (`v1.14.0`) Dotprompt runner serving A2A gRPC (`lf.a2a.v1.A2AService`), A2A JSON-RPC, and Genkit HTTP on `:80` for [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md).
 - `dgem-agent` (`images/dgem-agent/`, `cmd/dgem-agent/`) — **DiffusionGemma (`dgem`)** System-1 decision router (`dgem-router`) and `.json.tmpl` policy templates (`specialist_router.json.tmpl`, `support_triage.json.tmpl`, `agent_step_drift.json.tmpl`) for [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md).
-- `agy-agent` (`images/agy-agent/`, `cmd/agy-agent/`) — **Google Antigravity (`agy`)** coding agent with the 4-stage cascading `dgem` `PreToolUse` safety gate (`dgem_gate.py`, `tool_safety_gate.json.tmpl`) and `ax ssh` HITL approval for [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md).
+- `agy-agent` (`images/agy-agent/`, `cmd/agy-agent/`, `internal/agent/`) — Dual-mode **Google Antigravity (`agy`)** coding agent (`antigravity-preview-09-2026` Gemini Interactions API + CLI/SDK): runs as a non-`dgem` baseline by default (matching `ghcr.io/rakyll/ax-images/antigravity`), or enables the 4-stage cascading `dgem` `PreToolUse` safety gate (`dgem_gate.py`, `tool_safety_gate.json.tmpl`) and `ax ssh` HITL approval when `spec.config.safetyGate: true` or `DGEM_GATEWAY_URL` is set, for [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md).
 
 ## Verification & Build Commands (in `~/projects/ax-images`)
 
