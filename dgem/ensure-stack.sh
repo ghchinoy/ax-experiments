@@ -63,11 +63,16 @@ ensure_dgem_stack() {
   # 2. Upstream dgem inference backend: either remote Cloud Run GPU (when DGEM_CLOUDRUN_URL is set)
   #    or local Apple Silicon Metal diffgemma (:8080)
   if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
-    echo "==> Using remote Cloud Run GPU upstream (${DGEM_CLOUDRUN_URL}, backend=${DGEM_BACKEND}); skipping local diffgemma (:8080)..."
+    echo "==> Using remote Cloud Run GPU upstream (${DGEM_CLOUDRUN_URL}, backend=${DGEM_BACKEND})..."
+    if [[ -f "${DGEM_REPO}/diffgemma.pid" ]] || lsof -i :8080 >/dev/null 2>&1; then
+      echo "==> Stopping local diffgemma (:8080) to free unified memory..."
+      (cd "${DGEM_REPO}" && ./scripts/stop_server.sh) >/dev/null 2>&1 || true
+    fi
   else
     if ! curl -fsSL -m 2 "http://127.0.0.1:8080/v1/models" >/dev/null 2>&1; then
       if [[ ! -f "${DGEM_REPO}/model/diffgemma-26b-a4b-it-q4/model.dgq.bin" ]] && [[ -d "$HOME/projects/diffusiongemma/model" ]]; then
-        ln -sfn "$HOME/projects/diffusiongemma/model" "${DGEM_REPO}/model"
+        mkdir -p "${DGEM_REPO}/model"
+        ln -sfn "$HOME/projects/diffusiongemma/model/diffgemma-26b-a4b-it-q4" "${DGEM_REPO}/model/diffgemma-26b-a4b-it-q4"
       fi
       echo "==> Starting local diffgemma Metal server (CTX=${DGEM_CTX})..."
       (cd "${DGEM_REPO}" && DIFFGEMMA_CTX="${DGEM_CTX}" ./scripts/serve.sh)
@@ -75,6 +80,15 @@ ensure_dgem_stack() {
   fi
 
   # 3. dgem serve gateway (:8095 bound on 0.0.0.0 with DGEM_ALLOWED_HOSTS=192.168.64.1)
+  if curl -fsSL -m 2 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/health" >/dev/null 2>&1; then
+    local running_backend
+    running_backend="$(curl -fsSL -m 2 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/api/backend-config" 2>/dev/null | jq -r '.default_backend // empty' || true)"
+    if [[ -n "${running_backend}" && "${running_backend}" != "${DGEM_BACKEND}" ]]; then
+      echo "==> Switching dgem serve gateway on :${DGEM_GATEWAY_PORT} from backend=${running_backend} to backend=${DGEM_BACKEND}..."
+      (cd "${DGEM_REPO}" && DGEM_GATEWAY_PORT="${DGEM_GATEWAY_PORT}" ./scripts/stop_gateway.sh)
+    fi
+  fi
+
   if ! curl -fsSL -m 2 "http://127.0.0.1:${DGEM_GATEWAY_PORT}/health" >/dev/null 2>&1; then
     if [[ -n "${DGEM_CLOUDRUN_URL}" ]]; then
       if [[ -z "${DGEM_SERVER_KEY:-}" ]] && command -v gcloud >/dev/null 2>&1; then
