@@ -7,7 +7,7 @@ BINDER ?= binder
 OKF_PROTO ?= okf-proto
 AX_REPO ?= $(HOME)/projects/ax
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-01 dgem-02 dgem-03 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -21,6 +21,7 @@ help:
 	@echo "  make dgem-up          Ensure both dgem (:8080/:8095) and AX (:8090) local stacks are up"
 	@echo "  make dgem-status      Show status of both dgem and AX local stacks"
 	@echo "  make dgem-down        Stop both dgem and AX local stacks"
+	@echo "  make dgem-cloudrun-down Tear down Cloud Run GPU service and switch :8095 gateway back to local Metal (:8080)"
 	@echo "  make dgem-01          Run dgem + Genkit systemonex & ToolApproval inside Apple container"
 	@echo "  make dgem-02          Run declarative genkit-runner + dgem Streamable HTTP MCP in Apple container"
 	@echo "  make dgem-03          Run 1-to-3 Hesitation-gated scale-to-zero specialist router swarm"
@@ -75,6 +76,9 @@ dgem-status:
 
 dgem-down:
 	./dgem/ensure-stack.sh down
+
+dgem-cloudrun-down:
+	./dgem/ensure-stack.sh cloudrun-down
 
 dgem-01:
 	./dgem/01-tool-approval-microvm.sh

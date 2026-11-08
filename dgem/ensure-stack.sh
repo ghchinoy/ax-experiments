@@ -191,6 +191,17 @@ dgem_stack_down() {
   (cd "${DGEM_REPO}" && DGEM_GATEWAY_PORT="${DGEM_GATEWAY_PORT}" make local-down) || true
 }
 
+dgem_cloudrun_down() {
+  echo "==> Tearing down Cloud Run GPU service (dgemma)..."
+  make -C "${DGEM_REPO}" cloudrun-teardown || true
+  echo "==> Switching local dgem gateway (:${DGEM_GATEWAY_PORT}) back to local Metal diffgemma (:8080)..."
+  DGEM_CLOUDRUN_URL=""
+  DGEM_BACKEND="local"
+  export DGEM_CLOUDRUN_URL DGEM_BACKEND
+  ensure_dgem_stack
+  dgem_stack_status
+}
+
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   case "${1:-up}" in
     up)
@@ -203,12 +214,15 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     down)
       dgem_stack_down
       ;;
+    cloudrun-down)
+      dgem_cloudrun_down
+      ;;
     image)
       ensure_dgem_stack
       ensure_dgem_task_image
       ;;
     *)
-      echo "Usage: $0 {up|status|down|image}" >&2
+      echo "Usage: $0 {up|status|down|cloudrun-down|image}" >&2
       exit 1
       ;;
   esac

@@ -80,8 +80,9 @@ DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-up
 # 3. Run the 1-to-3 specialist router demo (microVMs still dial http://192.168.64.1:8095 with zero cloud keys inside containers)
 GEMINI_API_KEY="your-key" DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-03
 
-# 4. Delete the Cloud Run GPU service immediately after recording (keeps Artifact Registry image & GCS weights for ~30s future redeploys)
-make -C ~/projects/dgem cloudrun-teardown
+# 4. Delete the Cloud Run GPU service immediately after recording AND switch :8095 back to local Metal diffgemma (:8080)
+unset DGEM_CLOUDRUN_URL
+make dgem-cloudrun-down
 ```
 
 When `DGEM_CLOUDRUN_URL` is set, `dgem/ensure-stack.sh` skips launching local `diffgemma` (`:8080`), sets `DGEM_BACKEND=cloudrun`, and starts `dgem serve` on `0.0.0.0:8095` with `-u "${DGEM_CLOUDRUN_URL}" --gcp-auth --default-backend cloudrun --allowed-hosts 192.168.64.1`. The Apple `container` microVMs continue calling `http://192.168.64.1:8095` (`/v1/systemone` and `/mcp`) with no GCP credentials inside the guest containers, while `dgem serve` on the Mac host handles IAM token refresh and GPU keepalive.

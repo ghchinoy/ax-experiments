@@ -78,8 +78,9 @@ make dgem-down
 DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-up
 GEMINI_API_KEY="your-key" DGEM_CLOUDRUN_URL="${DGEM_CLOUDRUN_URL}" make dgem-03
 
-# 3. Tear down the Cloud Run GPU service immediately after recording to eliminate idle GPU cost
-make -C ~/projects/dgem cloudrun-teardown
+# 3. Tear down the Cloud Run GPU service AND switch the local :8095 gateway back to local Metal diffgemma (:8080):
+unset DGEM_CLOUDRUN_URL
+make dgem-cloudrun-down
 ```
 
 See [`GUIDE.md`](./GUIDE.md) for the full architectural walkthrough, empirical measurements, alternatives considered, and operational constraints.
