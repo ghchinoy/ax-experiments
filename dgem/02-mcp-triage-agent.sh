@@ -43,7 +43,8 @@ metadata:
   name: ${WS_NAME}
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "inbox/ticket-9481.txt"
       content: |
         Double charged \$500 on invoice #9481 for my annual renewal this morning — please refund ASAP!
@@ -58,7 +59,8 @@ metadata:
   name: ${TASK_NAME}
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
   config:
     name: dgem_triage_agent
     description: Uses local M5 DiffusionGemma policy templates via MCP to triage incoming tickets.

@@ -34,7 +34,8 @@ metadata:
   name: map-topic-1
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -50,7 +51,8 @@ metadata:
   name: map-topic-2
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -66,7 +68,8 @@ metadata:
   name: map-topic-3
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -82,7 +85,8 @@ metadata:
   name: reduce-synthesis
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY

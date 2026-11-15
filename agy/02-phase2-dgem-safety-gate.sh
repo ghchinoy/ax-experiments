@@ -65,7 +65,8 @@ metadata:
   name: ${WS_NAME}
   atespace: ${ATESPACE}
 spec:
-  files:
+  setup:
+    files:
     - path: ".agents/hooks.json"
       content: |
         {
@@ -111,7 +112,8 @@ metadata:
   name: ${TASK_NAME}
   atespace: ${ATESPACE}
 spec:
-  image: "dgem-genkit-task:latest"
+  profile:
+    image: "dgem-genkit-task:latest"
   debug: true
   env:
     - name: DGEM_GATEWAY_URL

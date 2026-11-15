@@ -38,18 +38,7 @@ ADC_PATH="${HOME}/.config/gcloud/application_default_credentials.json"
 
 ax() { "${AX_BIN}" "$@"; }
 
-if [[ ! -f "${AX_REPO}/bin/genkit-runner.digest" ]]; then
-  printf '==> Building and pushing localhost:5001/genkit-runner image...\n'
-  (
-    cd "${AX_REPO}"
-    make push-genkit-image \
-      CONTAINER_CLI=docker \
-      GENKIT_REPO=localhost:5001/genkit-runner \
-      GENKIT_BASE_IMAGE=localhost:5001/ax-task-runner:e2e
-  )
-fi
-GENKIT_DIGEST="$(cat "${AX_REPO}/bin/genkit-runner.digest")"
-GENKIT_IMAGE="localhost:5001/genkit-runner@${GENKIT_DIGEST}"
+GENKIT_IMAGE="${GENKIT_IMAGE:-ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06}"
 
 if [[ -z "${GEMINI_API_KEY:-}" && ! -f "${ADC_PATH}" ]]; then
   echo "error: neither GEMINI_API_KEY nor ${ADC_PATH} is present" >&2
@@ -82,7 +71,8 @@ metadata:
   name: coder-ws
   atespace: ${ATESPACE}
 spec:
-  files:
+  setup:
+    files:
     - path: "README.md"
       content: |
         # Payment Service (payd)
@@ -120,7 +110,8 @@ metadata:
   name: auditor-ws
   atespace: ${ATESPACE}
 spec:
-  files:
+  setup:
+    files:
     - path: ".agents/skills/security-rubric/SKILL.md"
       content: |
         ---
@@ -134,8 +125,8 @@ spec:
     - path: ".gcloud/adc.json"
       content: |
 ${ADC_INDENTED}
-  skills:
-    path: ".agents/skills"
+    skills:
+      path: ".agents/skills"
 ---
 apiVersion: ax.io/v1alpha1
 kind: Task
@@ -143,7 +134,8 @@ metadata:
   name: coder-agent
   atespace: ${ATESPACE}
 spec:
-  image: "${GENKIT_IMAGE}"
+  profile:
+    image: "${GENKIT_IMAGE}"
   debug: true
   env:
     - name: GOOGLE_CLOUD_PROJECT
@@ -179,7 +171,8 @@ metadata:
   name: auditor-agent
   atespace: ${ATESPACE}
 spec:
-  image: "${GENKIT_IMAGE}"
+  profile:
+    image: "${GENKIT_IMAGE}"
   debug: true
   env:
     - name: GOOGLE_CLOUD_PROJECT

@@ -107,7 +107,8 @@ metadata:
   name: specialist-ws
   atespace: ${ATESPACE}
 spec:
-  files:
+  setup:
+    files:
     - path: ".agents/skills/webhook-security/SKILL.md"
       content: |
         ---
@@ -121,8 +122,8 @@ spec:
     - path: ".gcloud/adc.json"
       content: |
 ${ADC_INDENTED}
-  skills:
-    path: ".agents/skills"
+    skills:
+      path: ".agents/skills"
 ---
 apiVersion: ax.io/v1alpha1
 kind: Workspace
@@ -130,7 +131,8 @@ metadata:
   name: lead-ws
   atespace: ${ATESPACE}
 spec:
-  files:
+  setup:
+    files:
     - path: "webhook_handler.go"
       content: |
         package webhook
@@ -166,7 +168,8 @@ metadata:
   name: security-specialist
   atespace: ${ATESPACE}
 spec:
-  image: "${GENKIT_IMAGE}"
+  profile:
+    image: "${GENKIT_IMAGE}"
   debug: true
   env:
     - name: GOOGLE_CLOUD_PROJECT
@@ -204,7 +207,8 @@ metadata:
   name: lead-engineer
   atespace: ${ATESPACE}
 spec:
-  image: "${GENKIT_IMAGE}"
+  profile:
+    image: "${GENKIT_IMAGE}"
   debug: true
   env:
     - name: GOOGLE_CLOUD_PROJECT

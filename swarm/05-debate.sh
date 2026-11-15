@@ -32,7 +32,8 @@ metadata:
   name: debate-proposer
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -48,7 +49,8 @@ metadata:
   name: debate-critic
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY

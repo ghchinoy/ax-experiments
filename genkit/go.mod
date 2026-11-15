@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/a2aproject/a2a-go/v2 v2.3.1
-	go.ate.dev/substrate v1.0.0-rc.1
+	go.ate.dev/substrate v1.0.0
 	google.golang.org/grpc v1.83.2
 )
 
@@ -21,5 +21,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260825221802-da73d73af1c5 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
-
-replace github.com/google/ax => /home/hussain/projects/ax

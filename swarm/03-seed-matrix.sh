@@ -27,7 +27,8 @@ metadata:
   name: matrix-seed-${s}
   atespace: default
 spec:
-  image: "debian:12"
+  profile:
+    image: "debian:12"
   debug: true
   env:
     - name: SEED

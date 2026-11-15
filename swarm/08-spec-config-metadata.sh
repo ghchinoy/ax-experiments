@@ -43,7 +43,8 @@ metadata:
   name: ${WS_NAME}
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "policy/rules.json"
       content: |
         {"maxRetries": 3, "sandbox": "apple-container", "loopbackMetadata": true}
@@ -54,7 +55,8 @@ metadata:
   name: ${TASK_NAME}
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   workspace:
     name: ${WS_NAME}
@@ -78,7 +80,7 @@ echo
 echo "--> Step 3: Inspecting 'ax describe task ${TASK_NAME}' (shows Config: section from #523)..."
 "${AX_BIN}" describe task "${TASK_NAME}"
 
-WORKER_IP="$("${AX_BIN}" describe task "${TASK_NAME}" | awk '/Worker IP:/{print $3}')"
+WORKER_IP="$(task_ip "${TASK_NAME}")"
 echo
 echo "--> Step 4: Verifying external boundary on ${WORKER_IP}:80..."
 READY_CODE="$(curl -s -o /dev/null -w "%{http_code}" "http://${WORKER_IP}:80/readyz")"

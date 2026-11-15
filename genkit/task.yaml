@@ -7,7 +7,8 @@ spec:
   # When running in an AX + Agent Substrate cluster, pin the pushed digest from
   # `make push-genkit-image`. When testing locally with `--task-file`, the image
   # field is unused.
-  image: "localhost:5001/genkit-runner@sha256:REPLACE_WITH_PUSHED_DIGEST"
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
   config:
     name: triage_agent
     description: Triages failing tests and writes reports to the workspace.

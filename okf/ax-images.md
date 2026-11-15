@@ -36,8 +36,8 @@ experiment:
     - images/agy-agent/Dockerfile
   upstream:
     repo: google/ax
-    base_commit: f0228f1
-    issues: [526, 538]
+    base_commit: 9a65684
+    issues: [526, 538, 563, 602]
 ---
 
 # Track 5: AX Images (`~/projects/ax-images`)
@@ -69,7 +69,7 @@ make pin            # pin @sha256: digests into images/*/task.yaml and README.md
 ## Related Experiment Tracks
 
 - Runs directly on [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) and [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md).
-- Packages the runtime images for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md), [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md), [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md), and [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md).
+- Packages the runtime images (`v0.2.0`, aligned with `google/ax` Epic `#563` / `#587` via [`ghchinoy/ax-images#1`](https://github.com/ghchinoy/ax-images/issues/1)) for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md), [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md), [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md), [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md), and [Track 6: End-to-End 5/5 Live AX v0.1 Hero Demo Harness (hero-demo)](/hero-demo.md).
 - Integrated into the Configurable Image Artifact Registry Catalog in [Track 4: AX Central — Desktop Control Plane, Task Designer & Podman Shim](/ax-central.md).
 
 [^ghchinoy-ax-images]: ghchinoy/ax-images: Multi-arch task images for AX

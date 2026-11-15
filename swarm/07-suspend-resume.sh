@@ -24,7 +24,8 @@ metadata:
   name: ${TASK_NAME}
   atespace: default
 spec:
-  image: "debian:12"
+  profile:
+    image: "debian:12"
   debug: true
 EOF
 
@@ -46,7 +47,7 @@ echo "--> Step 3: Suspending task (stopping Apple container to free host CPU/RAM
 sleep 2
 
 # Verify container is stopped
-CONTAINER_STATE="$(container list --all 2>/dev/null | awk -v name="ate-default-${TASK_NAME}" '$1 == name {print $5}')"
+CONTAINER_STATE="$(container list --all 2>/dev/null | awk -v n1="ate-default-${TASK_NAME}" -v n2="ate-apple-default-${TASK_NAME}" '$1 == n1 || $1 == n2 {print $5; exit}')"
 echo "   Container state after suspend: ${CONTAINER_STATE:-stopped}"
 
 echo "--> Step 4: Resuming task (cold-booting container with persistent volume)..."

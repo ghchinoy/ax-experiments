@@ -13,6 +13,7 @@ okf_version: "0.2"
 * [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md) - Discrete-diffusion System-1 decision policies (`DiffusionGemma 26B-A4B`) + Genkit Go `v1.14.0` inside Apple `container` microVMs: `systemonex` tool-interrupt guardrails, Streamable HTTP MCP triage, and a 1-to-3 Hesitation-gated scale-to-zero specialist router swarm.
 * [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md) - Google Antigravity (`ghcr.io/rakyll/ax-images/antigravity` and `agy` CLI/Python SDK) coding tasks on AX across macOS `ate-local` and `Kind + Agent Substrate`: Phase 1 non-decision baseline and Phase 2 4-stage cascading `dgem` `PreToolUse` safety gate (`tool_safety_gate.json.tmpl`) with live `ax ssh` HITL approval.
 * [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md) - JSONL trace event schema, Go recorder (`ax-trace`), Lit 3 + Force-Graph + Cytoscape CoSE replay UI, and swarm lineage RFC.
+* [Track 6: End-to-End 5/5 Live AX v0.1 Hero Demo Harness (hero-demo)](/hero-demo.md) - Live `5/5 🟢 PASS` execution of upstream `google/ax`'s v0.1 Hero Demo (`google/ax#590`) across `ate-local` (`google/ax#602`), warm Substrate `Tag` snapshots, digest-pinned `genkit-runner` (`v0.2.0`) multi-turn sessions across suspend/resume, stock `python:3.12-slim` runner injection, and `Apple container` $\rightarrow$ `Podman`/Kubernetes cluster promotion.
 
 ## External Companion Projects (`~/projects/*`)
 

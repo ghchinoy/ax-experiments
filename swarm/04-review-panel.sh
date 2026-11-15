@@ -55,7 +55,8 @@ metadata:
   name: panel-security-reviewer
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -73,7 +74,8 @@ metadata:
   name: panel-readability-reviewer
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY
@@ -91,7 +93,8 @@ metadata:
   name: panel-performance-reviewer
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   env:
     - name: GEMINI_API_KEY

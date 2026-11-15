@@ -8,7 +8,7 @@ OKF_PROTO ?= $(shell command -v okf-proto 2>/dev/null || echo $(HOME)/go/bin/okf
 AX_REPO ?= $(HOME)/projects/ax
 AX_IMAGES_REPO ?= $(HOME)/projects/ax-images
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple hero-demo dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -20,6 +20,7 @@ help:
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
 	@echo "  make ax-images-local  Build ghcr.io/ghchinoy/ax-images/* in Apple container (via $(AX_IMAGES_REPO))"
 	@echo "  make genkit-apple     Run Genkit Go runner (#538) E2E in Apple container microVM"
+	@echo "  make hero-demo        Run End-to-End 5/5 Live AX v0.1 Hero Demo (#590/#602) across Apple container & Podman"
 	@echo "  make dgem-up          Ensure both dgem (:8080/:8095) and AX (:8090) local stacks are up"
 	@echo "  make dgem-status      Show status of both dgem and AX local stacks"
 	@echo "  make dgem-down        Stop both dgem and AX local stacks"
@@ -56,7 +57,7 @@ stack-down:
 	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
-	bash -n swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh crostini/*.sh crostini/samples/*.sh
+	bash -n swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh hero-demo/*.sh crostini/*.sh crostini/samples/*.sh
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
 	cd crostini/samples/a2a-duo && go build -o /dev/null ./... && go vet ./...
 	cd dgem/router && go build -o /dev/null ./... && go vet ./...
@@ -80,6 +81,9 @@ ax-images-local:
 
 genkit-apple:
 	./genkit/run-apple-container.sh
+
+hero-demo:
+	./hero-demo/run-live.sh
 
 dgem-up:
 	./dgem/ensure-stack.sh up

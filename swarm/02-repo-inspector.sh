@@ -23,10 +23,11 @@ metadata:
   name: ws-ax
   atespace: default
 spec:
-  git:
-    - name: ax
-      repo: "https://github.com/golang/example.git"
-      depth: 1
+  setup:
+    git:
+      - name: ax
+        repo: "https://github.com/golang/example.git"
+        depth: 1
 ---
 apiVersion: ax.io/v1alpha1
 kind: Workspace
@@ -34,9 +35,10 @@ metadata:
   name: ws-sample
   atespace: default
 spec:
-  files:
-    - path: "data.txt"
-      content: "Hello from AX Workspace inlined file support!"
+  setup:
+    files:
+      - path: "data.txt"
+        content: "Hello from AX Workspace inlined file support!"
 ---
 apiVersion: ax.io/v1alpha1
 kind: Task
@@ -44,7 +46,8 @@ metadata:
   name: repo-ax
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   workspace:
     name: ws-ax
@@ -55,7 +58,8 @@ metadata:
   name: repo-substrate
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
   workspace:
     name: ws-sample
@@ -66,7 +70,8 @@ metadata:
   name: repo-goexample
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ax-agent-local:latest"
   debug: true
 EOF
 

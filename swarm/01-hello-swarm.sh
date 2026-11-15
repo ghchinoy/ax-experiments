@@ -30,7 +30,8 @@ metadata:
   name: ${t}
   atespace: default
 spec:
-  image: "debian:12"
+  profile:
+    image: "debian:12"
   debug: true
 ---
 EOF
@@ -53,8 +54,7 @@ printf "%-18s %-16s %-24s %s\n" "TASK NAME" "WORKER IP" "HOSTNAME" "OS / ARCH"
 printf "%-18s %-16s %-24s %s\n" "---------" "---------" "--------" "---------"
 
 for t in "${TASKS[@]}"; do
-  desc="$("${AX_BIN}" describe task "$t" 2>/dev/null)"
-  ip="$(echo "${desc}" | awk '/Worker IP:/{print $3}')"
+  ip="$(task_ip "$t")"
   info="$(ssh_task "$t" sh -c 'printf "%s|%s" "$(hostname)" "$(uname -sm)"' 2>/dev/null || echo "error|error")"
   hname="$(echo "${info}" | cut -d'|' -f1)"
   arch="$(echo "${info}" | cut -d'|' -f2)"

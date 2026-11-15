@@ -22,7 +22,8 @@ if [[ ! -x "${AX_BIN}" ]]; then
 fi
 
 AX_SERVER="${AX_SERVER:-localhost:8090}"
-export AX_SERVER
+ATENET_ROUTER_ADDR="${ATENET_ROUTER_ADDR:-127.0.0.1:50051}"
+export AX_SERVER ATENET_ROUTER_ADDR
 
 trace_event() {
   if [[ -n "${AX_TRACE_RECIPE:-}" ]]; then
@@ -106,14 +107,12 @@ wait_ready() {
   while (( SECONDS - start < max_wait )); do
     local desc
     desc="$("${AX_BIN}" describe task "${task_name}" 2>/dev/null || true)"
-    local phase
-    phase="$(echo "${desc}" | awk '/Phase:/{print $2}')"
+    local state
+    state="$(echo "${desc}" | awk '/^(State|Phase):/{print $2; exit}')"
     local has_ready
     has_ready="$(echo "${desc}" | grep -E "Ready\s+True" || true)"
-    local ip
-    ip="$(echo "${desc}" | awk '/Worker IP:/{print $3}')"
 
-    if [[ "${phase}" == "Running" && -n "${has_ready}" && -n "${ip}" && "${ip}" != "<none>" ]]; then
+    if [[ ( "${state}" == "Working" || "${state}" == "Running" ) && -n "${has_ready}" ]]; then
       return 0
     fi
     sleep 0.1
@@ -165,7 +164,20 @@ count_apple_containers() {
 
 task_ip() {
   local task_name="$1"
-  "${AX_BIN}" describe task "${task_name}" 2>/dev/null | awk '/Worker IP:/{print $3}'
+  local ip
+  ip="$("${AX_BIN}" describe task "${task_name}" 2>/dev/null | awk '/Worker IP:/{print $3}')"
+  if [[ -n "${ip}" && "${ip}" != "<none>" ]]; then
+    printf '%s\n' "${ip}"
+    return 0
+  fi
+  for cname in "ate-default-${task_name}" "ate-apple-default-${task_name}" "ate-cluster-b-default-${task_name}"; do
+    ip="$(container inspect "${cname}" 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); d=d[0] if isinstance(d,list) and d else (d if isinstance(d,dict) else {}); nets=((d.get("status") or {}).get("networks") or []); print((nets[0].get("ipv4Address") or nets[0].get("address") or "").split("/")[0] if nets else "")' 2>/dev/null || true)"
+    if [[ -n "${ip}" ]]; then
+      printf '%s\n' "${ip}"
+      return 0
+    fi
+  done
+  printf '127.0.0.1\n'
 }
 
 wait_a2a_ready() {
@@ -200,16 +212,24 @@ ensure_genkit_runner() {
   fi
 
   if [[ ! -x "${genkit_cache}" ]]; then
-    echo "==> Cross-compiling genkit-runner (linux/arm64) from origin/feat/genkit-runner..."
-    local wt_dir
-    wt_dir="$(mktemp -d /tmp/ax-genkit-wt-XXXXXX)"
-    (
-      cd "${AX_REPO}"
-      git worktree add --detach "${wt_dir}" origin/feat/genkit-runner >/dev/null 2>&1
-      trap 'git -C "${AX_REPO}" worktree remove --force "${wt_dir}" >/dev/null 2>&1 || true' EXIT
-      cd "${wt_dir}"
-      GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "${genkit_cache}" ./cmd/runners/genkit-runner
-    )
+    local ax_images_repo="${AX_IMAGES_REPO:-$HOME/projects/ax-images}"
+    if [[ -d "${ax_images_repo}/cmd/genkit-runner" ]]; then
+      echo "==> Cross-compiling genkit-runner (linux/arm64) from ${ax_images_repo}..."
+      GOOS=linux GOARCH=arm64 CGO_ENABLED=0 \
+        go -C "${ax_images_repo}" build -trimpath -ldflags="-s -w" \
+        -o "${genkit_cache}" ./cmd/genkit-runner
+    else
+      echo "==> Cross-compiling genkit-runner (linux/arm64) from origin/feat/genkit-runner..."
+      local wt_dir
+      wt_dir="$(mktemp -d /tmp/ax-genkit-wt-XXXXXX)"
+      (
+        cd "${AX_REPO}"
+        git worktree add --detach "${wt_dir}" origin/feat/genkit-runner >/dev/null 2>&1
+        trap 'git -C "${AX_REPO}" worktree remove --force "${wt_dir}" >/dev/null 2>&1 || true' EXIT
+        cd "${wt_dir}"
+        GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "${genkit_cache}" ./cmd/runners/genkit-runner
+      )
+    fi
   fi
   cp "${genkit_cache}" "${runner_target}"
 }

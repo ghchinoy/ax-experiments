@@ -53,7 +53,7 @@ echo "==> [1/6] Applying Workspace (demo-workspace) and Task (genkit-triage)..."
 echo "==> [2/6] Resuming genkit-triage in Apple container microVM..."
 "${AX_BIN}" resume genkit-triage
 
-WORKER_IP="$("${AX_BIN}" describe task genkit-triage | awk '/Worker IP:/{print $3}')"
+WORKER_IP="$(task_ip genkit-triage)"
 echo "    Task Running at vmnet IP: ${WORKER_IP}"
 "${AX_BIN}" describe task genkit-triage
 
@@ -85,7 +85,7 @@ echo "==> [5/6] Suspending and Resuming Task (microVM stop -> cold boot)..."
 "${AX_BIN}" suspend genkit-triage
 "${AX_BIN}" get tasks
 "${AX_BIN}" resume genkit-triage
-WORKER_IP="$("${AX_BIN}" describe task genkit-triage | awk '/Worker IP:/{print $3}')"
+WORKER_IP="$(task_ip genkit-triage)"
 echo "    Task Resumed at vmnet IP: ${WORKER_IP}"
 
 for _ in $(seq 1 30); do

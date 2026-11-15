@@ -4,7 +4,8 @@ metadata:
   name: billing-ws
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "ledger/invoices.json"
       content: |
         {
@@ -28,7 +29,8 @@ metadata:
   name: security-ws
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "playbooks/prompt-injection-sop.md"
       content: |
         # Security Incident Response SOP: Agent & Webhook Injection
@@ -46,7 +48,8 @@ metadata:
   name: engineering-ws
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "README.md"
       content: |
         # Payment Service (payd)

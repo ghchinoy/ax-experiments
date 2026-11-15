@@ -37,7 +37,8 @@ metadata:
   name: ${TASK_NAME}
   atespace: default
 spec:
-  image: "dgem-genkit-task:latest"
+  profile:
+    image: "dgem-genkit-task:latest"
   debug: true
   env:
     - name: DGEM_GATEWAY_URL

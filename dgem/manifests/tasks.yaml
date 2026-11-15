@@ -4,7 +4,8 @@ metadata:
   name: dgem-router
   atespace: default
 spec:
-  image: "dgem-genkit-task:latest"
+  profile:
+    image: "dgem-genkit-task:latest"
   debug: true
   env:
     - name: DGEM_GATEWAY_URL
@@ -22,7 +23,8 @@ metadata:
   name: specialist-billing
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
   config:
     name: billing_specialist
     description: Billing & ledger operations specialist for refunds, duplicate charges, and vendor payouts.
@@ -53,7 +55,8 @@ metadata:
   name: specialist-security
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
   config:
     name: security_specialist
     description: Security incident & prompt-injection specialist with dgem MCP policy verification.
@@ -85,7 +88,8 @@ metadata:
   name: specialist-engineering
   atespace: default
 spec:
-  image: "ax-agent-local:latest"
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
   config:
     name: engineering_specialist
     description: Go software engineering specialist for diagnosing panics, inspecting code, and patching bugs.

@@ -16,9 +16,10 @@
 """AX Swarm Agent worker script.
 
 Reads structured agent configuration from the in-sandbox AX loopback metadata
-server ($AX_METADATA_URL/metadata/v1alpha1/ax/task -> spec.config) or from
-environment variables (AGENT_ROLE, AGENT_PROMPT, AX_AGENT_MODEL), invokes
-Gemini, and writes output to both stdout and a structured file.
+server ($AX_METADATA_URL/metadata/v1alpha1/ax/task -> spec.goal.spec and
+spec.config) or from environment variables (AGENT_ROLE, AGENT_PROMPT,
+AX_AGENT_MODEL), invokes Gemini, and writes output to both stdout and a
+structured file.
 """
 
 import os
@@ -31,7 +32,7 @@ warnings.filterwarnings("ignore")
 
 
 def load_task_config():
-    """Fetches spec.config from the in-sandbox loopback metadata endpoint."""
+    """Fetches spec.goal.spec and spec.config from the loopback metadata endpoint."""
     meta_url = os.environ.get("AX_METADATA_URL", "http://127.0.0.1:8099")
     url = f"{meta_url.rstrip('/')}/metadata/v1alpha1/ax/task"
     raw_yaml = ""
@@ -50,9 +51,14 @@ def load_task_config():
 
         doc = yaml.safe_load(raw_yaml) or {}
         spec = doc.get("spec") or {}
+        out = {}
         cfg = spec.get("config") or {}
         if isinstance(cfg, dict):
-            return cfg
+            out.update(cfg)
+        goal = spec.get("goal") or {}
+        if isinstance(goal, dict) and goal.get("spec"):
+            out.setdefault("goalSpec", goal.get("spec"))
+        return out
     except Exception:
         pass
     return {}
@@ -69,6 +75,7 @@ def main():
     role = os.environ.get("AGENT_ROLE") or cfg.get("role") or "Assistant"
     user_prompt = (
         os.environ.get("AGENT_PROMPT")
+        or cfg.get("goalSpec")
         or cfg.get("prompt")
         or "Introduce yourself and report your environment."
     )

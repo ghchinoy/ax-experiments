@@ -4,7 +4,8 @@ metadata:
   name: demo-workspace
   atespace: default
 spec:
-  files:
+  setup:
+    files:
     - path: "README.md"
       content: |
         # Payment Service (payd)
@@ -109,10 +110,10 @@ spec:
                 }
                 sys.stdout.write(json.dumps(resp) + "\n")
                 sys.stdout.flush()
+    skills:
+      path: ".agents/skills"
   mcp:
     servers:
       - name: telemetry
         command: "python3"
         args: ["/workspace/tools/incident_mcp.py"]
-  skills:
-    path: ".agents/skills"
