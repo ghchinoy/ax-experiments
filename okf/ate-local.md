@@ -32,15 +32,17 @@ experiment:
     - ax-experiments-1rx.1
     - ax-experiments-1rx.2
     - ax-experiments-1rx.3
+    - ax-experiments-1rx.4
   entrypoints:
     - ate-local/README.md
     - ate-local/PROPOSAL.md
     - ate-local/TESTING.md
+    - ate-local/HERO-DEMO-FEEDBACK.md
   upstream:
     repo: google/ax
-    base_commit: f0228f1
-    issues: [526, 515, 517, 532, 536]
-    prs: [504]
+    base_commit: 9a65684
+    issues: [526, 515, 517, 532, 536, 563, 602]
+    prs: [504, 590]
   forks:
     - repo: ghchinoy/ax
       branch: feat/ate-local-apple-container

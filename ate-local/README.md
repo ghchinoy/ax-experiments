@@ -14,6 +14,7 @@ With `ate-local`, an AX developer on an Apple Silicon Mac can boot the full AX s
 |---|---|
 | [`PROPOSAL.md`](/ate-local/PROPOSAL.md) | Full architectural proposal, Substrate concept mapping, developer glidepath analysis, and Apple Silicon performance benchmarks. |
 | [`TESTING.md`](/ate-local/TESTING.md) | Step-by-step verification guide: automated unit tests, live Apple `container` microVM integration tests, and full local stack walkthrough. |
+| [`HERO-DEMO-FEEDBACK.md`](/ate-local/HERO-DEMO-FEEDBACK.md) | Field report & actionable follow-ups for `~/projects/ax` (`feat/ate-local-apple-container`) uncovered during the live 5/5 Hero Demo (`#590` / `#602`). |
 | [`archive/prior-proposal.md`](/ate-local/archive/prior-proposal.md) | Archived initial `ate-local` design draft. |
 | [`archive/glidepath.md`](/ate-local/archive/glidepath.md) | Archived developer adoption funnel ("glidepath") notes. |
 
