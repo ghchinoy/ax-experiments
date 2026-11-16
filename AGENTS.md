@@ -31,10 +31,12 @@ okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/
   ax-central.md         Track 4 concept card (`type: External Experiment`, ~/projects/ax-central)
   ax-images.md          Track 5 concept card (`type: External Experiment`, ~/projects/ax-images)
   hero-demo.md          Track 6 concept card (`type: Experiment Track`, in-tree)
-ate-local/              Track 1: Native macOS Apple container Substrate (google/ax#526)
-  README.md             Track overview & quick verification commands
+ate-local/              Track 1: Local Agent Substrate on Apple container & Podman (google/ax#526, #602)
+  README.md             Track overview, quick verification & two-layer setup/runtime appendix
   PROPOSAL.md           Architecture proposal, concept mapping & Apple Silicon benchmarks
   TESTING.md            Automated unit/live microVM test suite & local stack walkthrough
+  AX-SETUP.md           Design notes towards `ax setup` & separating setup from daemon lifecycle
+  HERO-DEMO-FEEDBACK.md Field report & landed follow-ups from the 5/5 Hero Demo (#590/#602)
   archive/              Archived early proposal and glidepath drafts
 crostini/               Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack
   README.md             Track overview & quickstart

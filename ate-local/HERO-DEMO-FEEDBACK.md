@@ -2,7 +2,7 @@
 
 > **OKF v0.2 Track Metadata**: [`okf/ate-local.md`](../okf/ate-local.md) · **Hero Demo Card**: [`okf/hero-demo.md`](../okf/hero-demo.md) · **Target Branch**: [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container)
 
-This document captures the edge cases, fixes already landed in [`ghchinoy/ax@471ca83`](https://github.com/ghchinoy/ax/commit/471ca83), and remaining follow-up work for the **`ate-local` fork agent (`~/projects/ax`)** uncovered while bringing upstream [`google/ax/hack/hero-demo/`](https://github.com/google/ax/pull/590) to **`5/5 🟢 PASS`** in [`hero-demo/run-live.sh`](../hero-demo/run-live.sh).
+This document captures the edge cases, fixes landed in [`ghchinoy/ax@471ca83`](https://github.com/ghchinoy/ax/commit/471ca83), and the three follow-up items for the **`ate-local` fork branch (`~/projects/ax`, `feat/ate-local-apple-container`)** uncovered while bringing upstream [`google/ax/hack/hero-demo/`](https://github.com/google/ax/pull/590) to **`5/5 🟢 PASS`** in [`hero-demo/run-live.sh`](../hero-demo/run-live.sh). All three follow-ups in Section 2 have since landed on `feat/ate-local-apple-container` (rebased onto `google/ax:main` at `b95c3f4`).
 
 ---
 
@@ -23,16 +23,15 @@ This document captures the edge cases, fixes already landed in [`ghchinoy/ax@471
 
 ---
 
-## 2. Actionable Follow-Ups for the `~/projects/ax` Agent
+## 2. Follow-Ups Landed on `feat/ate-local-apple-container`
 
-### Follow-Up 1: Clean Up Staged `workdirs/` on `DeleteActor` & Host-Fallback Snapshot Archiving (`internal/atelocal/server.go`)
-1. **`DeleteActor` cleanup**: When `DeleteActor` deletes an actor (`internal/atelocal/server.go:937`), also remove `<SnapshotDir>/workdirs/<prefix>/<atespace>/<actor>` (and optionally decide whether `<SnapshotDir>/<atespace>/<actor>.tar.gz` should be removed on explicit `DeleteActor` so a deleted-and-recreated task starts clean from `<workspace>-warm.tar.gz` rather than stale deleted-task state!).
-   - *Important*: Right now, if a user runs `ax delete task foo` and then `ax apply -f foo.yaml`, a leftover `<SnapshotDir>/<atespace>/foo.tar.gz` from the deleted task will hydrate into the new `foo` task unless `DeleteActor` cleans it up!
-2. **Host-directory fallback in `saveWorkspaceSnapshot`**: When `stagePreBootWorkspace` mounted `-v <hostDir>:/workspace`, `saveWorkspaceSnapshot` (`internal/atelocal/server.go:815`) can archive directly from `<hostDir>` on the host if `container exec ... tar` fails (for instance, if a container exited before `SuspendActor` was called), and add a unit test in `internal/atelocal/server_test.go` covering real gzip archive pre-boot staging + `DeleteActor` cleanup.
+### Follow-Up 1 (`✅ Landed` — `8cb98dd` / rebased `4ef71a5`): Clean Up Staged `workdirs/` on `DeleteActor` & Host-Fallback Snapshot Archiving (`internal/atelocal/server.go`)
+1. **`DeleteActor` cleanup**: `DeleteActor` now removes both `<SnapshotDir>/workdirs/<prefix>/<atespace>/<actor>` and `<SnapshotDir>/<atespace>/<actor>.tar.gz` while preserving shared `<SnapshotDir>/<atespace>/tags/*.tar.gz` archives, ensuring a deleted-and-recreated task starts clean from `<workspace>-warm.tar.gz` rather than stale deleted-task state.
+2. **Host-directory fallback in `saveWorkspaceSnapshot`**: When `stagePreBootWorkspace` mounted `-v <hostDir>:/workspace`, `saveWorkspaceSnapshot` now archives directly from `<hostDir>` on the host (`archiveDirTarGz`) if `container exec ... tar` fails (for instance, when a batch container like `python:3.12-slim` exits before `SuspendActor` is called), covered by `TestPreBootWorkspaceStagingAndDeleteCleanup` in `internal/atelocal/server_test.go`.
 
-### Follow-Up 2: Automatic Workspace Pre-Warm `Tag` & `WorkspaceSpec.profile` Support (`internal/server/workspace.go` + `examples/ate_local/`)
-1. **Unblock `WorkspaceSpec.profile` (`#584`)**: Upstream `hack/hero-demo/workspace.yaml` sets `spec.profile.resources`, which `firstUnimplementedWorkspaceField` in `internal/server/workspace.go:154` currently rejects with `codes.Unimplemented: spec.profile is not supported yet`.
-2. **Auto-Prewarm on `CreateWorkspace` (or `TaskReconciler`)**: Currently [`hero-demo/run-live.sh`](../hero-demo/run-live.sh) runs a temporary setup task (`hero-demo-ws-prewarm`) and [`genkit/cmd/ws-tag`](../genkit/cmd/ws-tag/main.go) to mint `Tag` `hero-demo-ws-warm`. Wiring `CreateWorkspace` (when `spec.setup` is non-empty) to run a short-lived setup actor on `ate-local` (using `spec.profile.image` or a git-capable default setup image) and call `CreateTag(<ws>-warm)` automatically will allow upstream's unmodified `hack/hero-demo/run.sh` Step 2 & Step 4 to turn `🟢 PASS` without any external helper!
+### Follow-Up 2 (`✅ Landed` — `8cb98dd` & `eb8a693` / rebased `4ef71a5` & `a7607d4`): Automatic Workspace Pre-Warm `Tag` & `WorkspaceSpec.profile` Support (`internal/server/workspace.go` + `internal/atelocal/server.go`)
+1. **Unblocked `WorkspaceSpec.profile.{image,resources}` (`#584`)**: `firstUnimplementedWorkspaceField` in `internal/server/workspace.go` now permits `spec.profile.image` and `spec.profile.resources` (enforced by `TaskReconciler.EffectiveProfile`), rejecting only `spec.profile.ateActorTemplate` and `spec.setup.gateway`.
+2. **Lazy Auto-Prewarm on First Attach**: `ensureWarmWorkspaceTag` in `internal/atelocal/server.go` runs a short-lived setup container (using `ws.spec.profile.image` or `alpine/git`) when a task attaches to a `Workspace` with non-empty `spec.setup` and no `<ws>-warm` `Tag` snapshot exists yet, waiting for `.ax/initialized` and archiving `tags/<ws>-warm.tar.gz` automatically.
 
-### Follow-Up 3: Upstream `hack/hero-demo/run.sh` Wiring on `feat/ate-local-apple-container`
-- With Follow-Ups 1 & 2 in place, `hack/hero-demo/run.sh` in `~/projects/ax` can wire Steps 1–5 directly against `examples/ate_local/local-stack.sh multi-up` (verify by running `~/projects/ax-experiments/hero-demo/run-live.sh` as the regression gate).
+### Follow-Up 3 (`✅ Landed` — `eb8a693` / rebased `a7607d4`): Upstream `hack/hero-demo/run.sh` Wiring on `feat/ate-local-apple-container`
+- `hack/hero-demo/run.sh` in `~/projects/ax` now supports `RUN_LIVE_STEPS=1 ATE_LOCAL=1` across all 5 steps directly against `examples/ate_local/local-stack.sh multi-up` (using digest-pinned `genkit-runner` for Step 3, unmodified stock `python:3.12-slim` with injected `ax-task-runner` + warm workspace snapshot for Step 4, and Cluster A $\rightarrow$ Cluster B promotion for Step 5).

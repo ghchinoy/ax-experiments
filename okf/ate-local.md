@@ -37,10 +37,11 @@ experiment:
     - ate-local/README.md
     - ate-local/PROPOSAL.md
     - ate-local/TESTING.md
+    - ate-local/AX-SETUP.md
     - ate-local/HERO-DEMO-FEEDBACK.md
   upstream:
     repo: google/ax
-    base_commit: 9a65684
+    base_commit: b95c3f4
     issues: [526, 515, 517, 532, 536, 563, 602]
     prs: [504, 590]
   forks:
