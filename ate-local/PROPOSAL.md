@@ -3,8 +3,8 @@
 > **Document Status**: Internal Proposal & Review Document  
 > **Author**: Hussain Chinoy (`ghchinoy@google.com`)  
 > **Target Audience**: AX and Agent Substrate committers, maintainers, and platform engineers  
-> **Working Branch**: [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) (cleanly rebased on `google/ax:main` at `f0228f1`)  
-> **Companion Guides**: [`TESTING.md`](/ate-local/TESTING.md), [`/swarm/GUIDE.md`](/swarm/GUIDE.md), [`/viz/FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md)  
+> **Working Branch**: [`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container) (cleanly rebased on `google/ax:main` at `f4a9203`, zero core AX Go package changes)  
+> **Companion Guides**: [`AX-SETUP.md`](/ate-local/AX-SETUP.md), [`TESTING.md`](/ate-local/TESTING.md), [`/swarm/GUIDE.md`](/swarm/GUIDE.md), [`/viz/FRICTION-REPORT.md`](/viz/FRICTION-REPORT.md)  
 > **Archived Drafts**: [`archive/prior-proposal.md`](/ate-local/archive/prior-proposal.md), [`archive/glidepath.md`](/ate-local/archive/glidepath.md)
 
 ---
@@ -271,8 +271,10 @@ To ensure clear technical expectations:
 | [**#496**](https://github.com/google/ax/pull/496) (jbd) | **Merged** (`6a1d6ea`) | Binds at most one workspace per task (`workspace:` singular) | **Updated in Swarms & examples:** all manifests use singular `workspace:`. |
 | [**#515**](https://github.com/google/ax/pull/515) (rakyll) | **Merged** (`2bfbcb8`) | Moves store to PostgreSQL; reads live actor state from Substrate (`GetActor`/`ListActors`) | **Verified end-to-end.** `local-stack.sh` now runs `postgres:17-alpine`, and `ate-local`'s `GetActor`/`ListActors` serve live actor state to `ax-server`. |
 | [**#517**](https://github.com/google/ax/pull/517) (siyuanfoundation) | **Merged** (`353f650`) | Bumps Substrate to `v0.6.0` (`go.ate.dev/substrate`, `ResourceRequirements`) | **Updated in `ate-local`:** imports `go.ate.dev/substrate` and parses `CpuMillicores` / `MemoryBytes`. |
-| [**#532**](https://github.com/google/ax/pull/532) (yongruilin) | **Merged** (`37dda66`) | Removes the `Reconciler` interface; `server.NewServer` requires a `*controller.TaskReconciler` with a `*substrate.Client` | **Validates `ate-local`'s design.** Because `ax-server` now exclusively speaks `ateapipb.ControlServer`, `ate-local` is the exact local control plane needed to run AX without Kubernetes. |
-| [**#526**](https://github.com/google/ax/issues/526) (rakyll) | **Open (Issue)** | Local development commands (`ax local start`, `ax local status`, `ax local stop`) | **Direct alignment.** `ate-local` + `local-stack.sh` already implements the exact `up / status / down` lifecycle on macOS in 3s using native Apple `container` microVMs instead of a heavy Kind cluster. |
+| [**#532**](https://github.com/google/ax/pull/532) (yongruilin) | **Merged** (`37dda66`) | Removes the `Reconciler` interface; `server.NewServer` requires a `*controller.TaskReconciler` with a `*substrate.Client` | **Validates `ate-local`'s design.** Because `ax-server` now exclusively speaks `ateapi/v1.ControlServer`, `ate-local` is the exact local control plane needed to run AX without Kubernetes. |
+| [**#526**](https://github.com/google/ax/issues/526) / [**#603**](https://github.com/google/ax/pull/603) (YoyinZyc) | **Merged** (`9003bbd`) | Adds `ax local <start\|status\|stop\|delete>` (Kind + K8s 1.36 + Substrate v1.0.0), `ax install/uninstall`, `ax ctx`, and `install.sh` (`~/.ax/bin`) | **Clarifies two-tier positioning.** `#603` provides full K8s/gVisor parity (requiring a 4–8 GiB rootful Docker/Colima/Podman VM with Linux $\ge 6.8$) and leaves a Phase 2 native macOS hook in `cluster.Provider`. `#602` (`ate-local`) provides the ~3.3s zero-K8s backend with 0 GiB idle VM on Apple `container` and full **rootless Podman** + kernel $< 6.8$ support. |
+| [**#618**](https://github.com/google/ax/pull/618) (`ax promote`), [**#620**](https://github.com/google/ax/pull/620) (`/opt/ax` runner volume), [**#627**](https://github.com/google/ax/pull/627) (`ax studio`) | **Merged** (`c6299c3`, `a17fc5f`, `7fd1bf7`) | Spec promotion across contexts, read-only `/opt/ax` runner volume mounts, and `ax studio` launcher | **Adapted & verified.** `ate-local` mirrors host `ax-task-runner` onto `/opt/ax/ax-task-runner` when `MountRunnerVolume` is active, complements `ax promote` with shared-snapshot `/workspace` hydration, and backs zero-VM laptop mode for `#543` / `#627`. |
+| [**#602**](https://github.com/google/ax/issues/602) (ghchinoy) | **Open (Proposal)** | Zero-Kubernetes `ate-local` Control + `atenet-router` daemon (Apple `container` & Podman) | Primary upstream tracking issue and stacked PR plan for this branch. |
 
 ---
 
@@ -307,26 +309,27 @@ To support community growth and developer onboarding, we propose authoring a ded
 
 ---
 
-## 11. Proposed Next Steps & Roadmap
+## 11. Proposed Next Steps & Roadmap (Post-PR #603)
 
-### Phase 1: Direct Alignment with Issue #526 (`ax local start / status / stop`) *(Current)*
+### Phase 2 Integration: Zero-Kubernetes Backend Behind `ax local` (`#602` + `#603`)
 
-With PR [#515](https://github.com/google/ax/pull/515) making Agent Substrate the live source of truth for actor state, PR [#532](https://github.com/google/ax/pull/532) removing the `Reconciler` interface so `ax-server` always speaks `ateapipb.ControlServer`, and PR #504 closing in favor of Issue [#526 (`Local development`)](https://github.com/google/ax/issues/526):
+With PR [#603](https://github.com/google/ax/pull/603) establishing `ax local <start|status|stop|delete>`, `~/.ax/bin`, and `internal/install/cluster/provider.go` (whose doc comment explicitly notes *"Kind in MVP; native macOS VM in Phase 2"*), `ate-local`'s role is sharper than ever:
 
-1. **`ate-local` is now the only non-Kubernetes way to run `ax-server` locally:**
-   - Because `server.NewServer` requires a `*controller.TaskReconciler` backed by a `*substrate.Client`, any local runtime must speak `ateapipb.ControlServer`.
-   - While Issue #526 proposes `ax local start / status / stop` using a Kind cluster (`kind` + Docker/Podman + gVisor + Envoy + cert-manager + Postgres), `ate-local` + `local-stack.sh` provides the exact same `up / status / down` developer experience on macOS in ~3 seconds using native Apple `container` microVMs.
-   - Furthermore, #532 introduced `internal/substrate/substratetest` (an in-memory `ateapipb.ControlServer` for unit tests); `ate-local` is its live-container counterpart.
+1. **Complementary Fast Tier (`ax local --backend=ate-local`):**
+   - PR #603's Kind backend intentionally requires a **rootful** Docker/Podman engine, a **Linux $\ge 6.8$** kernel (`fsconfig` `lowerdir+`), and a persistent **4–8 GiB RAM Linux VM** on macOS (Colima, OrbStack, or Docker Desktop).
+   - `ate-local` (`#602`) serves every environment and workflow where those requirements are prohibitive or unnecessary: **0 GiB idle VM** on Apple Silicon (`Virtualization.framework` microVMs), **rootless Podman** on macOS and Linux, hosts with **kernels $< 6.8$**, and **~3.3s startup / 0.70s wakeup** with unpinned local images.
+2. **Zero Core AX Maintenance Burden:**
+   - Rebased onto `google/ax:main` (`f4a9203`), `feat/ate-local-apple-container` touches **zero core AX Go packages** (`internal/{server,controller,substrate,store}`, `runner/`, `pkg/apis/v1alpha1`), speaking standard `go.ate.dev/substrate/api/ateapi/v1.ControlServer` (`v1.0.0`), `Tag` snapshots, `/opt/ax` runner mounts (`#620`), and `atenet-router` `h2c` proxying.
 
 ---
 
 ## 12. Discussion Questions for Colleagues & Maintainers
 
-### Question 1: Architectural Path & Issue #526 (`ax local`)
-Given Issue #526 (`ax local start / status / stop`):
-- **Option A (`ax local --runtime=apple-container` in `google/ax`)**: Should `ax local start` on macOS support an Apple `container` mode powered by `ate-local` (avoiding the heavy Kind + gVisor + Envoy setup when developing on Apple Silicon)?
-- **Option B (`agent-substrate/substrate`)**: Should `ate-local` live in `agent-substrate/substrate` (`go.ate.dev/substrate`) as an official macOS local control plane for emulating Substrate?
-- **Option C (Companion / Standalone Repository)**: Maintained as a dedicated open-source bridge tool (`ate-local` or `ax-local`).
+### Question 1: Integration Seam After PR #603 (`google/ax` vs. `agent-substrate/substrate`)
+Given merged PR #603 (`ax local`) and Proposal [#602](https://github.com/google/ax/issues/602):
+- **Option A (`ax local --backend=ate-local` in `google/ax`)**: Wire `internal/atelocal` behind `ax local` (and `pkg/axclient` in `#640`) as the lightweight Apple `container` / rootless Podman backend alongside `KindProvider`?
+- **Option B (`agent-substrate/substrate`)**: Upstream `ate-local` into `go.ate.dev/substrate` as Substrate's official zero-K8s local `ControlServer` + `atenet-router` emulator?
+- **Option C (Standalone Companion Binary)**: Distribute `ate-local` alongside `ax` in `~/.ax/bin/` (`install.sh`, similar to `ax-studio` in `#627`).
 
 ### Question 2: In-Memory Store Mode for `ax local`
 `ax-server` supports `--in-memory-store` (`internal/store/memory`) alongside PostgreSQL (`internal/store/postgres`). For `ax local start` (#526), should the default store be `postgres:17-alpine` (preserving task history across restarts) with an optional `--in-memory` flag for zero-container control-plane runs?

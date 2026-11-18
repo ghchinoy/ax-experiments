@@ -41,9 +41,9 @@ experiment:
     - ate-local/HERO-DEMO-FEEDBACK.md
   upstream:
     repo: google/ax
-    base_commit: b95c3f4
-    issues: [526, 515, 517, 532, 536, 563, 602]
-    prs: [504, 590]
+    base_commit: f4a9203
+    issues: [526, 515, 517, 532, 536, 543, 563, 584, 602]
+    prs: [504, 590, 603, 618, 620, 627]
   forks:
     - repo: ghchinoy/ax
       branch: feat/ate-local-apple-container
