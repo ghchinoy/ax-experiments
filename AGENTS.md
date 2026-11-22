@@ -37,6 +37,8 @@ ate-local/              Track 1: Local Agent Substrate on Apple container & Podm
   TESTING.md            Automated unit/live microVM test suite & local stack walkthrough
   AX-SETUP.md           Design notes towards `ax setup` & separating setup from daemon lifecycle
   HERO-DEMO-FEEDBACK.md Field report & landed follow-ups from the 5/5 Hero Demo (#590/#602)
+  LOCAL-BACKEND.md      Kind `ax local` (#603/#689) timing vs ate-local & local.Backend options
+  bench/                Isolated `ax local` phase-timing harness (ax-local-timing.sh)
   archive/              Archived early proposal and glidepath drafts
 crostini/               Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack
   README.md             Track overview & quickstart

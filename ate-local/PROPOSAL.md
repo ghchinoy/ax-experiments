@@ -320,6 +320,8 @@ With PR [#603](https://github.com/google/ax/pull/603) establishing `ax local <st
    - `ate-local` (`#602`) serves every environment and workflow where those requirements are prohibitive or unnecessary: **0 GiB idle VM** on Apple Silicon (`Virtualization.framework` microVMs), **rootless Podman** on macOS and Linux, hosts with **kernels $< 6.8$**, and **~3.3s startup / 0.70s wakeup** with unpinned local images.
 2. **Zero Core AX Maintenance Burden:**
    - Rebased onto `google/ax:main` (`f4a9203`), `feat/ate-local-apple-container` touches **zero core AX Go packages** (`internal/{server,controller,substrate,store}`, `runner/`, `pkg/apis/v1alpha1`), speaking standard `go.ate.dev/substrate/api/ateapi/v1.ControlServer` (`v1.0.0`), `Tag` snapshots, `/opt/ax` runner mounts (`#620`), and `atenet-router` `h2c` proxying.
+3. **Measured Against the Kind Path:**
+   - [`LOCAL-BACKEND.md`](./LOCAL-BACKEND.md) times `ax local` v0.4.0-rc.1 step by step against `ate-local` on an Apple M5 (128 s fresh and 170–362 s for `start` after `stop`, vs 2.7 s), answers the open question in [#689](https://github.com/google/ax/issues/689), and shows why `ate-local` belongs behind a `local.Backend` seam above `cluster.Provider` rather than inside it.
 
 ---
 

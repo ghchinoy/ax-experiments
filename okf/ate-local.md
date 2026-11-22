@@ -22,7 +22,16 @@ sources:
     title: "ghchinoy/ax:feat/ate-local-apple-container"
   - id: upstream-substrate
     resource: https://github.com/agent-substrate/substrate
-    title: "agent-substrate/substrate: Agent Substrate v0.6.0 Control API"
+    title: "agent-substrate/substrate: Agent Substrate Control API (v1.0.0 since bfd5042)"
+  - id: ax-pr-603
+    resource: https://github.com/google/ax/pull/603
+    title: "google/ax#603: Kind-based ax local and ax install (cluster.Provider)"
+  - id: ax-issue-689
+    resource: https://github.com/google/ax/issues/689
+    title: "google/ax#689: ax local start takes 3-5 minutes on a fresh cluster"
+  - id: ax-release-v040rc1
+    resource: https://github.com/google/ax/releases/tag/v0.4.0-rc.1
+    title: "google/ax v0.4.0-rc.1 (benchmarked ax local build)"
 experiment:
   track: ate-local
   location: in-tree
@@ -33,17 +42,22 @@ experiment:
     - ax-experiments-1rx.2
     - ax-experiments-1rx.3
     - ax-experiments-1rx.4
+    - ax-experiments-1rx.5
+    - ax-experiments-1rx.6
+    - ax-experiments-1rx.7
   entrypoints:
     - ate-local/README.md
     - ate-local/PROPOSAL.md
     - ate-local/TESTING.md
     - ate-local/AX-SETUP.md
     - ate-local/HERO-DEMO-FEEDBACK.md
+    - ate-local/LOCAL-BACKEND.md
+    - ate-local/bench/ax-local-timing.sh
   upstream:
     repo: google/ax
-    base_commit: f4a9203
-    issues: [526, 515, 517, 532, 536, 543, 563, 584, 602]
-    prs: [504, 590, 603, 618, 620, 627]
+    base_commit: 0b44e97
+    issues: [526, 515, 517, 532, 536, 543, 563, 584, 602, 648, 689, 696]
+    prs: [504, 590, 603, 618, 620, 627, 640, 688]
   forks:
     - repo: ghchinoy/ax
       branch: feat/ate-local-apple-container
@@ -60,13 +74,16 @@ Implement the **Agent Substrate Control gRPC API** (`go.ate.dev/substrate/pkg/pr
 - `ate-local/README.md` — Track overview and quick verification commands.
 - `ate-local/PROPOSAL.md` — Full architectural proposal, Substrate concept mapping, and empirical Apple Silicon benchmarks.
 - `ate-local/TESTING.md` — Step-by-step verification suite (unit tests + live microVM tests + local stack walkthrough).
+- `ate-local/LOCAL-BACKEND.md` — Step-by-step timing of upstream Kind-based `ax local` (v0.4.0-rc.1) vs `ate-local`, and the `local.Backend` (Option A) vs #689 Kind optimization (Option B) proposal.[^ax-issue-689]
+- `ate-local/bench/ax-local-timing.sh` — Isolated, timestamped `ax local` phase harness with a pod-state monitor.
 - `ate-local/archive/prior-proposal.md` & `ate-local/archive/glidepath.md` — Archived initial drafts.
 
 ## Empirical Outcomes
 
 - **Stack Startup (`local-stack.sh up`)**: ~3.3s (`postgres:17-alpine` + `ate-local` `:50051` + `ax-server` `:8090`).
 - **Actor Resume → Ready (`vmnet` IP assigned & `/readyz` 200 OK)**: 0.70s median.
-- **Interactive Guest Exec (`ax ssh`)**: 0.03s over direct `vmnet` bridge IP (`192.168.64.x:80`).
+- **Interactive Guest Exec (`ax ssh`)**: 0.03s over direct `vmnet` bridge IP (`192.168.64.x:80`) before the `bfd5042` rebase; currently failing (`ax-experiments-1rx.7`).
+- **Kind comparison (2026-11-21, Apple M5, `ax` v0.4.0-rc.1)**: fresh `ax local start` 128–129s (one unreproduced 1059s outlier), `start` after `stop` 170–362s, vs `ate-local` warm `up` 2.7s (7.8s with a first build). On a running Kind cluster, task resume → `Working` is 0.10–0.14s vs 0.45–0.61s on `ate-local`, so the advantage is environment bring-up, not the task inner loop.[^ax-pr-603]
 
 ## Related Experiment Tracks
 
@@ -75,4 +92,6 @@ Implement the **Agent Substrate Control gRPC API** (`go.ate.dev/substrate/pkg/pr
 - Emits control-plane lifecycle logs consumed by [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md).
 
 [^ax-issue-526]: google/ax#526: ax local start/status/stop
+[^ax-issue-689]: google/ax#689: ax local start takes 3-5 minutes on a fresh cluster
+[^ax-pr-603]: google/ax#603: Kind-based ax local and ax install (cluster.Provider)
 [^fork-atelocal]: ghchinoy/ax:feat/ate-local-apple-container

@@ -15,6 +15,7 @@ With `ate-local`, an AX developer on an Apple Silicon Mac can boot the full AX s
 | [`PROPOSAL.md`](/ate-local/PROPOSAL.md) | Full architectural proposal, Substrate concept mapping, developer glidepath analysis, and Apple Silicon performance benchmarks. |
 | [`TESTING.md`](/ate-local/TESTING.md) | Step-by-step verification guide: automated unit tests, live Apple `container` microVM integration tests, and full local stack walkthrough. |
 | [`AX-SETUP.md`](/ate-local/AX-SETUP.md) | Post-PR `#603` (`ax local`) comparison, what remains unique to `#602`, and how `ate-local` plugs behind `ax local --backend=ate-local` while separating setup from daemon lifecycle. |
+| [`LOCAL-BACKEND.md`](/ate-local/LOCAL-BACKEND.md) | Step-by-step timing of upstream Kind-based `ax local` (v0.4.0-rc.1) next to `ate-local`, root causes for slow cold starts and resumes (`#689`), and the `local.Backend` vs Kind-optimization options. Harness: [`bench/ax-local-timing.sh`](/ate-local/bench/ax-local-timing.sh). |
 | [`HERO-DEMO-FEEDBACK.md`](/ate-local/HERO-DEMO-FEEDBACK.md) | Field report & landed follow-ups (`471ca83`, `4ef71a5`, `a7607d4`) on `feat/ate-local-apple-container` from the live 5/5 Hero Demo (`#590` / `#602`). |
 | [`archive/prior-proposal.md`](/ate-local/archive/prior-proposal.md) | Archived initial `ate-local` design draft. |
 | [`archive/glidepath.md`](/ate-local/archive/glidepath.md) | Archived developer adoption funnel ("glidepath") notes. |
