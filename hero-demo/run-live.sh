@@ -165,10 +165,12 @@ cleanup() {
   rm -f "${WS_TAG_BIN}"
   if [[ -x "${AX_BIN}" ]]; then
     ax_a delete task "${PREWARM_TASK}" >/dev/null 2>&1 || true
-    ax_a delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
-    ax_a delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
-    ax_b delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
-    ax_b delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+    if [[ "${KEEP_STACK}" != "1" ]]; then
+      ax_a delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+      ax_a delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+      ax_b delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+      ax_b delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+    fi
   fi
   if [[ "${ISOLATED}" == "1" && "${KEEP_STACK}" != "1" ]]; then
     echo "==> Tearing down isolated dual-cluster stack (${AX_LOCAL_DIR})..."
@@ -281,6 +283,8 @@ step3_starter_task_session() {
   echo "==> [Step 3] Starter Task, Session & Resume"
 
   ax_a delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+  container delete --force "ate-apple-default-${STARTER_TASK}" "ate-default-${STARTER_TASK}" >/dev/null 2>&1 || true
+  rm -f "${AX_LOCAL_DIR}/snapshots/default/${STARTER_TASK}.tar.gz"
   local rendered_starter
   rendered_starter="$(mktemp "${TMPDIR:-/tmp}/hero-starter-XXXXXX.yaml")"
   sed "s|\${GEMINI_API_KEY}|${GEMINI_API_KEY:-}|g" "${STARTER_MANIFEST}" > "${rendered_starter}"
@@ -395,6 +399,8 @@ step4_custom_image_task() {
   echo "==> [Step 4] Custom Image Task - No Starter Template (python:3.12-slim)"
 
   ax_a delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  container delete --force "ate-apple-default-${CUSTOM_TASK}" "ate-default-${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  rm -f "${AX_LOCAL_DIR}/snapshots/default/${CUSTOM_TASK}.tar.gz"
   local custom_err
   if ! custom_err="$(ax_a apply -f "${CUSTOM_MANIFEST}" 2>&1)"; then
     mark_fail "${step}" "ax apply -f task-custom.yaml failed: ${custom_err}"
@@ -405,8 +411,12 @@ step4_custom_image_task() {
     return
   fi
 
-  local cname="ate-apple-default-${CUSTOM_TASK}"
-  container inspect "${cname}" >/dev/null 2>&1 || cname="ate-default-${CUSTOM_TASK}"
+  local cname=""
+  if container inspect "ate-apple-default-${CUSTOM_TASK}" >/dev/null 2>&1; then
+    cname="ate-apple-default-${CUSTOM_TASK}"
+  else
+    cname="ate-default-${CUSTOM_TASK}"
+  fi
   local logs=""
   for _ in $(seq 1 30); do
     logs="$(container logs "${cname}" 2>&1 || true)"
@@ -448,6 +458,8 @@ step5_remote_promote() {
   # Promote unchanged manifests from Cluster A (Apple container :8097/:8090) to
   # Cluster B (Podman runtime :8098/:8091) and verify unit tests pass on Cluster B!
   ax_b delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  command -v podman >/dev/null 2>&1 && podman rm -f "ate-podman-default-${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  container delete --force "ate-cluster-b-default-${CUSTOM_TASK}" >/dev/null 2>&1 || true
   local b_err
   if ! b_err="$(ax_b apply -f "${WORKSPACE_MANIFEST}" 2>&1)" || ! b_err="$(ax_b apply -f "${CUSTOM_MANIFEST}" 2>&1)"; then
     mark_fail "${step}" "Promoting workspace.yaml & task-custom.yaml to Cluster B (${AX_SERVER_B}) failed: ${b_err}"
