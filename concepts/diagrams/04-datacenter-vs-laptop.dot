@@ -1,0 +1,48 @@
+// Scaling down without changing the mental model: Data-center Substrate 1.0
+// (1B actors on K8s WorkerPools) vs Laptop ate-local (10s of swarm microVMs).
+digraph datacenter_vs_laptop {
+  label = "Same AX contract · data center scale vs laptop swarm";
+  ranksep = 0.7;
+  nodesep = 0.5;
+  newrank = true;
+
+  manifest [label="Task + Workspace YAML", class="primary"];
+  axsrv    [label="ax-server (unmodified)", class="emphasis code"];
+
+  subgraph cluster_dc {
+    label = "Cloud · Substrate 1.0 (1B actors)";
+    dc_api   [label="ate-api-server", class="code"];
+    dc_pool  [label="Warm WorkerPool Pods"];
+    dc_gcs   [label="GCS snapshots", class="store"];
+    dc_boot  [label="3–5m cluster setup\n<100ms actor wake", class="muted"];
+
+    dc_api -> dc_pool [label="multiplex N:M"];
+    dc_pool -> dc_gcs [label="checkpoint", class="async"];
+    dc_pool -> dc_boot [class="muted"];
+  }
+
+  subgraph cluster_mac {
+    label = "Laptop · ate-local (1–50 swarm tasks)";
+    class = "accent";
+    loc_api  [label="ate-local :50051", class="emphasis code"];
+    loc_apple [label="Apple container VMs", class="agent-blue"];
+    loc_pod  [label="Rootless Podman", class="agent-violet"];
+    loc_snap [label=".tar.gz snapshots", class="store"];
+    loc_boot [label="~3s stack boot\n0 RAM when suspended", class="positive"];
+
+    loc_api -> loc_apple [label="vmnet :80"];
+    loc_api -> loc_pod   [label="127.0.0.1:port"];
+    loc_apple -> loc_snap [label="pre-boot mount", class="async"];
+    loc_pod   -> loc_snap [label="migrate", class="async"];
+    loc_apple -> loc_boot [class="positive"];
+  }
+
+  {rank=same; dc_api; loc_api;}
+  {rank=same; dc_pool; loc_apple; loc_pod;}
+  {rank=same; dc_gcs; loc_snap;}
+  {rank=same; dc_boot; loc_boot;}
+
+  manifest -> axsrv [label="ax apply", class="primary"];
+  axsrv -> dc_api   [label="ateapi/v1 + router", class="code"];
+  axsrv -> loc_api  [label="ateapi/v1 + router", class="primary code"];
+}

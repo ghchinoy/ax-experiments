@@ -1,0 +1,52 @@
+// Evolution of the Task-to-ActorTemplate seam across three AX architectures:
+// Era 1 (1 template per task), Era 2 (:8081 pull), and Era 3 (#688 inbound push).
+digraph template_actor_pivots {
+  label = "Task to ActorTemplate · three architectural eras";
+  ranksep = 0.55;
+  nodesep = 0.4;
+  newrank = true;
+
+  subgraph cluster_era1 {
+    label = "Era 1 · per-task template (Oct–Nov 15)";
+    class = "muted";
+    e1_task [label="N Task YAMLs"];
+    e1_tmpl [label="N ActorTemplates", class="warning code"];
+    e1_act  [label="N Actors (env YAML)"];
+    e1_out  [label="No golden reuse", class="warning"];
+
+    e1_task -> e1_tmpl [label="1:1 env"];
+    e1_tmpl -> e1_act  [label="cold image"];
+    e1_act  -> e1_out  [class="warning"];
+  }
+
+  subgraph cluster_era2 {
+    label = "Era 2 · outbound pull :8081 (Nov 17–19)";
+    class = "muted";
+    e2_task [label="N Task YAMLs"];
+    e2_tmpl [label="1 Profile template", class="code"];
+    e2_act  [label="Blank ax-runner"];
+    e2_out  [label="Egress hole + JWTs", class="error"];
+
+    e2_task -> e2_tmpl [label="shared image"];
+    e2_tmpl -> e2_act  [label="golden boot"];
+    e2_act  -> e2_out  [label="dial :8081", class="error"];
+  }
+
+  subgraph cluster_era3 {
+    label = "Era 3 · inbound push #688 (settled)";
+    class = "accent";
+    e3_task [label="N Task YAMLs", class="primary"];
+    e3_tmpl [label="1 Profile template", class="emphasis code"];
+    e3_act  [label="AwaitPush :80", class="code"];
+    e3_out  [label="Zero-egress intact", class="positive"];
+
+    e3_task -> e3_tmpl [label="shared image", class="primary"];
+    e3_tmpl -> e3_act  [label="<100ms clone", class="positive"];
+    e3_act  -> e3_out  [label="POST via router", class="positive"];
+  }
+
+  {rank=same; e1_task; e2_task; e3_task;}
+  {rank=same; e1_tmpl; e2_tmpl; e3_tmpl;}
+  {rank=same; e1_act;  e2_act;  e3_act;}
+  {rank=same; e1_out;  e2_out;  e3_out;}
+}

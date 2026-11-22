@@ -1,0 +1,67 @@
+// Two-plane architecture: how AX (application & agent control plane) layers on
+// top of Agent Substrate 1.0 (zero-trust actor multiplexer on Kubernetes).
+digraph ax_substrate_two_planes {
+  label = "AX and Agent Substrate 1.0 · two-plane architecture";
+  ranksep = 0.7;
+  nodesep = 0.5;
+  newrank = true;
+
+  caller [label="Developer or agent", class="terminal"];
+  axcli  [label="ax CLI / Studio", class="primary code"];
+
+  subgraph cluster_ax {
+    label = "AX plane (ax.io/v1alpha1)";
+    class = "accent";
+    axdb  [label="AX Postgres", class="store"];
+    axsrv [label="ax-server", class="emphasis code"];
+  }
+
+  subgraph cluster_substrate {
+    label = "Agent Substrate 1.0 (ateapi/v1)";
+
+    subgraph cluster_sub_ctrl {
+      label = "Actor control plane";
+      ateapi  [label="ate-api-server", class="code"];
+      atedb   [label="Actor Postgres", class="store"];
+      objstore [label="Snapshot bucket", class="store"];
+    }
+
+    subgraph cluster_sub_net {
+      label = "Zero-trust network PEP";
+      router [label="atenet-router", class="emphasis code"];
+      egress [label="atenet-egress", class="code"];
+    }
+
+    subgraph cluster_sub_workers {
+      label = "Pre-warmed WorkerPool (K8s Pods)";
+      atelet  [label="atelet", class="muted code"];
+      sandbox [label="gVisor / microVM", class="positive"];
+      runner  [label="ax-runner :80", class="code"];
+    }
+  }
+
+  ext [label="Model & Git APIs", class="external"];
+
+  {rank=same; axdb; axsrv;}
+  {rank=same; ateapi; router;}
+  {rank=same; atedb; objstore; egress;}
+
+  caller -> axcli [label="YAML / send"];
+  axcli -> axsrv  [label="AX gRPC", class="primary code"];
+  axcli -> router [label="ax ssh (h2c)", class="code"];
+
+  axsrv -> axdb   [label="specs + locks", constraint=false];
+  axsrv -> ateapi [label="Control gRPC", class="primary code"];
+  axsrv -> router [label="POST task + /readyz", class="code"];
+
+  ateapi -> atedb    [label="1B actors"];
+  ateapi -> atelet   [label="assign / checkpoint"];
+  atelet -> objstore [label="snapshots", class="async"];
+  atelet -> sandbox  [label="<100ms restore"];
+
+  router -> ateapi   [label="wake on request", class="async"];
+  router -> runner   [label="port 80", class="positive"];
+  sandbox -> runner  [class="muted"];
+  runner -> egress   [label="placeholder key"];
+  egress -> ext      [label="inject secret", class="positive"];
+}

@@ -1,0 +1,43 @@
+// Settled AX task lifecycle (#683 cold-start resume, #688 inbound push,
+// #669/#696 Tag ForkTask branching, and #692 TaskService multi-turn steering).
+digraph settled_task_lifecycle {
+  label = "Settled AX mental model · lifecycle, fork, and steering";
+  rankdir = LR;
+  ranksep = 0.6;
+  nodesep = 0.45;
+
+  start [label="", class="dot"];
+  queued [label="Queued", class="code"];
+
+  subgraph cluster_active {
+    label = "1 Task = 1 Actor (inbound port 80)";
+    class = "accent";
+    working [label="Working", class="primary code"];
+    idle    [label="Idle", class="emphasis code"];
+    action  [label="RequiresAction", class="warning code"];
+  }
+
+  suspended [label="Suspended (0 RAM)", class="code"];
+  vol       [label="/workspace snapshot", class="store code"];
+  tag       [label="Immutable Tag", class="emphasis code"];
+  forked    [label="Forked child Task", class="agent-teal"];
+  done      [label="Completed", class="positive code"];
+
+  start -> queued [label="ax apply"];
+  queued -> working [label="Resume + POST task", class="primary"];
+
+  working -> idle      [label="turn ends"];
+  working -> action    [label="asks question", class="warning"];
+  action  -> working   [label="ax send answer", class="primary"];
+  idle    -> working   [label="ax send message", class="primary"];
+  idle    -> suspended [label="idle timeout", class="async"];
+  working -> suspended [label="ax suspend"];
+
+  suspended -> vol     [label="checkpoint files"];
+  vol -> working       [label="cold start (#683)", class="positive"];
+
+  vol -> tag           [label="CreateTag (#669)", class="async"];
+  tag -> forked        [label="ax fork (#696)", class="positive"];
+
+  working -> done      [label="goal met (/ax/STATUS)", class="positive"];
+}
