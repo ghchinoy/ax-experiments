@@ -17,6 +17,9 @@ sources:
   - id: substrate-v1
     resource: https://github.com/agent-substrate/substrate/releases/tag/v1.0.0
     title: "Agent Substrate v1.0.0 Release Notes (2026-11-05)"
+  - id: substrate-3876
+    resource: https://github.com/agent-substrate/substrate/issues/3876
+    title: "agent-substrate/substrate#3876: Per-actor environment variables / SystemInfo configuration"
   - id: ax-pr-688
     resource: https://github.com/google/ax/pull/688
     title: "google/ax#688: Push tasks to runners and remove the runner pull protocol"
@@ -51,12 +54,13 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 
 - `concepts/README.md` — 4 Golden Rules for AX developers and canonical upstream reference map.
 - `concepts/01-substrate-and-ax-mental-model.md` — Two-plane separation between Substrate `1.0` (`WorkerPool`, `ActorTemplate`, `Actor`, `atenet-router`, `atenet-egress`) and AX (`Task`, `Profile`, `Workspace`, `Gateway`).
-- `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688` Inbound Push + `#683` Cold Resume + `#696` `ForkTask`.
+- `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688` (`2ede873`) Inbound Push + `#683` Cold Resume + `#696` `ForkTask`, and the `v1.1` `/run/ate` `SystemInfo` horizon (`substrate#3876`).[^substrate-3876]
 - `concepts/03-datacenter-to-laptop.md` — Six empirical lessons from running 10–50 microVM swarm tasks on `ate-local` (`#602`)[^ax-issue-602] and alignment scorecard against upstream AX & Substrate.
 - `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Four dual-theme Luminous Graphviz schematics.
 
 [^substrate-arch]: Agent Substrate 1.0 Architecture (1B actors, <100ms wakeup, WorkerPools, ActorTemplates)
 [^substrate-v1]: Agent Substrate v1.0.0 Release Notes (2026-11-05)
+[^substrate-3876]: agent-substrate/substrate#3876: Per-actor environment variables / SystemInfo configuration
 [^ax-pr-688]: google/ax#688: Push tasks to runners and remove the runner pull protocol
 [^ax-issue-683]: google/ax#683: Never assume tasks resume with memory (cold-start invariant)
 [^ax-issue-696]: google/ax#696: Don't split Workspace into its own actor; use ForkTask for branching
