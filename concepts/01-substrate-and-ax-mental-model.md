@@ -43,7 +43,8 @@ Agent Substrate is deliberately **agent-framework agnostic** (`Persona #2/#3` in
 |---|---|---|
 | **`Profile`** *(embedded on `Task` / `Workspace`)* | `@sha256` container image (or existing `ateTemplate`), CPU/RAM limits | Content-addressed shared `ActorTemplate` (`ax-<16-char-sha256>`), plus optional read-only `/opt/ax/ax-runner` volume (`#620`). |
 | **`Task`** | `profile`, `commands` or `goal.text`, `env`, `config`, `workspace`, `gateway`, `debug` | **1 `Actor`** (named after the task) in the same `atespace`. Launched/steered via inbound HTTP/gRPC on port 80 (`#688`, `#692`). |
-| **`Workspace`** | `setup` (`git` clones, inline `files`, `skills`, `commands`) + `mcp` servers | Materialized inside the task's `/workspace` on maiden boot by `ax-runner` (`#696`), with loopback discovery on `127.0.0.1:8099`. |
+| **`Workspace`** | `setup` (`git` clones, inline `files`, `skills`, `commands`) + `mcp` servers | Materialized inside the task's `$AX_WORKSPACE` (`/workspace`) on maiden boot by `ax-runner` (`#696`, `#723`), with loopback discovery on `127.0.0.1:8099`. |
+| **`Model`** | Provider, model ID, generation parameters, credential Secret ref (`#709` multi-model) | Resolved by `ax-server` into model config + `atenet-egress` secret header injection; keeps API keys out of task manifests. |
 | **`Gateway`** | Outbound `http` / `https` (with secret header injection) / `tlsPassthrough` rules | Copied once onto the actor's `default` `EgressPolicy` while suspended (`#585`). |
 | **`ForkTask`** (`ax fork`) | Branch a follow-up task from a parked task's filesystem state (`#669`) | `SuspendActor` $\rightarrow$ `CreateTag` $\rightarrow$ `CreateActor(source_tag)`. |
 

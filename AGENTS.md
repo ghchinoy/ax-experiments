@@ -37,7 +37,8 @@ concepts/               Track 0: AX & Agent Substrate 1.0 Developer Mental Model
   01-substrate-and-ax-mental-model.md  Two-plane split (Substrate 1.0 vs AX) & dual-Postgres rationale
   02-the-three-pivots.md               Template-vs-Task impedance mismatch & Era 1 -> 2 -> 3 (#688/#683/#696)
   03-datacenter-to-laptop.md           6 empirical ate-local swarm learnings & upstream alignment scorecard
-  diagrams/             4 dual-theme Luminous Graphviz schematics (.dot + -{light,dark}.webp)
+  04-from-orchestrator-to-platform.md  Substrate-vs-AX boundary & 7-pillar agentic platform evolution (#724)
+  diagrams/             5 dual-theme Luminous Graphviz schematics (.dot + -{light,dark}.webp)
   Makefile              Re-renders diagrams via gvpr + Luminous Graphviz theme
 ate-local/              Track 1: Local Agent Substrate on Apple container & Podman (google/ax#526, #602)
   README.md             Track overview, quick verification & two-layer setup/runtime appendix

@@ -35,6 +35,15 @@ sources:
   - id: ax-issue-602
     resource: https://github.com/google/ax/issues/602
     title: "google/ax#602: ate-local zero-Kubernetes local Substrate daemon"
+  - id: ax-issue-709
+    resource: https://github.com/google/ax/issues/709
+    title: "google/ax#709: api: add repeated models to TaskSpec"
+  - id: ax-issue-724
+    resource: https://github.com/google/ax/issues/724
+    title: "google/ax#724: docs: explain how AX differs from Agent Substrate and how it grows into an agentic platform"
+  - id: ax-roadmap
+    resource: https://github.com/google/ax/blob/main/docs/roadmap.md
+    title: "google/ax docs/roadmap.md: Core Specs, Actor Architecture, Agentic Environment, Sessions & Memory, Trajectory Collection"
 experiment:
   track: concepts
   location: in-tree
@@ -44,19 +53,21 @@ experiment:
     - concepts/01-substrate-and-ax-mental-model.md
     - concepts/02-the-three-pivots.md
     - concepts/03-datacenter-to-laptop.md
+    - concepts/04-from-orchestrator-to-platform.md
 ---
 
 # Concepts: AX & Agent Substrate 1.0 Developer Mental Model (`concepts/`)
 
-Visual architecture explainers and historical synthesis connecting [Track 1 (`ate-local`)](/ate-local.md), [Track 2a (`swarm`)](/swarm.md), [Track 2b (`genkit`)](/genkit.md), [Track 4 (`ax-central`)](/ax-central.md), and [Track 6 (`hero-demo`)](/hero-demo.md) to Agent Substrate `1.0` (`2026-11-05`)[^substrate-v1][^substrate-arch] and AX's settled `v0.4` design (`#683`, `#688`, `#692`, `#696`).[^ax-issue-683][^ax-pr-688][^ax-issue-692][^ax-issue-696]
+Visual architecture explainers and historical synthesis connecting [Track 1 (`ate-local`)](/ate-local.md), [Track 2a (`swarm`)](/swarm.md), [Track 2b (`genkit`)](/genkit.md), [Track 2c (`dgem`)](/dgem.md), [Track 2d (`agy`)](/agy.md), [Track 3 (`viz`)](/viz.md), [Track 4 (`ax-central`)](/ax-central.md), [Track 5 (`ax-images`)](/ax-images.md), and [Track 6 (`hero-demo`)](/hero-demo.md) to Agent Substrate `1.0` (`2026-11-05`)[^substrate-v1][^substrate-arch], AX's settled `v0.4` design (`#683`, `#688`, `#692`, `#696`),[^ax-issue-683][^ax-pr-688][^ax-issue-692][^ax-issue-696] and its evolution into a 7-pillar agentic platform (`#724`, `#709`, `docs/roadmap.md`).[^ax-issue-724][^ax-issue-709][^ax-roadmap]
 
 ## Artifacts (`concepts/`)
 
 - `concepts/README.md` — 4 Golden Rules for AX developers and canonical upstream reference map.
-- `concepts/01-substrate-and-ax-mental-model.md` — Two-plane separation between Substrate `1.0` (`WorkerPool`, `ActorTemplate`, `Actor`, `atenet-router`, `atenet-egress`) and AX (`Task`, `Profile`, `Workspace`, `Gateway`).
+- `concepts/01-substrate-and-ax-mental-model.md` — Two-plane separation between Substrate `1.0` (`WorkerPool`, `ActorTemplate`, `Actor`, `atenet-router`, `atenet-egress`) and AX (`Task`, `Profile`, `Workspace`, `Model`, `Gateway`).
 - `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688` (`2ede873`) Inbound Push + `#683` Cold Resume + `#696` `ForkTask`, and the `v1.1` `/run/ate` `SystemInfo` horizon (`substrate#3876`).[^substrate-3876]
 - `concepts/03-datacenter-to-laptop.md` — Six empirical lessons from running 10–50 microVM swarm tasks on `ate-local` (`#602`)[^ax-issue-602] and alignment scorecard against upstream AX & Substrate.
-- `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Four dual-theme Luminous Graphviz schematics.
+- `concepts/04-from-orchestrator-to-platform.md` — Explicit Substrate-vs-AX responsibility boundary and the 7 platform pillars from `google/ax#724` (Sessions, Memory, Multi-task coordination, Input steering, Registries, Models, Trajectory collection) mapped to `docs/roadmap.md` and `ax-experiments` prototypes.
+- `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Five dual-theme Luminous Graphviz schematics.
 
 [^substrate-arch]: Agent Substrate 1.0 Architecture (1B actors, <100ms wakeup, WorkerPools, ActorTemplates)
 [^substrate-v1]: Agent Substrate v1.0.0 Release Notes (2026-11-05)
@@ -66,3 +77,6 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 [^ax-issue-696]: google/ax#696: Don't split Workspace into its own actor; use ForkTask for branching
 [^ax-issue-692]: google/ax#692: Long-running, goal-based tasks with steering (TaskService)
 [^ax-issue-602]: google/ax#602: ate-local zero-Kubernetes local Substrate daemon
+[^ax-issue-709]: google/ax#709: api: add repeated models to TaskSpec
+[^ax-issue-724]: google/ax#724: docs: explain how AX differs from Agent Substrate and how it grows into an agentic platform
+[^ax-roadmap]: google/ax docs/roadmap.md
