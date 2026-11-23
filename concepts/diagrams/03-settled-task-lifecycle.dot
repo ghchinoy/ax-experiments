@@ -20,7 +20,7 @@ digraph settled_task_lifecycle {
   suspended [label="Suspended (0 RAM)", class="code"];
   vol       [label="/workspace snapshot", class="store code"];
   tag       [label="Immutable Tag", class="emphasis code"];
-  forked    [label="Forked child Task", class="agent-teal"];
+  forked    [label="Forked child Task", class="cat-teal"];
   done      [label="Completed", class="positive code"];
 
   start -> queued [label="ax apply"];

@@ -25,8 +25,8 @@ digraph datacenter_vs_laptop {
     label = "Laptop · ate-local (1–50 swarm tasks)";
     class = "accent";
     loc_api  [label="ate-local :50051", class="emphasis code"];
-    loc_apple [label="Apple container VMs", class="agent-blue"];
-    loc_pod  [label="Rootless Podman", class="agent-violet"];
+    loc_apple [label="Apple container VMs", class="cat-cobalt"];
+    loc_pod  [label="Rootless Podman", class="cat-violet"];
     loc_snap [label=".tar.gz snapshots", class="store"];
     loc_boot [label="~3s stack boot\n0 RAM when suspended", class="positive"];
 

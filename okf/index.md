@@ -6,7 +6,7 @@ okf_version: "0.2"
 
 ## In-Tree Experiment Tracks (`ax-experiments/`)
 
-* [Concepts: AX & Agent Substrate 1.0 Developer Mental Model](/concepts.md) - Visual architecture explainers (Luminous Graphviz) mapping Agent Substrate 1.0's 1B-actor multiplexer onto AX's settled `v0.4` programming model (`#683`, `#688`, `#692`, `#696`) and laptop-scale `ate-local` microVM swarms.
+* [Concepts: AX & Agent Substrate 1.0 Developer Mental Model](/concepts.md) - Visual architecture explainers (Lustrous Graphviz) mapping Agent Substrate 1.0's 1B-actor multiplexer onto AX's settled `v0.4` programming model (`#683`, `#688`, `#692`, `#696`) and laptop-scale `ate-local` microVM swarms.
 * [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) - Native macOS Local Substrate (`ateapipb.ControlServer`) backed by Apple `container` microVMs and PostgreSQL (`google/ax#526`).
 * [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md) - Empirically verified guide and bootstrap script for running AX + Agent Substrate (`v1.0.0-rc.1`) locally on a Chromebook Linux (Crostini / Bagels KVM) VM with Debian 13 (`trixie`), Kind, and gVisor sandboxes.
 * [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) - Eight runnable multi-agent swarm and sandbox boundary recipes (`swarm/01..08`) on Apple `container` microVMs.

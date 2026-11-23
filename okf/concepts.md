@@ -1,7 +1,7 @@
 ---
 type: Architecture Guide
 title: "Concepts: AX & Agent Substrate 1.0 Developer Mental Model"
-description: "Visual architecture explainers (Luminous Graphviz) mapping Agent Substrate 1.0's 1B-actor multiplexer onto AX's settled v0.4 programming model (#683, #688, #692, #696) and laptop-scale ate-local microVM swarms."
+description: "Visual architecture explainers (Lustrous Graphviz) mapping Agent Substrate 1.0's 1B-actor multiplexer onto AX's settled v0.4 programming model (#683, #688, #692, #696) and laptop-scale ate-local microVM swarms."
 status: stable
 tags: [concepts, architecture, substrate, ax, mental-model, graphviz, atelocal]
 generated:
@@ -67,7 +67,7 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 - `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688` (`2ede873`) Inbound Push + `#683` Cold Resume + `#696` `ForkTask`, and the `v1.1` `/run/ate` `SystemInfo` horizon (`substrate#3876`).[^substrate-3876]
 - `concepts/03-datacenter-to-laptop.md` — Six empirical lessons from running 10–50 microVM swarm tasks on `ate-local` (`#602`)[^ax-issue-602] and alignment scorecard against upstream AX & Substrate.
 - `concepts/04-from-orchestrator-to-platform.md` — Explicit Substrate-vs-AX responsibility boundary and the 7 platform pillars from `google/ax#724` (Sessions, Memory, Multi-task coordination, Input steering, Registries, Models, Trajectory collection) mapped to `docs/roadmap.md` and `ax-experiments` prototypes.
-- `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Five dual-theme Luminous Graphviz schematics.
+- `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Five dual-theme Lustrous Graphviz schematics.
 
 [^substrate-arch]: Agent Substrate 1.0 Architecture (1B actors, <100ms wakeup, WorkerPools, ActorTemplates)
 [^substrate-v1]: Agent Substrate v1.0.0 Release Notes (2026-11-05)

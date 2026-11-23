@@ -13,10 +13,10 @@
 # limitations under the License.
 
 # Renders semantic Graphviz .dot diagrams in diagrams/ into light and dark WebP
-# assets using the Luminous Graphviz gvpr theme (~/projects/graphviz-style).
+# assets using the Lustrous Graphviz gvpr theme (~/projects/graphviz-style).
 
 GRAPHVIZ_STYLE_DIR ?= $(abspath ../../graphviz-style)
-THEME := $(GRAPHVIZ_STYLE_DIR)/theme/luminous.gvpr
+THEME := $(GRAPHVIZ_STYLE_DIR)/theme/lustrous.gvpr
 GVPR ?= /opt/homebrew/bin/gvpr
 DOT ?= /opt/homebrew/bin/dot
 

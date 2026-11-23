@@ -1,6 +1,6 @@
 # AX & Agent Substrate 1.0: Developer Mental Model & Architecture Guide
 
-> **OKF v0.2 Card**: [`../okf/concepts.md`](../okf/concepts.md) · **Diagrams**: Rendered with [Luminous Graphviz](https://github.com/ghchinoy/graphviz-style) (`make -C concepts`)
+> **OKF v0.2 Card**: [`../okf/concepts.md`](../okf/concepts.md) · **Diagrams**: Rendered with [Lustrous Graphviz](https://github.com/ghchinoy/graphviz-style) (`make -C concepts`)
 
 Developing on **[AX (`google/ax`)](https://github.com/google/ax)** becomes dramatically easier once you understand how **[Agent Substrate 1.0 (`agent-substrate/substrate`)](https://github.com/agent-substrate/substrate)** shapes every layer beneath it—and why AX went through three rapid architectural pivots immediately after Substrate froze `v1.0.0` on November 5, 2026.
 
