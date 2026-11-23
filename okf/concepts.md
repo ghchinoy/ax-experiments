@@ -41,6 +41,9 @@ sources:
   - id: ax-issue-724
     resource: https://github.com/google/ax/issues/724
     title: "google/ax#724: docs: explain how AX differs from Agent Substrate and how it grows into an agentic platform"
+  - id: ax-pr-732
+    resource: https://github.com/google/ax/pull/732
+    title: "google/ax#732: docs: explain how AX relates to Agent Substrate (orthogonal outside task execution; portable across Google, customer clusters, and on-prem)"
   - id: ax-roadmap
     resource: https://github.com/google/ax/blob/main/docs/roadmap.md
     title: "google/ax docs/roadmap.md: Core Specs, Actor Architecture, Agentic Environment, Sessions & Memory, Trajectory Collection"
@@ -58,7 +61,7 @@ experiment:
 
 # Concepts: AX & Agent Substrate 1.0 Developer Mental Model (`concepts/`)
 
-Visual architecture explainers and historical synthesis connecting [Track 1 (`ate-local`)](/ate-local.md), [Track 2a (`swarm`)](/swarm.md), [Track 2b (`genkit`)](/genkit.md), [Track 2c (`dgem`)](/dgem.md), [Track 2d (`agy`)](/agy.md), [Track 3 (`viz`)](/viz.md), [Track 4 (`ax-central`)](/ax-central.md), [Track 5 (`ax-images`)](/ax-images.md), and [Track 6 (`hero-demo`)](/hero-demo.md) to Agent Substrate `1.0` (`2026-11-05`)[^substrate-v1][^substrate-arch], AX's settled `v0.4` design (`#683`, `#688`, `#692`, `#696`),[^ax-issue-683][^ax-pr-688][^ax-issue-692][^ax-issue-696] and its evolution into a 7-pillar agentic platform (`#724`, `#709`, `docs/roadmap.md`).[^ax-issue-724][^ax-issue-709][^ax-roadmap]
+Visual architecture explainers and historical synthesis connecting [Track 1 (`ate-local`)](/ate-local.md), [Track 2a (`swarm`)](/swarm.md), [Track 2b (`genkit`)](/genkit.md), [Track 2c (`dgem`)](/dgem.md), [Track 2d (`agy`)](/agy.md), [Track 3 (`viz`)](/viz.md), [Track 4 (`ax-central`)](/ax-central.md), [Track 5 (`ax-images`)](/ax-images.md), and [Track 6 (`hero-demo`)](/hero-demo.md) to Agent Substrate `1.0` (`2026-11-05`)[^substrate-v1][^substrate-arch], AX's settled `v0.4` design (`#683`, `#688`, `#692`, `#696`),[^ax-issue-683][^ax-pr-688][^ax-issue-692][^ax-issue-696] and its evolution into a portable 7-pillar agentic platform (`#724`, `#732`, `#709`, `docs/roadmap.md`).[^ax-issue-724][^ax-pr-732][^ax-issue-709][^ax-roadmap]
 
 ## Artifacts (`concepts/`)
 
@@ -79,4 +82,5 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 [^ax-issue-602]: google/ax#602: ate-local zero-Kubernetes local Substrate daemon
 [^ax-issue-709]: google/ax#709: api: add repeated models to TaskSpec
 [^ax-issue-724]: google/ax#724: docs: explain how AX differs from Agent Substrate and how it grows into an agentic platform
+[^ax-pr-732]: google/ax#732: docs: explain how AX relates to Agent Substrate (orthogonal outside task execution; portable across Google, customer clusters, and on-prem)
 [^ax-roadmap]: google/ax docs/roadmap.md

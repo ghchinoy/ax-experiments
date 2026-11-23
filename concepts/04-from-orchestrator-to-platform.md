@@ -1,6 +1,6 @@
-# 4. How AX Differs from Agent Substrate & Grows into an Agentic Platform (`#724`)
+# 4. How AX Differs from Agent Substrate & Grows into an Agentic Platform (`#724`, `#732`)
 
-[Document 1](./01-substrate-and-ax-mental-model.md) introduced the two-plane split between Agent Substrate and AX, and [Document 2](./02-the-three-pivots.md) traced how AX converged on its `v0.4` task-orchestration contract (`#683`, `#688`, `#696`). A recurring question—captured in **[`google/ax#724`](https://github.com/google/ax/issues/724)**—is *what cleanly separates AX from Agent Substrate long term*, and *how AX grows from a task orchestrator into a full agentic platform* without duplicating Substrate.
+[Document 1](./01-substrate-and-ax-mental-model.md) introduced the two-plane split between Agent Substrate and AX, and [Document 2](./02-the-three-pivots.md) traced how AX converged on its `v0.4` task-orchestration contract (`#683`, `#688`, `#696`). In **[`google/ax#724`](https://github.com/google/ax/issues/724)** and **[`google/ax#732`](https://github.com/google/ax/pull/732)**, upstream frames the long-term boundary starkly: *besides task execution, AX and Agent Substrate are orthogonal projects*, and AX is being built as a **portable agentic platform** that runs the same way **inside Google, on customer clusters, and on-prem** (as well as locally on a developer laptop via [`ate-local`](./03-datacenter-to-laptop.md)).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="diagrams/05-agentic-platform-evolution-dark.webp">
@@ -9,12 +9,12 @@
 
 ---
 
-## 1. The Clean Layer Boundary: Agent Substrate vs. AX
+## 1. The Clean Layer Boundary: Orthogonal Outside Task Execution
 
-The shortest way to separate the two projects is by **what each layer knows about**:
+The shortest way to separate the two projects is by **where they meet—and where they don't** ([`google/ax#732`](https://github.com/google/ax/pull/732)):
 
-- **Agent Substrate knows about *isolated compute*, not agents.** It runs up to 1 billion untrusted sandboxes (`Actor`s) from immutable container classes (`ActorTemplate`s), restores them onto pre-warmed `WorkerPool` Pods in `<100 ms`, checkpoints their state (`Tag`s), routes inbound HTTP/gRPC traffic by logical ID (`atenet-router`), and mediates outbound network access and secret header injection (`atenet-egress`). Substrate deliberately has **no concept** of prompts, LLMs, sessions, memory, MCP tools, skills, or multi-agent graphs.
-- **AX knows about *agentic work*, not sandbox plumbing.** AX treats Substrate's `Actor` as its unit of isolated execution (`1 Task = 1 Actor`) and owns every developer-facing and agent-facing concern above the container boundary: declarative specs (`Task`, `Workspace`, `Model`, `Gateway`), workspace hydration (`$AX_WORKSPACE`, `#723`), runner/launcher contracts (`ax-runner` / `ax-launcher`, `#711`), multi-turn interaction, coordination across tasks, model/tool governance, and agent telemetry.
+- **Agent Substrate is the compute runtime layer.** It schedules untrusted sandboxes (`Actor`s) onto pre-warmed `WorkerPool` Pods from immutable container classes (`ActorTemplate`s), restores them in `<100 ms`, suspends/resumes and checkpoints them (`Tag`s), routes inbound HTTP/gRPC traffic by logical ID (`atenet-router`), and mediates outbound network access and secret header injection (`atenet-egress`). It deliberately knows *almost nothing* about agents—no prompts, LLMs, sessions, memory, MCP tools, skills, or multi-agent graphs.
+- **AX and Agent Substrate intersect *only* at task execution.** AX runs each `Task` on Substrate (`1 Task = 1 Actor`), and everything else in AX—declarative specs (`Task`, `Workspace`, `Model`, `Gateway`), runner/launcher contracts (`ax-runner` / `ax-launcher`, `#711`, `$AX_WORKSPACE` `#723`), sessions, memory, multi-task coordination, input steering, registries, models, and trajectory collection—is **orthogonal** to Substrate. Keeping that boundary narrow is also what lets AX stay portable across Google-internal infrastructure, customer Kubernetes clusters, on-prem environments, and zero-Kubernetes local runtimes (`ate-local`, `#712`).
 
 ### Responsibility Matrix
 
@@ -55,10 +55,11 @@ Every one of the seven pillars reinforces the same three invariants from [Docume
 
 ---
 
-## 4. Upstream-Ready Summary (Draft Material for `google/ax#724`)
+## 4. How This Guide Expands on `google/ax#732`
 
-When contributing this framing back to `google/ax/docs/` (for example, as a new section in `docs/concepts.md` or a dedicated `docs/architecture.md`), the repository-neutral core fits in three concise blocks:
+Upstream [`google/ax#732`](https://github.com/google/ax/pull/732) distills the relationship into three README paragraphs (compute runtime vs. orthogonal agentic platform, plus portability across Google, customer clusters, and on-prem). The four documents in `concepts/` serve as the deeper architectural companion behind each statement:
 
-1. **Division of responsibility:** *Agent Substrate is the zero-trust actor runtime (sandboxes, snapshots, `<100 ms` wake-on-request, inbound routing, and outbound secret injection); AX is the agentic control plane layered above it (`1 Task = 1 Actor`), owning declarative agent environments, runner contracts, and everything semantically aware of LLMs, tools, and users.*
-2. **Why AX starts with `Task`:** *A cheap, isolated, suspendable `Task` is the atomic building block. Keeping it small lets a single task be either a standalone job or one node in a coordinated multi-agent tree—and lets AX inherit Substrate's 1B-actor scale-to-zero density by storing specs in PostgreSQL rather than Kubernetes `etcd`.*
-3. **Roadmap from orchestrator to agentic platform:** *Built on that task/actor foundation, AX expands into seven platform layers—**Session management**, **Memory**, **Multi-task coordination**, **Input steering**, **Registries**, **Models**, and **Trajectory collection**—while keeping Substrate agent-agnostic and sandboxes default-deny.*
+1. **"Substrate is the compute runtime layer AX relies on"** $\rightarrow$ [Document 1](./01-substrate-and-ax-mental-model.md) explains why both layers have PostgreSQL outside `etcd` and how `WorkerPool`, `ActorTemplate`, `atenet-router`, and `atenet-egress` achieve `<100 ms` wakeup.
+2. **"AX runs each task on Substrate, and everything else is orthogonal"** $\rightarrow$ [Document 2](./02-the-three-pivots.md) traces how AX narrowed that task-execution seam down to inbound port-80 push (`#688`), cold-start resume (`#683`), and stateless `Workspace` + `ForkTask` (`#696`/`#669`).
+3. **"Runs the same way inside Google, on customer clusters, and on-prem" (and on a laptop)** $\rightarrow$ [Document 3](./03-datacenter-to-laptop.md) and [`ate-local/LOCAL-BACKEND.md`](../ate-local/LOCAL-BACKEND.md) examine the laptop end of that portability spectrum (`#689`, `#712`) and six empirical swarm learnings.
+4. **"Grow into an agentic platform"** $\rightarrow$ §2 above maps all seven capabilities from `#724`/`#732` to `docs/roadmap.md`, active upstream issues, and runnable `ax-experiments` prototypes.
