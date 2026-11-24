@@ -42,7 +42,7 @@ Even with **1 human tenant** on a laptop, multi-agent workflows (`swarm/03-seed-
 
 ### Learning 4: Logical Actor Routing (`atenet-router`) Abstracts VM Network Asymmetry
 - **What happened:** Apple `container` gives every microVM a routable macOS `vmnet` IP (`192.168.64.x:80`), whereas rootless `podman` on macOS runs inside a `libkrun` VM reachable only via published host ports (`127.0.0.1:<ephemeralPort>`). Embedding an HTTP/1.1 + `h2c` `atenet-router` (`ate-target-actor` header) inside `ate-local` made `ax ssh`, `/readyz`, A2A JSON-RPC, and `#688` task pushes work identically across both runtimes.
-- **Alignment:** **100% aligned** with AX `#587` (dropping `TaskStatus.worker_ip` from `ax ssh` in favor of `atenet-router`) and `#688` (`actorhttp.go` inbound push).
+- **Alignment:** **100% aligned** with AX `#587` (dropping `TaskStatus.worker_ip` from `ax ssh`), `#688` (`actorhttp.go` inbound push), and `#700` (reaching actors exclusively through `atenet-router`).
 
 ### Learning 5: Hypervisor Guest-Init Drift Mirrors Substrate's `SandboxConfig`
 - **What happened:** Upgrading the macOS `container` CLI (`0.10` $\rightarrow$ `0.12`) broke container startup when `ghcr.io/apple/containerization/vminit:<tag>` drifted from cached local images, requiring `detectLocalVminitImage` fallback in `internal/atelocal/runner.go`.
@@ -62,7 +62,7 @@ Even with **1 human tenant** on a laptop, multi-agent workflows (`swarm/03-seed-
 | Axis | Early Exploration (`ax-experiments`) | Settled Upstream (`Substrate 1.0` + `AX #683/#688/#696`) | Verdict |
 |---|---|---|---|
 | **Resume semantics** | Cold process restart over `.tar.gz` `/workspace` | Cold start over snapshotted filesystem (`#683`) | **Exact match** |
-| **Control -> Runner direction** | Inbound HTTP/gRPC via `workerIP` & `atenet-router` | Inbound HTTP push on port 80 (`#688`) + `TaskService` (`#692`) | **Exact match** *(after upstream reverted Era 2 Pull)* |
+| **Control -> Runner direction** | Inbound HTTP/gRPC through `atenet-router` | Router-only inbound HTTP push on port 80 (`#688`, `#700`) + `TaskService` (`#692`) | **Exact match** *(after upstream reverted Era 2 Pull)* |
 | **Stock image execution** | Host bind-mount of arm64 `ax-runner` | Read-only `/opt/ax/ax-runner` OCI image volume (`#620`) | **Converged** |
 | **Reusable setup / branching** | `Tag` snapshots (`CreateTag` + `source_tag`) | `ForkTask` (`#669`) + stateless `Workspace` (`#696`) | **Exact match** |
 | **Multi-turn scale-to-zero** | A2A `contextId` on `/workspace` + `Wake & Prompt` | `TaskService` (`Send`/`List`/`Watch` + idle suspend, `#692`) | **Prefigured `#692`** |

@@ -19,7 +19,7 @@ Over three weeks in November 2026, AX tried three distinct architectures to brid
 </picture>
 
 ### Era 1: One `ActorTemplate` per `Task` *(Oct – Nov 15)*
-- **How it worked:** `TaskReconciler` hashed `AX_TASK_YAML` + `AX_WORKSPACE_YAML` into `ActorTemplate.containers[0].env`, minting a dedicated `<task>-tmpl-<hash>` template for every task.
+- **How it worked:** The task controller (then `TaskReconciler`, renamed `TaskManager` in `#730`) hashed `AX_TASK_YAML` + `AX_WORKSPACE_YAML` into `ActorTemplate.containers[0].env`, minting a dedicated `<task>-tmpl-<hash>` template for every task.
 - **Why it broke on Substrate `1.0`:**
   1. **Zero Golden-Snapshot Reuse:** 10,000 tasks meant 10,000 distinct `ActorTemplate`s—defeating Substrate's image/snapshot caching.
   2. **Golden-Boot Side Effects (`google/ax#427`, `#428`):** Substrate boots a template's container once *without* actor egress to capture its golden snapshot (`agent-substrate/substrate#3875`). Baking `spec.commands` and `git clone` into the template caused tasks to run—and fail—inside the golden boot!
@@ -30,10 +30,10 @@ Over three weeks in November 2026, AX tried three distinct architectures to brid
   1. **Punched a Hole in Zero-Egress Security:** Even tasks with *no* `Gateway` now required an outbound `EgressPolicy` rule to reach `ax-server:8081`.
   2. **Accidental Distributed-Systems Complexity:** Required a second HTTP listener, `NetworkPolicy` exceptions (`#631`), OIDC JWKS discovery/verification, `/run/ate/actor-uid` token binding, and run-attempt sequence fencing in Postgres.
 
-### Era 3: Shared `Profile` Template + Inbound Port-80 Push (`#688`, merged `2ede873`) *(Settled, Nov 20–22)*
+### Era 3: Shared `Profile` Template + Inbound Port-80 Push (`#688`, merged `2ede873`) *(Settled, Nov 20–24)*
 - **How it works:** Keep shared `Profile` `ActorTemplate`s (`ax-<hash>`), delete `:8081` and OIDC JWTs (`-6,252` LOC), and **flip the network arrow 180 degrees**:
-  1. `ax-runner` boots in `AwaitPush` mode on port 80 (`/readyz` = `200`, `/readyz?check=workspace` = `503`).
-  2. `ax-server` (`TaskReconciler.Resume`) pushes `POST /runner/v1alpha1/task` **inbound** over port 80 (via `workerAddr` or `atenet-router` `ate-target-actor`) and polls `/readyz?check=workspace`.
+  1. `ax-runner` boots in `AwaitPush` mode on port 80 (`/readyz` = `200`, `/readyz?check=workspace` = `503`) and invokes the image's default `/usr/local/bin/ax-launcher` (`#734`, renamed from `ax-harness`).
+  2. `ax-server` (`TaskManager.Resume`, renamed from `TaskReconciler` in `#730`) pushes `POST /runner/v1alpha1/task` **inbound** over port 80 **exclusively through `atenet-router`** (`ate-target-actor`, `#700`) and polls `/readyz?check=workspace`.
 - **Why Era 3 sticks:** It swims *with* Substrate's native inbound router path, restores strict zero-egress on tasks without a `Gateway`, and needs zero background queues across multiple `ax-server` replicas.
 
 > **Where This Goes Next — Substrate `v1.1` ([`agent-substrate/substrate#3876`](https://github.com/agent-substrate/substrate/issues/3876)):**
@@ -54,5 +54,5 @@ Alongside `#688`, `@rakyll` locked in three companion invariants that make the A
    Even though Substrate's README highlights gVisor RAM checkpointing, `SNAPSHOT_FIDELITY_MEMORY` is only a best-effort hint (and open TLS sockets to LLM APIs die across hibernation anyway). `#683` makes *"every resume is a cold process start over the snapshotted filesystem"* an explicit AX invariant—eliminating dual memory-vs-disk code paths.
 2. **Stateless `Workspace` + `ForkTask` Branching (`google/ax#696` & `#669`):**
    Giving `Workspace` its own hidden setup actor (`#592`/`#651`) froze time-sensitive MCP registries, skills, and Git refs at creation time and doubled lifecycle complexity. `#696` restores **"1 `Task` = 1 `Actor`"** (`ax-runner` resolves `Workspace` fresh on task startup) and directs "set up once, branch N times" workflows to explicit **`ax fork task`** (`#669`), which snapshots a parked task into a Substrate `Tag` and seeds child actors via `source_tag`—with optional `Gateway` narrowing on fork so a setup task can use repository-clone credentials that forked runtime tasks never inherit.
-3. **Conversational `TaskService` Over One-Shot Exit Codes (`google/ax#690` & `#692`):**
-   Real agents pursue goals across multiple turns (`Working` $\leftrightarrow$ `RequiresAction` / `Idle` $\leftrightarrow$ `Suspended`), finishing when the *goal* is met (`/ax/STATUS` JSON, `#690`) rather than when a shell PID exits—steered inbound via `TaskService` (`Send`, `List`, `Watch`, `#692`).
+3. **Compute-Aligned `TaskState` + Caller-Owned Completion (`google/ax#731`, `#690`, `#738`, `#692`):**
+   PR `#731` (`33b93cf`) aligned `TaskState` directly to Substrate's `ActorState` with an explicit wire-format boundary: enum values **`< 200`** mirror Substrate 1-to-1 (`RESUMING=1`, `RUNNING=2`, `SUSPENDING=3`, `SUSPENDED=4`, `CRASHED=5`, `DELETING=6`, `REVERTING=7`, read live and never stored), while values **`>= 200`** are AX-only (`QUEUED=200`, `FAILED=201`, `COMPLETED=202`). `WORKING`, `IDLE`, `REQUIRES_ACTION`, and `CANCELLED` were removed. After Draft PR `#743` showed how brittle a single-replica 5-second `ObserveStatus` polling loop on `ax-server` would be, upstream consensus on `#690` left task completion and richer turn states (`Idle`, `RequiresAction`, `Completed`) to **callers and the agent's own protocol** (e.g., `#738` checking a sandbox exit-code marker over `ax ssh`, and future `TaskService` `#692` steering)—keeping Substrate's `Actor` as the single source of truth for execution state, paired with future Substrate actor self-suspend (`agent-substrate/substrate#450`) to reclaim idle sandboxes to 0 RAM.

@@ -1,43 +1,49 @@
-// Settled AX task lifecycle (#683 cold-start resume, #688 inbound push,
-// #669/#696 Tag ForkTask branching, and #692 TaskService multi-turn steering).
+// Settled AX task lifecycle (#683 cold-start resume, #688/#700 router-only
+// inbound push, #731 TaskState aligned to Substrate ActorState, #690/#743
+// caller-owned completion, and #669/#696 Tag ForkTask branching).
 digraph settled_task_lifecycle {
-  label = "Settled AX mental model · lifecycle, fork, and steering";
+  label = "Settled AX mental model · compute state (#731), fork, and caller protocol";
   rankdir = LR;
-  ranksep = 0.6;
-  nodesep = 0.45;
+  ranksep = 0.55;
+  nodesep = 0.42;
 
-  start [label="", class="dot"];
-  queued [label="Queued", class="code"];
+  start  [label="", class="dot"];
+  queued [label="Queued (200)", class="code"];
 
   subgraph cluster_active {
-    label = "1 Task = 1 Actor (inbound port 80)";
+    label = "TaskState = Running (2) · 1 Task = 1 Actor via atenet-router :80";
     class = "accent";
-    working [label="Working", class="primary code"];
-    idle    [label="Idle", class="emphasis code"];
-    action  [label="RequiresAction", class="warning code"];
+    running [label="Running\n(ax-runner + ax-launcher)", class="primary code"];
+
+    subgraph cluster_agent {
+      label = "Caller / agent protocol (not polled by ax-server · #690/#743)";
+      idle   [label="Idle", class="emphasis code"];
+      action [label="RequiresAction", class="warning code"];
+      done   [label="Completed\n(caller / marker)", class="positive code"];
+    }
   }
 
-  suspended [label="Suspended (0 RAM)", class="code"];
-  vol       [label="/workspace snapshot", class="store code"];
+  crashed   [label="Crashed (5)", class="error code"];
+  suspended [label="Suspended (4 · 0 RAM)", class="code"];
+  vol       [label="$AX_WORKSPACE snapshot", class="store code"];
   tag       [label="Immutable Tag", class="emphasis code"];
   forked    [label="Forked child Task", class="cat-teal"];
-  done      [label="Completed", class="positive code"];
 
-  start -> queued [label="ax apply"];
-  queued -> working [label="Resume + POST task", class="primary"];
+  start  -> queued  [label="ax apply"];
+  queued -> running [label="Resume + POST task", class="primary"];
 
-  working -> idle      [label="turn ends"];
-  working -> action    [label="asks question", class="warning"];
-  action  -> working   [label="ax send answer", class="primary"];
-  idle    -> working   [label="ax send message", class="primary"];
-  idle    -> suspended [label="idle timeout", class="async"];
-  working -> suspended [label="ax suspend"];
+  running -> idle      [label="turn ends"];
+  running -> action    [label="asks user", class="warning"];
+  action  -> running   [label="send answer", class="primary"];
+  idle    -> running   [label="send message", class="primary"];
+  running -> done      [label="goal met (#738)", class="positive"];
+
+  running -> crashed   [label="actor crash", class="error async"];
+  running -> suspended [label="ax suspend / self-suspend"];
 
   suspended -> vol     [label="checkpoint files"];
-  vol -> working       [label="cold start (#683)", class="positive"];
+  vol -> running       [label="cold start (#683)", class="positive"];
 
   vol -> tag           [label="CreateTag (#669)", class="async"];
   tag -> forked        [label="ax fork (#696)", class="positive"];
-
-  working -> done      [label="goal met (/ax/STATUS)", class="positive"];
 }

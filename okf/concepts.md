@@ -44,6 +44,12 @@ sources:
   - id: ax-pr-732
     resource: https://github.com/google/ax/pull/732
     title: "google/ax#732: docs: explain how AX relates to Agent Substrate (orthogonal outside task execution; portable across Google, customer clusters, and on-prem)"
+  - id: ax-pr-731
+    resource: https://github.com/google/ax/pull/731
+    title: "google/ax#731: api: align TaskState (< 200) 1-to-1 with Substrate ActorState (Running/Suspended/Crashed)"
+  - id: ax-pr-738
+    resource: https://github.com/google/ax/pull/738
+    title: "google/ax#738: hack/hero-demo: detect task completion inside the sandbox over ax ssh (caller-owned completion)"
   - id: ax-roadmap
     resource: https://github.com/google/ax/blob/main/docs/roadmap.md
     title: "google/ax docs/roadmap.md: Core Specs, Actor Architecture, Agentic Environment, Sessions & Memory, Trajectory Collection"
@@ -67,7 +73,7 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 
 - `concepts/README.md` — 4 Golden Rules for AX developers and canonical upstream reference map.
 - `concepts/01-substrate-and-ax-mental-model.md` — Two-plane separation between Substrate `1.0` (`WorkerPool`, `ActorTemplate`, `Actor`, `atenet-router`, `atenet-egress`) and AX (`Task`, `Profile`, `Workspace`, `Model`, `Gateway`).
-- `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688` (`2ede873`) Inbound Push + `#683` Cold Resume + `#696` `ForkTask`, and the `v1.1` `/run/ate` `SystemInfo` horizon (`substrate#3876`).[^substrate-3876]
+- `concepts/02-the-three-pivots.md` — How Substrate `1.0`'s immutable `ActorTemplate` contract drove AX from Per-Task Templates $\rightarrow$ `:8081` Pull $\rightarrow$ `#688`/`#700` router-only Inbound Push + `#683` Cold Resume + `#731` compute-aligned `TaskState` + caller-owned completion (`#690`/`#738`),[^ax-pr-731][^ax-pr-738] and the `v1.1` `/run/ate` `SystemInfo` horizon (`substrate#3876`).[^substrate-3876]
 - `concepts/03-datacenter-to-laptop.md` — Six empirical lessons from running 10–50 microVM swarm tasks on `ate-local` (`#602`)[^ax-issue-602] and alignment scorecard against upstream AX & Substrate.
 - `concepts/04-from-orchestrator-to-platform.md` — Explicit Substrate-vs-AX responsibility boundary and the 7 platform pillars from `google/ax#724` (Sessions, Memory, Multi-task coordination, Input steering, Registries, Models, Trajectory collection) mapped to `docs/roadmap.md` and `ax-experiments` prototypes.
 - `concepts/diagrams/*.dot` & `*-{light,dark}.webp` — Five dual-theme Lustrous Graphviz schematics.
@@ -83,4 +89,6 @@ Visual architecture explainers and historical synthesis connecting [Track 1 (`at
 [^ax-issue-709]: google/ax#709: api: add repeated models to TaskSpec
 [^ax-issue-724]: google/ax#724: docs: explain how AX differs from Agent Substrate and how it grows into an agentic platform
 [^ax-pr-732]: google/ax#732: docs: explain how AX relates to Agent Substrate (orthogonal outside task execution; portable across Google, customer clusters, and on-prem)
+[^ax-pr-731]: google/ax#731: api: align TaskState (< 200) 1-to-1 with Substrate ActorState (Running/Suspended/Crashed)
+[^ax-pr-738]: google/ax#738: hack/hero-demo: detect task completion inside the sandbox over ax ssh (caller-owned completion)
 [^ax-roadmap]: google/ax docs/roadmap.md

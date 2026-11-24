@@ -12,7 +12,7 @@ digraph ax_platform_evolution {
     // Row 1: continuity & control
     sessions  [label="1. Session management\n(sessionId, turn history)", class="primary code"];
     memory    [label="2. Memory\n(cross-task long-term store)", class="cat-teal"];
-    steering  [label="4. Input steering\n(TaskService, /ax/STATUS)", class="emphasis code"];
+    steering  [label="4. Input steering\n(TaskService, caller protocol)", class="emphasis code"];
     multitask [label="3. Multi-task coordination\n(ForkTask, A2A, swarms)", class="primary"];
 
     // Row 2: governance, models & observability
