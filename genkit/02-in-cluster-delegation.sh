@@ -115,6 +115,8 @@ metadata:
   name: specialist-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: ".agents/skills/webhook-security/SKILL.md"
@@ -139,6 +141,8 @@ metadata:
   name: lead-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: "webhook_handler.go"

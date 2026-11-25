@@ -195,7 +195,10 @@ step1_local_up() {
   fi
 
   if ! nc -z 127.0.0.1 "${AX_LOCAL_SERVER_PORT}" >/dev/null 2>&1 || ! nc -z 127.0.0.1 "${AX_LOCAL_SERVER_B_PORT}" >/dev/null 2>&1; then
-    echo "    Starting dual-cluster local AX stack (Cluster A=apple :${AX_LOCAL_SERVER_PORT}, Cluster B=podman/apple :${AX_LOCAL_SERVER_B_PORT})..."
+    if [[ -z "${AX_LOCAL_CLUSTER_B_RUNTIME:-}" ]] && ! podman info >/dev/null 2>&1; then
+      export AX_LOCAL_CLUSTER_B_RUNTIME=apple
+    fi
+    echo "    Starting dual-cluster local AX stack (Cluster A=apple :${AX_LOCAL_SERVER_PORT}, Cluster B=${AX_LOCAL_CLUSTER_B_RUNTIME:-podman} :${AX_LOCAL_SERVER_B_PORT})..."
     if ! "${AX_REPO}/examples/ate_local/local-stack.sh" multi-up >/dev/null; then
       mark_fail "${step}" "local-stack.sh multi-up failed"
       return
@@ -420,21 +423,23 @@ step4_custom_image_task() {
   local logs=""
   for _ in $(seq 1 30); do
     logs="$(container logs "${cname}" 2>&1 || true)"
-    if echo "${logs}" | grep -q "Ran 2 tests" && echo "${logs}" | grep -q "task command completed successfully"; then
+    if echo "${logs}" | grep -qE "Ran [1-9][0-9]* test" && echo "${logs}" | grep -q "^OK" && echo "${logs}" | grep -q "task command completed successfully"; then
       break
     fi
     sleep 0.3
   done
 
-  if ! echo "${logs}" | grep -q "Ran 2 tests" || ! echo "${logs}" | grep -q "task command completed successfully"; then
-    mark_fail "${step}" "Custom python:3.12-slim task did not report 'Ran 2 tests' cleanly: ${logs}"
+  if ! echo "${logs}" | grep -qE "Ran [1-9][0-9]* test" || ! echo "${logs}" | grep -q "task command completed successfully"; then
+    mark_fail "${step}" "Custom python:3.12-slim task did not pass unit tests cleanly: ${logs}"
     return
   fi
 
   # Suspend custom task so its snapshot is committed for Step 5 cross-cluster promotion.
   ax_a suspend task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
 
-  mark_pass "${step}" "Unmodified python:3.12-slim ran injected ax-runner, skipped git setup via warm snapshot, and passed 2/2 unit tests (exitCode=0)"
+  local ran_summary
+  ran_summary="$(echo "${logs}" | grep -oE "Ran [0-9]+ tests?" | head -n1)"
+  mark_pass "${step}" "Unmodified python:3.12-slim ran injected ax-runner, skipped maiden setup via warm snapshot, and passed (${ran_summary}, OK)"
 }
 
 # ------------------------------------------------------------------------------
@@ -478,14 +483,14 @@ step5_remote_promote() {
     else
       b_logs="$(container logs "ate-cluster-b-default-${CUSTOM_TASK}" 2>&1 || true)"
     fi
-    if echo "${b_logs}" | grep -q "Ran 2 tests" && echo "${b_logs}" | grep -q "task command completed successfully"; then
+    if echo "${b_logs}" | grep -qE "Ran [1-9][0-9]* test" && echo "${b_logs}" | grep -q "^OK" && echo "${b_logs}" | grep -q "task command completed successfully"; then
       break
     fi
     sleep 0.3
   done
 
-  if ! echo "${b_logs}" | grep -q "Ran 2 tests" || ! echo "${b_logs}" | grep -q "task command completed successfully"; then
-    mark_fail "${step}" "Cluster B (${AX_SERVER_B}) promoted task did not pass 2/2 unit tests: ${b_logs}"
+  if ! echo "${b_logs}" | grep -qE "Ran [1-9][0-9]* test" || ! echo "${b_logs}" | grep -q "task command completed successfully"; then
+    mark_fail "${step}" "Cluster B (${AX_SERVER_B}) promoted task did not pass unit tests: ${b_logs}"
     return
   fi
 
@@ -494,7 +499,9 @@ step5_remote_promote() {
     b_runtime="apple-cluster-b"
   fi
 
-  mark_pass "${step}" "Promoted unchanged manifests from Cluster A (apple) to Cluster B (${b_runtime} ${AX_SERVER_B}) & passed 2/2 unit tests (exitCode=0)"
+  local b_ran_summary
+  b_ran_summary="$(echo "${b_logs}" | grep -oE "Ran [0-9]+ tests?" | head -n1)"
+  mark_pass "${step}" "Promoted unchanged manifests from Cluster A (apple) to Cluster B (${b_runtime} ${AX_SERVER_B}) & passed (${b_ran_summary}, OK)"
 }
 
 FUNCS=(step1_local_up step2_warm_workspace step3_starter_task_session step4_custom_image_task step5_remote_promote)

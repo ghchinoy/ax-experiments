@@ -4,6 +4,8 @@ metadata:
   name: billing-ws
   atespace: default
 spec:
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd"
   setup:
     files:
     - path: "ledger/invoices.json"
@@ -29,6 +31,8 @@ metadata:
   name: security-ws
   atespace: default
 spec:
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd"
   setup:
     files:
     - path: "playbooks/prompt-injection-sop.md"
@@ -48,6 +52,8 @@ metadata:
   name: engineering-ws
   atespace: default
 spec:
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd"
   setup:
     files:
     - path: "README.md"

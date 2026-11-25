@@ -43,6 +43,8 @@ metadata:
   name: ${WS_NAME}
   atespace: default
 spec:
+  profile:
+    image: "ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd"
   setup:
     files:
     - path: "inbox/ticket-9481.txt"

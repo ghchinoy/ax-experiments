@@ -71,6 +71,8 @@ metadata:
   name: coder-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: "README.md"
@@ -110,6 +112,8 @@ metadata:
   name: auditor-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: ".agents/skills/security-rubric/SKILL.md"

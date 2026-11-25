@@ -65,6 +65,8 @@ metadata:
   name: ${WS_NAME}
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "ax-agent-local:latest"
   setup:
     files:
     - path: ".agents/hooks.json"

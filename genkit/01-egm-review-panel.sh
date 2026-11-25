@@ -104,6 +104,8 @@ metadata:
   name: elephant-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: "CONTEXT.md"
@@ -125,6 +127,8 @@ metadata:
   name: goldfish-design-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: ".agents/skills/egm-design/SKILL.md"
@@ -142,6 +146,8 @@ metadata:
   name: goldfish-catalyst-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: ".agents/skills/egm-inventive-catalyst/SKILL.md"
@@ -159,6 +165,8 @@ metadata:
   name: goldfish-comprehension-ws
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${GENKIT_IMAGE}"
   setup:
     files:
     - path: ".agents/skills/egm-comprehension/SKILL.md"

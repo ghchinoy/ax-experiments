@@ -1,13 +1,13 @@
 {
   "rc_version": "v0.4.0-rc.2",
-  "tier": "quick",
-  "timestamp": "2026-11-25T21:31:02Z",
-  "total_seconds": 60.8,
+  "tier": "full",
+  "timestamp": "2026-11-25T22:01:56Z",
+  "total_seconds": 254.3,
   "summary": {
-    "passed": 13,
+    "passed": 17,
     "failed": 0,
-    "skipped": 0,
-    "total": 13
+    "skipped": 1,
+    "total": 18
   },
   "versions": {
     "google_ax_upstream": "8d879b5",
@@ -15,7 +15,7 @@
     "ax_fork": "feat/ate-local-apple-container@473959a",
     "ax_images": "v0.3.0@161e29a",
     "ax_central": "3d71152",
-    "ax_experiments": "b5fbf7e"
+    "ax_experiments": "b53d963"
   },
   "host": {
     "cpu": "Apple M5",
@@ -30,7 +30,7 @@
       "id": "exp-make-check",
       "title": "OKF v0.2 + bash -n + 4 Go builds/vets",
       "status": "PASS",
-      "seconds": 2.5,
+      "seconds": 2.6,
       "note": "OKF strict 100%, shell syntax & Go builds green",
       "tail": ""
     },
@@ -40,7 +40,7 @@
       "id": "images-go-test",
       "title": "go vet & go test -race ./...",
       "status": "PASS",
-      "seconds": 4.3,
+      "seconds": 10.0,
       "note": "All image runner & launcher unit tests green",
       "tail": ""
     },
@@ -50,7 +50,7 @@
       "id": "central-make-check",
       "title": "make check (Go -race, lint, audit, Vitest+axe)",
       "status": "PASS",
-      "seconds": 13.2,
+      "seconds": 14.0,
       "note": "Lint, 0 audit vulns, Go -race & Vitest green",
       "tail": ""
     },
@@ -60,7 +60,7 @@
       "id": "atelocal-unit",
       "title": "go test ./internal/atelocal (unit suite)",
       "status": "PASS",
-      "seconds": 0.7,
+      "seconds": 1.0,
       "note": "ControlServer, Podman, Tag/Router & PreBoot unit tests green",
       "tail": ""
     },
@@ -80,7 +80,7 @@
       "id": "central-doctor",
       "title": "make doctor (6-point prerequisite audit)",
       "status": "PASS",
-      "seconds": 0.2,
+      "seconds": 0.3,
       "note": "All prerequisites verified",
       "tail": ""
     },
@@ -90,7 +90,7 @@
       "id": "central-smoke-local",
       "title": "make smoke-local (debian:12 + Move Task tar)",
       "status": "PASS",
-      "seconds": 3.6,
+      "seconds": 2.9,
       "note": "Apply/resume, ax ssh & cross-atespace tar pipe green",
       "tail": ""
     },
@@ -100,7 +100,7 @@
       "id": "swarm-01",
       "title": "01-hello-swarm (8 parallel microVMs)",
       "status": "PASS",
-      "seconds": 8.5,
+      "seconds": 7.7,
       "note": "8 parallel Apple container microVMs Ready & ax ssh ok",
       "tail": ""
     },
@@ -110,7 +110,7 @@
       "id": "swarm-02",
       "title": "02-repo-inspector (Workspace git + inline)",
       "status": "PASS",
-      "seconds": 7.1,
+      "seconds": 9.8,
       "note": "Workspace git clone & inline files hydrated across 3 VMs",
       "tail": ""
     },
@@ -120,7 +120,7 @@
       "id": "swarm-03",
       "title": "03-seed-matrix (6 parallel sweep VMs)",
       "status": "PASS",
-      "seconds": 5.9,
+      "seconds": 5.6,
       "note": "6 parallel matrix tasks completed",
       "tail": ""
     },
@@ -130,7 +130,7 @@
       "id": "swarm-07",
       "title": "07-suspend-resume (#683 cold-start persistence)",
       "status": "PASS",
-      "seconds": 4.9,
+      "seconds": 4.7,
       "note": "Volume state persisted across suspend -> fresh VM boot",
       "tail": ""
     },
@@ -140,7 +140,7 @@
       "id": "swarm-08",
       "title": "08-spec-config-metadata (:8099 boundary)",
       "status": "PASS",
-      "seconds": 2.5,
+      "seconds": 2.9,
       "note": "External :80/metadata 404; loopback :8099 metadata & config ok",
       "tail": ""
     },
@@ -150,8 +150,58 @@
       "id": "images-genkit-live",
       "title": "GHCR genkit-runner #688 AwaitPush + A2A card",
       "status": "PASS",
-      "seconds": 1.5,
+      "seconds": 1.4,
       "note": "Pulled @sha256, verified ax-runner/ax-launcher & A2A card via router",
+      "tail": ""
+    },
+    {
+      "tier": "T2",
+      "track": "hero-demo",
+      "id": "hero-demo-live",
+      "title": "5/5 Live Hero Demo (hero-demo/run-live.sh)",
+      "status": "PASS",
+      "seconds": 53.5,
+      "note": "Hero Demo completed",
+      "tail": ""
+    },
+    {
+      "tier": "T2",
+      "track": "genkit",
+      "id": "genkit-apple",
+      "title": "genkit/run-apple-container.sh (A2A + MCP + suspend)",
+      "status": "PASS",
+      "seconds": 38.9,
+      "note": "Genkit Apple container E2E passed",
+      "tail": ""
+    },
+    {
+      "tier": "T2",
+      "track": "swarm",
+      "id": "swarm-04-review",
+      "title": "04-review-panel (3 Gemini reviewers)",
+      "status": "PASS",
+      "seconds": 33.8,
+      "note": "3-reviewer Gemini swarm passed",
+      "tail": ""
+    },
+    {
+      "tier": "T2",
+      "track": "agy",
+      "id": "agy-01-baseline",
+      "title": "agy/01-phase1-baseline.sh (ax-image)",
+      "status": "PASS",
+      "seconds": 59.1,
+      "note": "Antigravity Phase 1 baseline passed",
+      "tail": ""
+    },
+    {
+      "tier": "T2",
+      "track": "dgem",
+      "id": "dgem-suite",
+      "title": "dgem/01..03 + agy/02",
+      "status": "SKIP",
+      "seconds": 0.0,
+      "note": "dgem gateway (:8095) not running; run 'make dgem-up'",
       "tail": ""
     }
   ]

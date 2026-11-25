@@ -110,6 +110,8 @@ metadata:
   name: ${WS_NAME}
   atespace: ${ATESPACE}
 spec:
+  profile:
+    image: "${TASK_IMAGE}"
   setup:
     files:
     - path: ".env"
@@ -245,7 +247,7 @@ spec:
     image: "${TASK_IMAGE}"
   debug: true
   goal:
-    spec: |
+    text: |
       Read build.log, discount.py, and test_discount.py, run the unit test, fix the bug in discount.py so test_discount.py passes, and write a summary to /workspace/agent-output.md.
   config:
     model: gemini-3.8-flash
@@ -273,6 +275,24 @@ if [[ "${SURFACE}" == "sdk" ]]; then
   ssh_task "${TASK_NAME}" sh -c 'cd /workspace && python3 phase1_ungated_runner.py && echo && echo "=== /workspace/discount.py ===" && cat /workspace/discount.py && echo "=== /workspace/agent-output.md ===" && cat /workspace/agent-output.md'
 else
   echo
-  echo "==> Running ${ANTIGRAVITY_IMAGE} (/usr/local/bin/ax-agent) inside ${TASK_NAME}..."
-  ssh_task "${TASK_NAME}" sh -c 'cd /workspace && /usr/local/bin/ax-agent && echo && echo "=== /workspace/agent-output.md ===" && cat /workspace/agent-output.md'
+  echo "==> Waiting for ${ANTIGRAVITY_IMAGE} (/usr/local/bin/ax-launcher) inside ${TASK_NAME}..."
+  ssh_task "${TASK_NAME}" sh -c '
+    for _ in $(seq 1 90); do
+      if [ -s /workspace/agent-output.md ] || [ -s /workspace/.ax/output ]; then
+        break
+      fi
+      sleep 1
+    done
+    echo "=== /workspace/discount.py ==="
+    cat /workspace/discount.py
+    echo "=== /workspace/agent-output.md (or /workspace/.ax/output) ==="
+    if [ -s /workspace/agent-output.md ]; then
+      cat /workspace/agent-output.md
+    elif [ -s /workspace/.ax/output ]; then
+      cat /workspace/.ax/output
+    else
+      echo "ERROR: neither /workspace/agent-output.md nor /workspace/.ax/output was written" >&2
+      exit 1
+    fi
+  '
 fi
