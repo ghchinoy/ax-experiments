@@ -1,49 +1,49 @@
-// Settled AX task lifecycle (#683 cold-start resume, #688/#700 router-only
-// inbound push, #731 TaskState aligned to Substrate ActorState, #690/#743
-// caller-owned completion, and #669/#696 Tag ForkTask branching).
+// Settled AX task lifecycle (#683 cold-start resume, #688/#700/#757 router-only
+// inbound push, #731/#756 pure control-plane TaskState, external orchestrator
+// ownership of outcomes/steering, substrate#483 self-suspend, and #669/#696 ForkTask).
 digraph settled_task_lifecycle {
-  label = "Settled AX mental model · compute state (#731), fork, and caller protocol";
+  label = "Settled AX lifecycle · pure control-plane state (#756) & external orchestrator";
   rankdir = LR;
   ranksep = 0.55;
   nodesep = 0.42;
 
   start  [label="", class="dot"];
-  queued [label="Queued (200)", class="code"];
 
-  subgraph cluster_active {
-    label = "TaskState = Running (2) · 1 Task = 1 Actor via atenet-router :80";
+  subgraph cluster_ax {
+    label = "AX Control Plane · TaskState (#731 · #756, zero data-plane polling)";
     class = "accent";
-    running [label="Running\n(ax-runner + ax-launcher)", class="primary code"];
-
-    subgraph cluster_agent {
-      label = "Caller / agent protocol (not polled by ax-server · #690/#743)";
-      idle   [label="Idle", class="emphasis code"];
-      action [label="RequiresAction", class="warning code"];
-      done   [label="Completed\n(caller / marker)", class="positive code"];
-    }
+    queued    [label="Queued (200)\n(or empty + Ready=False)", class="code"];
+    running   [label="Running (2)\n(ax-runner + ax-launcher)", class="primary code"];
+    suspended [label="Suspended (4 · 0 RAM)", class="code"];
+    crashed   [label="Crashed (5)", class="error code"];
   }
 
-  crashed   [label="Crashed (5)", class="error code"];
-  suspended [label="Suspended (4 · 0 RAM)", class="code"];
-  vol       [label="$AX_WORKSPACE snapshot", class="store code"];
-  tag       [label="Immutable Tag", class="emphasis code"];
-  forked    [label="Forked child Task", class="cat-teal"];
+  subgraph cluster_orch {
+    label = "External orchestrator / agent protocol (#756 · AX Central, TaskService, A2A)";
+    idle   [label="Idle / turn ended", class="emphasis code"];
+    action [label="RequiresAction\n(HITL / steering)", class="warning code"];
+    done   [label="Completed / Failed\n(caller or #738 marker)", class="positive code"];
+  }
+
+  vol    [label="$AX_WORKSPACE snapshot", class="store code"];
+  tag    [label="Immutable Tag", class="emphasis code"];
+  forked [label="Forked child Task", class="cat-teal"];
 
   start  -> queued  [label="ax apply"];
-  queued -> running [label="Resume + POST task", class="primary"];
+  queued -> running [label="Resume + POST (--router-url #757)", class="primary"];
 
-  running -> idle      [label="turn ends"];
-  running -> action    [label="asks user", class="warning"];
-  action  -> running   [label="send answer", class="primary"];
-  idle    -> running   [label="send message", class="primary"];
-  running -> done      [label="goal met (#738)", class="positive"];
-
+  running -> suspended [label="ax suspend / self-suspend (#483)"];
   running -> crashed   [label="actor crash", class="error async"];
-  running -> suspended [label="ax suspend / self-suspend"];
 
   suspended -> vol     [label="checkpoint files"];
   vol -> running       [label="cold start (#683)", class="positive"];
 
   vol -> tag           [label="CreateTag (#669)", class="async"];
   tag -> forked        [label="ax fork (#696)", class="positive"];
+
+  running -> idle      [label="port 80 protocol", class="async"];
+  running -> action    [label="asks user", class="warning async"];
+  action  -> running   [label="send answer", class="primary async"];
+  idle    -> running   [label="send message", class="primary async"];
+  running -> done      [label="goal outcome", class="positive async"];
 }

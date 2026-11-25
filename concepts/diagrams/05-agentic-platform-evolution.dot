@@ -6,13 +6,13 @@ digraph ax_platform_evolution {
   nodesep = 0.45;
 
   subgraph cluster_platform {
-    label = "Agentic platform capabilities (AX plane · #724)";
+    label = "3. External orchestrator & agentic platform (#724 · #732 · #756)";
     class = "accent";
 
     // Row 1: continuity & control
     sessions  [label="1. Session management\n(sessionId, turn history)", class="primary code"];
     memory    [label="2. Memory\n(cross-task long-term store)", class="cat-teal"];
-    steering  [label="4. Input steering\n(TaskService, caller protocol)", class="emphasis code"];
+    steering  [label="4. Input steering & outcomes\n(orchestrator, TaskService)", class="emphasis code"];
     multitask [label="3. Multi-task coordination\n(ForkTask, A2A, swarms)", class="primary"];
 
     // Row 2: governance, models & observability
@@ -28,15 +28,15 @@ digraph ax_platform_evolution {
   }
 
   subgraph cluster_core {
-    label = "Task orchestrator foundation (AX v0.4 · ax.io/v1alpha1)";
+    label = "2. AX control plane (pure declarative · zero data-plane polling · #756/#757)";
     class = "accent";
-    task      [label="Task\n(1 Task = 1 Actor)", class="emphasis code"];
+    task      [label="Task + TaskManager\n(1 Task = 1 Actor · --router-url)", class="emphasis code"];
     workspace [label="Workspace\n(git, skills, MCP)", class="code"];
     gateway   [label="Gateway\n(egress + secrets)", class="code"];
   }
 
   subgraph cluster_sub {
-    label = "Agent Substrate 1.0 (agent-agnostic infrastructure · ateapi/v1)";
+    label = "1. Agent Substrate 1.0 (compute runtime · future #483 self-suspend)";
     actors     [label="Actor + Tag snapshots\n(1B scale-to-zero)", class="store"];
     workerpool [label="WorkerPool + ActorTemplate\n(<100ms sandbox restore)", class="muted"];
     netedge    [label="atenet-router + atenet-egress\n(inbound h2c, secret injection)", class="muted code"];

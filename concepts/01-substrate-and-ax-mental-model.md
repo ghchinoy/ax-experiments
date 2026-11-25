@@ -49,4 +49,9 @@ Agent Substrate is deliberately **agent-framework agnostic** (`Persona #2/#3` in
 | **`ForkTask`** (`ax fork`) | Branch a follow-up task from a parked task's filesystem state (`#669`) | `SuspendActor` $\rightarrow$ `CreateTag` $\rightarrow$ `CreateActor(source_tag)`. |
 
 ### Why AX Uses Its Own PostgreSQL Instead of Kubernetes CRDs (`DESIGN.md`)
-If AX stored `Task`s as Kubernetes CRDs, `etcd` would cap AX at ~50,000 tasks—throwing away 99.99% of Substrate's 1B-actor capacity. Instead, `ax-server` stores only **what AX owns** (declarative specs and per-resource distributed lease locks) in PostgreSQL, and reads live `Actor` state and `actorUid` directly from Substrate (`#515`, `#556`, `#695`).
+If AX stored `Task`s as Kubernetes CRDs, `etcd` would cap AX at ~50,000 tasks—throwing away 99.99% of Substrate's 1B-actor capacity. Instead, `ax-server` stores only **what AX owns** (declarative specs and per-resource distributed lease locks) in PostgreSQL, reads live `Actor` state and `actorUid` directly from Substrate (`#515`, `#556`, `#695`, `#731`), and drops all data-plane outcomes from `TaskStatus` (`#756`).
+
+### The Resulting Three-Layer Stack (`#732`, `#756`)
+1. **Agent Substrate 1.0 (Compute Runtime):** Actor isolation, `ActorState`, `Tag` snapshots, `atenet-router`, `atenet-egress`, and future actor self-suspend (`agent-substrate/substrate#483`).
+2. **AX Control Plane (Pure Declarative Control):** `Task`, `Workspace`, `Model`, `Gateway`, `TaskManager` (`#730`), `--router-url` (`#757`), and `Ready` conditions—with **zero data-plane polling** (`#756`).
+3. **External Orchestrator / Agent Platform:** Task outcomes, completion/retry policy, multi-turn steering, suspend/resume decisions, and trajectory collection (`#724`, `#732`, `#756`). See [Document 4](./04-from-orchestrator-to-platform.md).
