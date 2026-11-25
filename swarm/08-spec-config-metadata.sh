@@ -43,6 +43,8 @@ metadata:
   name: ${WS_NAME}
   atespace: default
 spec:
+  profile:
+    image: "ax-agent-local:latest"
   setup:
     files:
     - path: "policy/rules.json"

@@ -14,7 +14,7 @@ echo "==> [02 Parallel Repo Inspector] Inspecting 3 git codebases across isolate
 T_START=$SECONDS
 
 TMP_MANIFEST="$(mktemp /tmp/repo-swarm-XXXXXX.yaml)"
-trap 'rm -f "${TMP_MANIFEST}"; delete_tasks "${TASKS[@]}"' EXIT
+trap 'rm -f "${TMP_MANIFEST}"; delete_tasks "${TASKS[@]}"; "${AX_BIN}" delete workspace ws-ax >/dev/null 2>&1 || true; "${AX_BIN}" delete workspace ws-sample >/dev/null 2>&1 || true' EXIT
 
 cat >"${TMP_MANIFEST}" <<'EOF'
 apiVersion: ax.io/v1alpha1
@@ -23,10 +23,13 @@ metadata:
   name: ws-ax
   atespace: default
 spec:
+  profile:
+    image: "ax-agent-local:latest"
   setup:
     git:
       - name: ax
         repo: "https://github.com/golang/example.git"
+        ref: "master"
         depth: 1
 ---
 apiVersion: ax.io/v1alpha1
@@ -35,6 +38,8 @@ metadata:
   name: ws-sample
   atespace: default
 spec:
+  profile:
+    image: "ax-agent-local:latest"
   setup:
     files:
       - path: "data.txt"
