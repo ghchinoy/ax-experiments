@@ -215,6 +215,8 @@ Implemented in [`ghchinoy/ax:feat/local-backend-atelocal`](https://github.com/gh
 | `delete` | 11.2 s | **5.43 s** | ~2× |
 | Zero-env-var `apply` $\rightarrow$ `resume` $\rightarrow$ `ax ssh` | Works via kube context | **Works via `$AX_HOME/endpoints/`** (`Linux aarch64`) | Parity |
 
+> **Standalone Graduation Note:** Since this benchmark, the `ate-local` daemon graduated out of the `ghchinoy/ax` fork into standalone **[`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local)** (`~/projects/substrate-local`, depending only on `go.ate.dev/substrate v1.0.0`), so unmodified upstream `google/ax` binaries run against it via `scripts/ax-stack.sh` with zero fork-rebase churn.
+
 ## Reproduce
 
 ```bash

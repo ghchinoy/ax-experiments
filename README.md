@@ -75,9 +75,9 @@ To run the swarm recipes (`swarm/01..08`), the Genkit microVM runner (`genkit/ru
    - **Go 1.26+**
    - **`GEMINI_API_KEY`** exported in your shell *(only required for AI swarm recipes `04`, `05`, `06` and `genkit/run-apple-container.sh`)*
 
-2. **Start the local AX stack** from [`ghchinoy/ax`](https://github.com/ghchinoy/ax) (`feat/ate-local-apple-container` branch):
+2. **Start the local AX stack** using standalone [`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local) (runs unmodified upstream `google/ax` on Apple `container` and rootless Podman):
    ```bash
-   git clone -b feat/ate-local-apple-container https://github.com/ghchinoy/ax.git ~/projects/ax
+   git clone https://github.com/ghchinoy/substrate-local.git ~/projects/substrate-local
    cd ~/projects/ax-experiments
    make stack-up
    ```
@@ -190,7 +190,7 @@ AX_LOCAL_POSTGRES_PORT=5441 \
 AX_LOCAL_SUBSTRATE_PORT=50061 \
 AX_LOCAL_SERVER_PORT=8096 \
 AX_LOCAL_POSTGRES_NAME=ax-exp-postgres \
-~/projects/ax/examples/ate_local/local-stack.sh up
+~/projects/substrate-local/scripts/ax-stack.sh up
 ```
 
 ### Verification Gates

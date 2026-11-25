@@ -1,5 +1,5 @@
 // Scaling down without changing the mental model: Data-center Substrate 1.0
-// (1B actors on K8s WorkerPools) vs Laptop ate-local (10s of swarm microVMs).
+// (1B actors on K8s WorkerPools) vs Laptop substrate-local (10s of swarm microVMs).
 digraph datacenter_vs_laptop {
   label = "Same AX contract · data center scale vs laptop swarm";
   ranksep = 0.7;
@@ -10,11 +10,11 @@ digraph datacenter_vs_laptop {
   axsrv    [label="ax-server (unmodified)", class="emphasis code"];
 
   subgraph cluster_dc {
-    label = "Cloud · Substrate 1.0 (1B actors)";
+    label = "Cloud / Kind · Substrate 1.0 (1B actors)";
     dc_api   [label="ate-api-server", class="code"];
     dc_pool  [label="Warm WorkerPool Pods"];
-    dc_gcs   [label="GCS snapshots", class="store"];
-    dc_boot  [label="3–5m cluster setup\n<100ms actor wake", class="muted"];
+    dc_gcs   [label="GCS / RustFS snapshots", class="store"];
+    dc_boot  [label="~2m fresh · 3–6m resume\n<100ms actor wake", class="muted"];
 
     dc_api -> dc_pool [label="multiplex N:M"];
     dc_pool -> dc_gcs [label="checkpoint", class="async"];
@@ -22,13 +22,13 @@ digraph datacenter_vs_laptop {
   }
 
   subgraph cluster_mac {
-    label = "Laptop · ate-local (1–50 swarm tasks)";
+    label = "Laptop · substrate-local (1–50 swarm tasks)";
     class = "accent";
-    loc_api  [label="ate-local :50051", class="emphasis code"];
+    loc_api  [label="substrate-local :50051", class="emphasis code"];
     loc_apple [label="Apple container VMs", class="cat-cobalt"];
     loc_pod  [label="Rootless Podman", class="cat-violet"];
     loc_snap [label=".tar.gz snapshots", class="store"];
-    loc_boot [label="~3s stack boot\n0 RAM when suspended", class="positive"];
+    loc_boot [label="~2s stack boot\n0 RAM when suspended", class="positive"];
 
     loc_api -> loc_apple [label="vmnet :80"];
     loc_api -> loc_pod   [label="127.0.0.1:port"];

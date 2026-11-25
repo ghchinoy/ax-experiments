@@ -5,7 +5,7 @@
 Upstream [`google/ax/hack/hero-demo/run.sh`](https://github.com/google/ax/pull/590) defines the five-step **AX v0.1 Hero Demo** scoreboard, where four steps remain `🟡 STUB`s on upstream `main` while local mode (`#526`/`#602`), warm workspace snapshots (`#584`), multi-turn starter sessions, and automatic `ax-task-runner` injection land.
 
 This directory executes **all 5 steps live end-to-end (`5/5 🟢 PASS`)** by combining:
-- **`ate-local`** ([`ghchinoy/ax:feat/ate-local-apple-container`](https://github.com/ghchinoy/ax/tree/feat/ate-local-apple-container), [`google/ax#602`](https://github.com/google/ax/issues/602)) with pre-boot warm `Tag` snapshot hydration, embedded `atenet-router`, automatic `/usr/local/bin/ax-task-runner` injection on stock images, and dual-cluster `Apple container` $\leftrightarrow$ `Podman` promotion;
+- **[`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local)** (graduated from [`ate-local`](/ate-local/README.md), [`google/ax#602`](https://github.com/google/ax/issues/602)) with pre-boot warm `Tag` snapshot hydration, embedded `atenet-router`, automatic `/usr/local/bin/ax-runner` injection on stock images, and dual-cluster `Apple container` $\leftrightarrow$ `Podman` promotion against **unmodified upstream `google/ax`**;
 - **[`ghcr.io/ghchinoy/ax-images/genkit-runner`](https://github.com/ghchinoy/ax-images)** (`v0.3.0`, multi-arch `@sha256:` pinned) with persistent `/workspace/.genkit/snapshots` multi-turn sessions across `ax suspend` and `ax resume`; and
 - **[`AX Central`](https://github.com/ghchinoy/ax-central)** (`~/projects/ax-central`) desktop control plane.
 
@@ -24,7 +24,7 @@ By default, `run-live.sh` spins up an **isolated dual-cluster stack** (`Cluster 
 
 ```bash
 ./hero-demo/run-live.sh                           # Isolated 5/5 live run (default)
-./hero-demo/run-live.sh --attach                  # Run against active local-stack.sh multi-up (:8090 / :8091)
+./hero-demo/run-live.sh --attach                  # Run against active substrate-local ax-stack.sh multi-up (:8090 / :8091)
 ./hero-demo/run-live.sh --step 4                  # Run a single step
 ./hero-demo/run-live.sh --remote-context <ctx>    # Promote Step 5 to a Kubernetes Kind/GKE context
 ./hero-demo/run-live.sh --keep-stack              # Leave isolated dual-cluster stack up for inspection

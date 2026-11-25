@@ -1,6 +1,8 @@
 # `ate-local`: Local Agent Substrate on Apple Container & Podman
 
-> **OKF v0.2 Track Metadata & Lineage**: [`okf/ate-local.md`](../okf/ate-local.md) · **Bundle Index**: [`okf/index.md`](../okf/index.md)
+> **OKF v0.2 Track Metadata & Lineage**: [`okf/ate-local.md`](../okf/ate-local.md) · **Graduated Standalone Repo**: [`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local) ([`okf/substrate-local.md`](../okf/substrate-local.md)) · **Bundle Index**: [`okf/index.md`](../okf/index.md)
+
+> **Graduated to [`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local):** The `ate-local` daemon now lives in its own standalone repository (`~/projects/substrate-local`, depending only on `go.ate.dev/substrate v1.0.0`), so **unmodified upstream `google/ax`** binaries run on Apple `container` and rootless Podman in ~2 seconds with zero fork-rebase churn. `make stack-up` in this repo prefers `~/projects/substrate-local/scripts/ax-stack.sh` automatically.
 
 This experiment track prototypes and benchmarks **`ate-local`** ([`google/ax#602`](https://github.com/google/ax/issues/602)), a lightweight Go control and data plane implementing the **Agent Substrate Control gRPC API** (`go.ate.dev/substrate/api/ateapi/v1.ControlServer`, `v1.0.0`) plus an embedded **`atenet-router`** (`ate-target-actor` HTTP/1.1 + HTTP/2 `h2c` reverse proxy with wake-on-request), backed by either macOS's native **Apple `container`** runtime (`/usr/local/bin/container`) or **Podman** (`podman`).
 

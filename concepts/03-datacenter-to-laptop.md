@@ -20,7 +20,7 @@ On a single developer's laptop (`ax local start` on Kind, `#603`), that same sta
 - Takes **~2 minutes (128–129 s measured on Apple M5, and 3–5 minutes in [`google/ax#689`](https://github.com/google/ax/issues/689))** on a fresh start while 12+ control-plane and worker Pods converge sequentially—and **170–362 s** on `stop` $\rightarrow$ `start` while pod-certificate volumes wait out kubelet mount backoff (see step-by-step breakdown in [`ate-local/LOCAL-BACKEND.md`](../ate-local/LOCAL-BACKEND.md));
 - Keeps `WorkerPool` Pods idling in VM memory even when no tasks are running.
 
-By contrast, on Apple Silicon macOS, **`Virtualization.framework` (`Apple container`) *is* already a sub-second microVM hypervisor**. Implementing Substrate's `ateapi/v1.ControlServer` + `atenet-router` (`h2c`) directly against `Apple container` and rootless `podman` (`ate-local`, [`google/ax#602`](https://github.com/google/ax/issues/602)) boots the entire AX stack in **~3 seconds** while running **100% unmodified `ax` and `ax-server`**.
+By contrast, on Apple Silicon macOS, **`Virtualization.framework` (`Apple container`) *is* already a sub-second microVM hypervisor**. Implementing Substrate's `ateapi/v1.ControlServer` + `atenet-router` (`h2c`) directly against `Apple container` and rootless `podman`—prototyped as `ate-local` ([`google/ax#602`](https://github.com/google/ax/issues/602)) and now graduated into standalone **[`ghchinoy/substrate-local`](https://github.com/ghchinoy/substrate-local)**—boots the entire AX stack in **~2 seconds** while running **100% unmodified upstream `google/ax` binaries** (`ax` and `ax-server`) with zero fork rebases.
 
 ---
 
@@ -53,7 +53,7 @@ Even with **1 human tenant** on a laptop, multi-agent workflows (`swarm/03-seed-
    - *Gap:* In `ate-local` v1, `EgressPolicy` RPCs are stored for API parity, but local tasks typically receive `GEMINI_API_KEY` via `spec.env` rather than an outbound TLS-intercepting proxy. In production Substrate, secrets *never* enter `spec.env` (`atenet-egress` swaps placeholder headers outside the sandbox).
    - *Future local option:* A ~150-line optional Go HTTP/CONNECT proxy in `ate-local` reading `EgressPolicy` + macOS Keychain/env secrets would give local developers 100% `Gateway` credential-injection parity too.
 2. **Stateful Cross-Cluster `/workspace` Migration (`Move Task` vs. Spec-Only `ax promote` `#694`):**
-   - *Divergence:* Upstream chose to keep `ax promote` (`#618`, `#694`) strictly spec-only (no `/workspace` file transfer). For developer inner-loop $\rightarrow$ cloud workflows, streaming uncommitted `/workspace` edits across clusters (`AX Central`'s `Move Task` over dual `ax ssh` pipes) remains a high-value Studio/desktop capability layered cleanly *above* AX without needing core changes.
+   - *Divergence:* Upstream chose to keep `ax promote` (`#618`, `#694`) strictly spec-only (no `/workspace` file transfer), and official single-cluster [`agentexecutor/studio`](https://github.com/agentexecutor/studio) (`ax studio`) explicitly focuses on a single local Kind cluster (`#28`). For developer inner-loop $\rightarrow$ cloud workflows, streaming uncommitted `/workspace` edits across clusters (`AX Central`'s `Move Task` over dual `ax ssh` pipes) remains a high-value multi-cluster capability layered cleanly *above* AX without needing core changes.
 
 ---
 

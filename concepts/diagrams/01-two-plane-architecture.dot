@@ -7,7 +7,7 @@ digraph ax_substrate_two_planes {
   newrank = true;
 
   caller [label="Developer or agent", class="terminal"];
-  axcli  [label="ax CLI / Studio", class="primary code"];
+  axcli  [label="ax CLI / Studio / Central", class="primary code"];
 
   subgraph cluster_ax {
     label = "AX plane (ax.io/v1alpha1)";
