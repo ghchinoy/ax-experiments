@@ -17,6 +17,9 @@ sources:
   - id: upstream-substrate
     resource: https://github.com/agent-substrate/substrate
     title: "agent-substrate/substrate: Agent Substrate"
+  - id: upstream-studio
+    resource: https://github.com/agentexecutor/studio
+    title: "agentexecutor/studio: Official single-cluster AX Studio web UI (ax studio)"
 experiment:
   track: ax-central
   location: external
@@ -32,9 +35,10 @@ experiment:
     - hack/doctor.sh
     - hack/smoke-local.sh
     - docs/index.md
+    - docs/explanation/ax-studio-comparison.md
   upstream:
     repo: google/ax
-    base_commit: f0228f1
+    base_commit: 8d879b5
 ---
 
 # Track 4: AX Central (`~/projects/ax-central`)
@@ -64,9 +68,10 @@ make dev            # wails dev live-reload session
 
 ## Related Experiment Tracks
 
-- Connects to local stacks managed by [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) or Podman/Kind clusters.
+- Connects to local stacks managed by [Track 7: Substrate Local (~/projects/substrate-local)](/substrate-local.md) / [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) or multi-cluster Kind/GKE/Crostini contexts, complementing the official single-cluster [`agentexecutor/studio`](https://github.com/agentexecutor/studio) (`docs/explanation/ax-studio-comparison.md`).[^upstream-studio]
 - Designs and launches workloads exercised in [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md) and [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md).
 - Complements the swarm execution trace replayer in [Track 3: Swarm Telemetry, Correlation IDs & Visual Replay](/viz.md).
 
 [^upstream-ax]: google/ax: Agent Executor
 [^upstream-substrate]: agent-substrate/substrate: Agent Substrate
+[^upstream-studio]: agentexecutor/studio: Official single-cluster AX Studio web UI (ax studio)

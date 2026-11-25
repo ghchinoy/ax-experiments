@@ -33,6 +33,7 @@ EXP_REPO="$(cd "${SCRIPT_DIR}/.." && pwd)"
 AX_REPO="${AX_REPO:-$HOME/projects/ax}"
 AX_IMAGES_REPO="${AX_IMAGES_REPO:-$HOME/projects/ax-images}"
 AX_CENTRAL_REPO="${AX_CENTRAL_REPO:-$HOME/projects/ax-central}"
+SUBSTRATE_LOCAL_REPO="${SUBSTRATE_LOCAL_REPO:-$HOME/projects/substrate-local}"
 
 TIER="quick"
 RC_VERSION="${RC_VERSION:-}"
@@ -205,6 +206,14 @@ else
   skip_check "T0" "ax-central" "central-make-check" "make check" "${AX_CENTRAL_REPO} not found"
 fi
 
+if [[ -d "${SUBSTRATE_LOCAL_REPO}" ]]; then
+  run_check "T0" "substrate-local" "sublocal-go-test" "go vet & go test ./pkg/sublocal/..." \
+    "Standalone substrate-local v1.0.0 ControlServer + router tests green" \
+    bash -c "cd '${SUBSTRATE_LOCAL_REPO}' && go vet ./... && go test -count=1 ./pkg/sublocal/..."
+else
+  skip_check "T0" "substrate-local" "sublocal-go-test" "substrate-local tests" "${SUBSTRATE_LOCAL_REPO} not found"
+fi
+
 if [[ -d "${AX_REPO}/internal/atelocal" ]]; then
   run_check "T0" "ax-fork" "atelocal-unit" "go test ./internal/atelocal (unit suite)" \
     "ControlServer, Podman, Tag/Router & PreBoot unit tests green" \
@@ -325,6 +334,7 @@ SUBSTRATE_VER="$(grep 'go.ate.dev/substrate ' "${AX_REPO}/go.mod" 2>/dev/null | 
 IMAGES_TAG="$(git -C "${AX_IMAGES_REPO}" describe --tags --abbrev=0 2>/dev/null || echo "unknown")"
 IMAGES_SHA="$(git -C "${AX_IMAGES_REPO}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
 CENTRAL_SHA="$(git -C "${AX_CENTRAL_REPO}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
+SUBLOCAL_SHA="$(git -C "${SUBSTRATE_LOCAL_REPO}" rev-parse --short HEAD 2>/dev/null || echo "absent")"
 EXP_SHA="$(git -C "${EXP_REPO}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
 HOST_CPU="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -m)"
 HOST_OS="$(sw_vers -productVersion 2>/dev/null || uname -sr)"
@@ -335,15 +345,15 @@ GO_VER="$(go version 2>/dev/null | awk '{print $3}' || echo "unknown")"
 python3 - "${RESULTS_JSONL}" "${JSON_REPORT}" "${MD_REPORT}" \
   "${RC_VERSION}" "${TIER}" "${STAMP_DATE}" "${STAMP_ISO}" "${TOTAL_SECS}" \
   "${UPSTREAM_SHA}" "${SUBSTRATE_VER}" "${FORK_BRANCH}" "${FORK_SHA}" \
-  "${IMAGES_TAG}" "${IMAGES_SHA}" "${CENTRAL_SHA}" "${EXP_SHA}" \
+  "${IMAGES_TAG}" "${IMAGES_SHA}" "${CENTRAL_SHA}" "${SUBLOCAL_SHA}" "${EXP_SHA}" \
   "${HOST_CPU}" "${HOST_OS}" "${CONTAINER_VER}" "${GO_VER}" <<'PY'
 import json, sys
 
 (jsonl_path, json_out, md_out,
  rc_ver, tier, date_s, iso_s, total_s,
  up_sha, sub_ver, fork_br, fork_sha,
- img_tag, img_sha, central_sha, exp_sha,
- host_cpu, host_os, container_ver, go_ver) = sys.argv[1:21]
+ img_tag, img_sha, central_sha, sublocal_sha, exp_sha,
+ host_cpu, host_os, container_ver, go_ver) = sys.argv[1:22]
 
 rows = [json.loads(line) for line in open(jsonl_path) if line.strip()]
 passed = sum(1 for r in rows if r["status"] == "PASS")
@@ -359,6 +369,7 @@ payload = {
     "versions": {
         "google_ax_upstream": up_sha,
         "substrate": sub_ver,
+        "substrate_local": sublocal_sha,
         "ax_fork": f"{fork_br}@{fork_sha}",
         "ax_images": f"{img_tag}@{img_sha}",
         "ax_central": central_sha,
@@ -390,6 +401,7 @@ lines = [
     "|---|---|",
     f"| **Upstream `google/ax`** | `{rc_ver}` (`upstream/main` @ `{up_sha}`) |",
     f"| **Agent Substrate** | `{sub_ver}` |",
+    f"| **`ghchinoy/substrate-local`** | `main` @ `{sublocal_sha}` |",
     f"| **Fork `ghchinoy/ax`** | `{fork_br}` @ `{fork_sha}` |",
     f"| **`ghchinoy/ax-images`** | `{img_tag}` (`{img_sha}`) |",
     f"| **`ghchinoy/ax-central`** | `main` @ `{central_sha}` |",

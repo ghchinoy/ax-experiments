@@ -32,6 +32,7 @@ okf/                    OKF v0.2 Knowledge Bundle (provenance, trust & upstream/
   ax-central.md         Track 4 concept card (`type: External Experiment`, ~/projects/ax-central)
   ax-images.md          Track 5 concept card (`type: External Experiment`, ~/projects/ax-images)
   hero-demo.md          Track 6 concept card (`type: Experiment Track`, in-tree)
+  substrate-local.md    Track 7 concept card (`type: External Experiment`, ~/projects/substrate-local)
 concepts/               Track 0: AX & Agent Substrate 1.0 Developer Mental Model & Architecture Guide
   README.md             4 settled AX developer rules & canonical upstream reference map
   01-substrate-and-ax-mental-model.md  Two-plane split (Substrate 1.0 vs AX) & dual-Postgres rationale
@@ -107,7 +108,7 @@ reports/                Tracked per-RC validation scorecards (.md + .json)
 
 | Assignee | Owned Folders | Scope & Responsibilities |
 |---|---|---|
-| `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`crostini/`](./crostini/README.md), [`hero-demo/`](./hero-demo/README.md), [`okf/ate-local.md`](./okf/ate-local.md), [`okf/crostini.md`](./okf/crostini.md), [`okf/hero-demo.md`](./okf/hero-demo.md) | `ateapipb.ControlServer`, Apple `container` microVMs, Crostini Kind + gVisor stack, `local-stack.sh`, 5/5 Hero Demo (`#590`, `#602`), `#526`, `#553` |
+| `agent-substrate` | [`ate-local/`](./ate-local/README.md), [`crostini/`](./crostini/README.md), [`hero-demo/`](./hero-demo/README.md), [`okf/ate-local.md`](./okf/ate-local.md), [`okf/crostini.md`](./okf/crostini.md), [`okf/hero-demo.md`](./okf/hero-demo.md), [`okf/substrate-local.md`](./okf/substrate-local.md) | `ateapipb.ControlServer`, `~/projects/substrate-local`, Apple `container` microVMs, Crostini Kind + gVisor stack, `local-stack.sh`, 5/5 Hero Demo (`#590`, `#602`), `#526`, `#553`, `#712` |
 | `agent-swarm` | [`swarm/`](./swarm/README.md), [`genkit/`](./genkit/README.md), [`dgem/`](./dgem/README.md), [`agy/`](./agy/README.md), [`okf/swarm.md`](./okf/swarm.md), [`okf/genkit.md`](./okf/genkit.md), [`okf/dgem.md`](./okf/dgem.md), [`okf/agy.md`](./okf/agy.md), [`okf/ax-images.md`](./okf/ax-images.md) | Multi-agent recipes (`01`–`08`), `ax-agent-local` & `ghchinoy/ax-images` (`~/projects/ax-images`), `genkit-runner` (`#538`), `dgem` + Genkit System-1 routing (`dgem/01..03`), Antigravity + `dgem` safety gates (`agy/01..02`) |
 | `agent-viz` | [`viz/`](./viz/README.md), [`okf/viz.md`](./okf/viz.md), [`okf/ax-central.md`](./okf/ax-central.md) | `SCHEMA.md`, `ax-trace` recorder, Lit 3 / Force-Graph / Cytoscape UI, telemetry RFC, `~/projects/ax-central` |
 | `agent-sync` | [`concepts/`](./concepts/README.md), [`okf/concepts.md`](./okf/concepts.md), [`okf/index.md`](./okf/index.md), [`README.md`](./README.md), [`AGENTS.md`](./AGENTS.md), `.beads/` | Upstream `google/ax` & `substrate` rebase checks, architecture mental-model docs, OKF v0.2 bundle conformance, `bd` hygiene |

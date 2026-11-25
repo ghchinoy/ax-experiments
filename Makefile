@@ -8,6 +8,7 @@ OKF_PROTO ?= $(shell command -v okf-proto 2>/dev/null || echo $(HOME)/go/bin/okf
 AX_REPO ?= $(HOME)/projects/ax
 AX_IMAGES_REPO ?= $(HOME)/projects/ax-images
 AX_CENTRAL_REPO ?= $(HOME)/projects/ax-central
+SUBSTRATE_LOCAL_REPO ?= $(HOME)/projects/substrate-local
 RC_VERSION ?=
 
 .PHONY: help check okf-validate rc-static rc-quick rc-full rc-bench stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple hero-demo dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
