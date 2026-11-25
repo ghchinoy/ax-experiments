@@ -18,8 +18,8 @@
 # Supports:
 #   - SUBSTRATE=atelocal (default, macOS Apple container microVMs) | kind (Kubernetes Kind + Agent Substrate)
 #   - SURFACE=sdk (default, Antigravity Python tool-calling loop inside ax-agent-local)
-#             | ax-image (default ghcr.io/ghchinoy/ax-images/agy-agent:latest in non-dgem baseline mode,
-#                         or override AGY_AX_IMAGE=ghcr.io/rakyll/ax-images/antigravity:latest)
+#             | ax-image (default ghcr.io/ghchinoy/ax-images/agy-agent in non-dgem baseline mode,
+#                         or override AGY_AX_IMAGE=ghcr.io/agentexecutor/agy-cli@sha256:13c1957d2e790c3a981de08e3996acc268e855f2e6a79b5e931ec62e8b54c2a5)
 #
 # Demonstrates:
 #   1. Running an Antigravity coding task inside an AX sandbox with zero dgem
@@ -41,7 +41,7 @@ SURFACE="${SURFACE:-sdk}"
 ATESPACE="${ATESPACE:-default}"
 TASK_NAME="agy-phase1-baseline"
 WS_NAME="agy-phase1-ws"
-ANTIGRAVITY_IMAGE="${AGY_AX_IMAGE:-ghcr.io/ghchinoy/ax-images/agy-agent@sha256:bd8792bf378a2ba2d8953934ed3a2b195d8b9c9063a4f58a31f1b5ebea75e47f}"
+ANTIGRAVITY_IMAGE="${AGY_AX_IMAGE:-ghcr.io/ghchinoy/ax-images/agy-agent@sha256:2d1ae9d22688ab26926ce808c9231e8c07b019c15b0f530d5616a50956dc63a1}"
 
 if [[ "${SUBSTRATE}" == "atelocal" ]]; then
   source "${AX_EXP_ROOT}/swarm/lib.sh"

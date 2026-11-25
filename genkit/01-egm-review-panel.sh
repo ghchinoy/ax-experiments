@@ -47,7 +47,7 @@ ADC_PATH="${HOME}/.config/gcloud/application_default_credentials.json"
 ax() { "${AX_BIN}" "$@"; }
 k() { kubectl --kubeconfig "${KUBECONFIG}" --context "${KUBE_CONTEXT}" "$@"; }
 
-GENKIT_IMAGE="${GENKIT_IMAGE:-ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06}"
+GENKIT_IMAGE="${GENKIT_IMAGE:-ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd}"
 
 printf '\n==> [Pre-flight] Ensuring ax-workers has 3 gVisor replicas for 3-way parallel Goldfish wave...\n'
 k -n "${AX_SYSTEM_NAMESPACE:-ax-system}" scale deployment/ax-workers --replicas=3

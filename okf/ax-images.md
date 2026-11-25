@@ -1,7 +1,7 @@
 ---
 type: External Experiment
 title: "Track 5: AX Images — Multi-Arch Task Image Repository (ghcr.io/ghchinoy/ax-images)"
-description: "Standalone multi-arch (linux/amd64 + linux/arm64) AX task image repository publishing swarm-agent, genkit-runner, dgem-agent, and agy-agent with hard-linked /usr/local/bin/ax-task-runner -> /usr/local/bin/ax-agent and digest-pinned release manifests."
+description: "Standalone multi-arch (linux/amd64 + linux/arm64) AX task image repository publishing swarm-agent, genkit-runner, dgem-agent, and agy-agent (v0.3.0, google/ax v0.4.0-rc.2) with hard-linked /usr/local/bin/{ax-runner,ax-task-runner,ax-launcher,ax-harness} -> /usr/local/bin/ax-agent and digest-pinned release manifests."
 status: stable
 tags: [ax-images, ghcr, multi-arch, swarm-agent, genkit-runner, dgem-agent, agy-agent, external]
 generated:
@@ -36,8 +36,8 @@ experiment:
     - images/agy-agent/Dockerfile
   upstream:
     repo: google/ax
-    base_commit: 9a65684
-    issues: [526, 538, 563, 602]
+    base_commit: 8d879b5
+    issues: [526, 538, 563, 602, 604, 620, 621, 677, 688, 723, 734, 770]
 ---
 
 # Track 5: AX Images (`~/projects/ax-images`)
@@ -46,7 +46,7 @@ experiment:
 
 Provide a standalone, multi-arch (`linux/amd64` + `linux/arm64`), digest-pinned container image repository ([`ghchinoy/ax-images`](https://github.com/ghchinoy/ax-images) publishing to `ghcr.io/ghchinoy/ax-images/<name>`) for the custom agent runners exercised across `ax-experiments` and `ax-central`, while keeping [`rakyll/ax-images`](https://github.com/rakyll/ax-images) strictly for upstream issues and fixes.[^ghchinoy-ax-images][^rakyll-ax-images-pr-2][^upstream-ax]
 
-Every image installs its entrypoint at `/usr/local/bin/ax-agent` with `/usr/local/bin/ax-task-runner` **hard-linked** (`ln -f`) to it, preventing host bind-mounts over `/usr/local/bin/ax-task-runner` from clobbering `/usr/local/bin/ax-agent`.[^rakyll-ax-images-pr-2]
+Every image installs its entrypoint at `/usr/local/bin/ax-agent` with `/usr/local/bin/ax-runner`, `/usr/local/bin/ax-task-runner`, `/usr/local/bin/ax-launcher`, and `/usr/local/bin/ax-harness` **hard-linked** (`ln -f`) to it, supporting both `#688` inbound push-runner mode and `#620`/`#621`/`#734` `--runner-volume-image` launcher mode without host bind-mounts clobbering `/usr/local/bin/ax-agent`.[^rakyll-ax-images-pr-2]
 
 ## Published Images (`ghcr.io/ghchinoy/ax-images/*`)
 
@@ -69,7 +69,7 @@ make pin            # pin @sha256: digests into images/*/task.yaml and README.md
 ## Related Experiment Tracks
 
 - Runs directly on [Track 1: Local Apple Container Substrate (ate-local)](/ate-local.md) and [Track 1b: Local Chromebook / Crostini Kind + Agent Substrate Stack (crostini)](/crostini.md).
-- Packages the runtime images (`v0.2.0`, aligned with `google/ax` Epic `#563` / `#587` via [`ghchinoy/ax-images#1`](https://github.com/ghchinoy/ax-images/issues/1)) for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md), [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md), [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md), [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md), and [Track 6: End-to-End 5/5 Live AX v0.1 Hero Demo Harness (hero-demo)](/hero-demo.md).
+- Packages the runtime images (`v0.3.0`, aligned with `google/ax` `v0.4.0-rc.2` / `8d879b5` via [`ghchinoy/ax-images#2`](https://github.com/ghchinoy/ax-images/issues/2)) for [Track 2a: Multi-Agent Swarm Recipes (01–08)](/swarm.md), [Track 2b: Declarative Genkit Go Runner (genkit-runner)](/genkit.md), [Track 2c: System-1 Decision Routing & Guardrails with dgem + Genkit on AX (dgem)](/dgem.md), [Track 2d: Antigravity (agy) Coding Agents on AX with Cascading dgem Safety Gates (agy)](/agy.md), and [Track 6: End-to-End 5/5 Live AX v0.1 Hero Demo Harness (hero-demo)](/hero-demo.md).
 - Integrated into the Configurable Image Artifact Registry Catalog in [Track 4: AX Central — Desktop Control Plane, Task Designer & Podman Shim](/ax-central.md).
 
 [^ghchinoy-ax-images]: ghchinoy/ax-images: Multi-arch task images for AX

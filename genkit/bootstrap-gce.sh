@@ -94,7 +94,7 @@ echo "==> [5/6] Building and pushing genkit-runner to localhost:5001..."
 make push-genkit-image \
   CONTAINER_CLI=docker \
   GENKIT_REPO=localhost:5001/genkit-runner \
-  GENKIT_BASE_IMAGE=localhost:5001/ax-task-runner:base
+  GENKIT_BASE_IMAGE=ghcr.io/google/ax/ax-runner@sha256:0937ebe5ad2d8db6bb25e88ded44d2d65de1b1bd8f0a9a97c6bb3787407d9947
 
 echo "==> [6/6] Writing /etc/profile.d/ax-e2e.sh for interactive shells..."
 cat >/etc/profile.d/ax-e2e.sh <<'EOF'

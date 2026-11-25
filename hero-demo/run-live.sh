@@ -103,7 +103,7 @@ PREWARM_TASK="hero-demo-ws-prewarm"
 WARM_TAG="hero-demo-ws-warm"
 STARTER_TASK="hero-demo-starter-task"
 CUSTOM_TASK="hero-demo-custom-task"
-STARTER_IMAGE="ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06"
+STARTER_IMAGE="ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd"
 
 STEPS=(
   "1. Local Up & Studio"
@@ -140,7 +140,7 @@ wait_task_working() {
     local state ready
     state="$(echo "${desc}" | awk '/^State:/{print $2; exit}')"
     ready="$(echo "${desc}" | grep -E "Ready\s+True" || true)"
-    if [[ "${state}" == "Working" && -n "${ready}" ]]; then
+    if [[ ( "${state}" == "Running" || "${state}" == "Working" ) && -n "${ready}" ]]; then
       return 0
     fi
     sleep 0.2
@@ -251,7 +251,7 @@ spec:
   debug: true
 EOF
   if ! ax_a resume task "${PREWARM_TASK}" >/dev/null 2>&1 || ! wait_task_working a "${PREWARM_TASK}" 60; then
-    mark_fail "${step}" "Pre-warm setup actor ${PREWARM_TASK} failed to reach Working"
+    mark_fail "${step}" "Pre-warm setup actor ${PREWARM_TASK} failed to reach Running"
     return
   fi
   if ! ax_a suspend task "${PREWARM_TASK}" >/dev/null 2>&1; then
@@ -434,7 +434,7 @@ step4_custom_image_task() {
   # Suspend custom task so its snapshot is committed for Step 5 cross-cluster promotion.
   ax_a suspend task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
 
-  mark_pass "${step}" "Unmodified python:3.12-slim ran injected ax-task-runner, skipped git setup via warm snapshot, and passed 2/2 unit tests (exitCode=0)"
+  mark_pass "${step}" "Unmodified python:3.12-slim ran injected ax-runner, skipped git setup via warm snapshot, and passed 2/2 unit tests (exitCode=0)"
 }
 
 # ------------------------------------------------------------------------------

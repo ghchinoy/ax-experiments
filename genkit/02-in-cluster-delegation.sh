@@ -54,15 +54,23 @@ mkdir -p "${AX_REPO}/bin/linux_amd64"
     -o "${AX_REPO}/bin/linux_amd64/a2a-mcp-bridge" ./cmd/a2a-mcp-bridge
 )
 (
+  AX_IMAGES_REPO="${AX_IMAGES_REPO:-$HOME/projects/ax-images}"
+  if [[ -d "${AX_IMAGES_REPO}/cmd/genkit-runner" ]]; then
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go -C "${AX_IMAGES_REPO}" build -trimpath -ldflags="-s -w" \
+      -o "${AX_REPO}/bin/linux_amd64/genkit-runner" ./cmd/genkit-runner
+  else
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go -C "${AX_REPO}" build -trimpath -ldflags="-s -w" \
+      -o bin/linux_amd64/genkit-runner ./cmd/runners/genkit-runner
+  fi
   cd "${AX_REPO}"
-  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" \
-    -o bin/linux_amd64/genkit-runner ./cmd/runners/genkit-runner
   TMP_DOCKERFILE="$(mktemp "${AX_REPO}/.Dockerfile.genkit-mcp.XXXXXX")"
   cat <<'DOCKERFILE' > "${TMP_DOCKERFILE}"
-FROM localhost:5001/ax-task-runner:e2e
-COPY bin/linux_amd64/genkit-runner /usr/local/bin/ax-task-runner
+FROM ghcr.io/google/ax/ax-runner@sha256:0937ebe5ad2d8db6bb25e88ded44d2d65de1b1bd8f0a9a97c6bb3787407d9947
+COPY bin/linux_amd64/genkit-runner /usr/local/bin/ax-runner
+RUN ln -f /usr/local/bin/ax-runner /usr/local/bin/ax-task-runner && \
+    ln -f /usr/local/bin/ax-runner /usr/local/bin/ax-launcher
 COPY bin/linux_amd64/a2a-mcp-bridge /usr/local/bin/a2a-mcp-bridge
-ENTRYPOINT ["/usr/local/bin/ax-task-runner"]
+ENTRYPOINT ["/usr/local/bin/ax-runner"]
 DOCKERFILE
   docker build -q -t localhost:5001/genkit-runner:latest -f "${TMP_DOCKERFILE}" . >/dev/null
   rm -f "${TMP_DOCKERFILE}"

@@ -197,17 +197,18 @@ wait_a2a_ready() {
 ensure_genkit_runner() {
   local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
   local genkit_cache="${state_dir}/bin/linux_arm64/genkit-runner"
-  local runner_target="${state_dir}/bin/linux_arm64/ax-task-runner"
-  local runner_orig="${state_dir}/bin/linux_arm64/ax-task-runner.orig"
+  local runner_target="${state_dir}/bin/linux_arm64/ax-runner"
+  local runner_legacy="${state_dir}/bin/linux_arm64/ax-task-runner"
+  local runner_orig="${state_dir}/bin/linux_arm64/ax-runner.orig"
 
   mkdir -p "${state_dir}/bin/linux_arm64"
   if [[ ! -x "${runner_orig}" ]]; then
     if [[ -x "${runner_target}" ]] && { [[ ! -x "${genkit_cache}" ]] || ! cmp -s "${runner_target}" "${genkit_cache}"; }; then
       cp -p "${runner_target}" "${runner_orig}"
-    elif [[ -d "${AX_REPO}/cmd/ax-task-runner" ]]; then
+    elif [[ -d "${AX_REPO}/cmd/ax-runner" ]]; then
       GOOS=linux GOARCH=arm64 CGO_ENABLED=0 \
         go -C "${AX_REPO}" build -trimpath -ldflags="-s -w" \
-        -o "${runner_orig}" ./cmd/ax-task-runner
+        -o "${runner_orig}" ./cmd/ax-runner
     fi
   fi
 
@@ -232,13 +233,16 @@ ensure_genkit_runner() {
     fi
   fi
   cp "${genkit_cache}" "${runner_target}"
+  ln -f "${runner_target}" "${runner_legacy}"
 }
 
 restore_default_runner() {
   local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
-  local runner_target="${state_dir}/bin/linux_arm64/ax-task-runner"
-  local runner_orig="${state_dir}/bin/linux_arm64/ax-task-runner.orig"
+  local runner_target="${state_dir}/bin/linux_arm64/ax-runner"
+  local runner_legacy="${state_dir}/bin/linux_arm64/ax-task-runner"
+  local runner_orig="${state_dir}/bin/linux_arm64/ax-runner.orig"
   if [[ -x "${runner_orig}" ]]; then
     cp -p "${runner_orig}" "${runner_target}"
+    ln -f "${runner_target}" "${runner_legacy}"
   fi
 }

@@ -38,7 +38,7 @@ ADC_PATH="${HOME}/.config/gcloud/application_default_credentials.json"
 
 ax() { "${AX_BIN}" "$@"; }
 
-GENKIT_IMAGE="${GENKIT_IMAGE:-ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:f5d7420468b7f1dec8304d7efa1dbe0ca2bb86a1e552181f823630412e01ee06}"
+GENKIT_IMAGE="${GENKIT_IMAGE:-ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:2620b7bc3dc328147b034c1210c29999589eef977e05bd027529e5d882fc4fcd}"
 
 if [[ -z "${GEMINI_API_KEY:-}" && ! -f "${ADC_PATH}" ]]; then
   echo "error: neither GEMINI_API_KEY nor ${ADC_PATH} is present" >&2
