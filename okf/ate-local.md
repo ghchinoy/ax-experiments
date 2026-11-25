@@ -61,6 +61,8 @@ experiment:
   forks:
     - repo: ghchinoy/ax
       branch: feat/ate-local-apple-container
+    - repo: ghchinoy/ax
+      branch: feat/local-backend-atelocal
 ---
 
 # Track 1: Local Apple Container Substrate (`ate-local`)
@@ -84,6 +86,7 @@ Implement the **Agent Substrate Control gRPC API** (`go.ate.dev/substrate/pkg/pr
 - **Actor Resume → Ready (`vmnet` IP assigned & `/readyz` 200 OK)**: 0.70s median.
 - **Interactive Guest Exec (`ax ssh`)**: 0.03s over direct `vmnet` bridge IP (`192.168.64.x:80`) before the `bfd5042` rebase; currently failing (`ax-experiments-1rx.7`).
 - **Kind comparison (2026-11-21, Apple M5, `ax` v0.4.0-rc.1)**: fresh `ax local start` 128–129s (one unreproduced 1059s outlier), `start` after `stop` 170–362s, vs `ate-local` warm `up` 2.7s (7.8s with a first build). On a running Kind cluster, task resume → `Working` is 0.10–0.14s vs 0.45–0.61s on `ate-local`, so the advantage is environment bring-up, not the task inner loop.[^ax-pr-603]
+- **Phase B `ax local --backend=ate-local` prototype (2026-11-25, `ghchinoy/ax@d4ba29a`, `ax-experiments-1rx.6`)**: cold `ax local start --backend=ate-local` **1.77s** (~72× faster than Kind), `stop` **5.30s**, `start` after `stop` (preserving Postgres) **0.86s** (~200–420× faster than Kind), `delete` **5.43s**; zero-env-var `ax ctx` / `ax apply` / `ax resume` / `ax ssh` verified via `$AX_HOME/endpoints/<name>.json`.
 
 ## Related Experiment Tracks
 

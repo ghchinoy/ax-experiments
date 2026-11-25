@@ -199,6 +199,22 @@ These changes cannot reach seconds. A Kind cluster (about 27 s) plus Substrate's
    - A per-environment actor prefix in `ate-local` (Finding 6).
    - A fix for `ax ssh` on `ate-local` (`ax-experiments-1rx.7`).
 
+## Phase B Prototype Results (`ax-experiments-1rx.6`)
+
+Implemented in [`ghchinoy/ax:feat/local-backend-atelocal`](https://github.com/ghchinoy/ax/tree/feat/local-backend-atelocal) (`d4ba29a`, branched from `473959a` / `google/ax@8d879b5`):
+
+- **`internal/install/local/`**: `Backend` interface (`Start`, `Stop`, `Status`, `Delete`), `KindBackend` (default `--backend=kind`), and `AteLocalBackend` (`--backend=ate-local`) with per-environment state under `$AX_HOME/local/<name>/`, isolated Postgres container (`ax-<name>-postgres`), and per-environment actor prefix (`ate-<name>-`, closing Finding 6).
+- **Non-K8s local endpoint contexts (`internal/tunnel/endpoints.go`)**: saves `$AX_HOME/endpoints/<name>.json` (`serverUrl`, `routerAddr`) and `$AX_HOME/current-context`, wired into `CurrentContext`, `ListContexts` (`ax ctx`), `SetCurrentContext`, `EnsureServerURL` (`pkg/client`), and `ax ssh` (`dialGuest`) — eliminating `source .ax-local/env`, `$AX_SERVER`, and `$ATENET_ROUTER_ADDR`.
+- **Measured on Apple M5** (isolated ports `5446`/`50076`/`8099`, `KUBECONFIG` empty, `AX_SERVER` & `ATENET_ROUTER_ADDR` unset):
+
+| Phase | `ax local --backend=kind` (`v0.4.0-rc.1`) | `ax local --backend=ate-local` (`d4ba29a`) | Speedup |
+| :--- | ---: | ---: | ---: |
+| Fresh start | 128.0–129.3 s | **1.77 s** | **~72×** |
+| `stop` | 10.4 s | **5.30 s** | ~2× |
+| `start` after `stop` (preserving Postgres) | 169.5–362.4 s | **0.86 s** | **~200–420×** |
+| `delete` | 11.2 s | **5.43 s** | ~2× |
+| Zero-env-var `apply` $\rightarrow$ `resume` $\rightarrow$ `ax ssh` | Works via kube context | **Works via `$AX_HOME/endpoints/`** (`Linux aarch64`) | Parity |
+
 ## Reproduce
 
 ```bash
