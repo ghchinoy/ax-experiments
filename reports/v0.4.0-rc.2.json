@@ -1,0 +1,158 @@
+{
+  "rc_version": "v0.4.0-rc.2",
+  "tier": "quick",
+  "timestamp": "2026-11-25T21:31:02Z",
+  "total_seconds": 60.8,
+  "summary": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "total": 13
+  },
+  "versions": {
+    "google_ax_upstream": "8d879b5",
+    "substrate": "v1.0.0",
+    "ax_fork": "feat/ate-local-apple-container@473959a",
+    "ax_images": "v0.3.0@161e29a",
+    "ax_central": "3d71152",
+    "ax_experiments": "b5fbf7e"
+  },
+  "host": {
+    "cpu": "Apple M5",
+    "os": "26.7.3",
+    "container_cli": "container CLI version 1.0.0 (build: release, commit: ee848e3)",
+    "go": "go1.27.4"
+  },
+  "checks": [
+    {
+      "tier": "T0",
+      "track": "ax-experiments",
+      "id": "exp-make-check",
+      "title": "OKF v0.2 + bash -n + 4 Go builds/vets",
+      "status": "PASS",
+      "seconds": 2.5,
+      "note": "OKF strict 100%, shell syntax & Go builds green",
+      "tail": ""
+    },
+    {
+      "tier": "T0",
+      "track": "ax-images",
+      "id": "images-go-test",
+      "title": "go vet & go test -race ./...",
+      "status": "PASS",
+      "seconds": 4.3,
+      "note": "All image runner & launcher unit tests green",
+      "tail": ""
+    },
+    {
+      "tier": "T0",
+      "track": "ax-central",
+      "id": "central-make-check",
+      "title": "make check (Go -race, lint, audit, Vitest+axe)",
+      "status": "PASS",
+      "seconds": 13.2,
+      "note": "Lint, 0 audit vulns, Go -race & Vitest green",
+      "tail": ""
+    },
+    {
+      "tier": "T0",
+      "track": "ax-fork",
+      "id": "atelocal-unit",
+      "title": "go test ./internal/atelocal (unit suite)",
+      "status": "PASS",
+      "seconds": 0.7,
+      "note": "ControlServer, Podman, Tag/Router & PreBoot unit tests green",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "ax-fork",
+      "id": "atelocal-live",
+      "title": "Live Apple container + reconciler guest-exec",
+      "status": "PASS",
+      "seconds": 5.3,
+      "note": "Live microVM ControlServer & ax ssh green",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "ax-central",
+      "id": "central-doctor",
+      "title": "make doctor (6-point prerequisite audit)",
+      "status": "PASS",
+      "seconds": 0.2,
+      "note": "All prerequisites verified",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "ax-central",
+      "id": "central-smoke-local",
+      "title": "make smoke-local (debian:12 + Move Task tar)",
+      "status": "PASS",
+      "seconds": 3.6,
+      "note": "Apply/resume, ax ssh & cross-atespace tar pipe green",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "swarm",
+      "id": "swarm-01",
+      "title": "01-hello-swarm (8 parallel microVMs)",
+      "status": "PASS",
+      "seconds": 8.5,
+      "note": "8 parallel Apple container microVMs Ready & ax ssh ok",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "swarm",
+      "id": "swarm-02",
+      "title": "02-repo-inspector (Workspace git + inline)",
+      "status": "PASS",
+      "seconds": 7.1,
+      "note": "Workspace git clone & inline files hydrated across 3 VMs",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "swarm",
+      "id": "swarm-03",
+      "title": "03-seed-matrix (6 parallel sweep VMs)",
+      "status": "PASS",
+      "seconds": 5.9,
+      "note": "6 parallel matrix tasks completed",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "swarm",
+      "id": "swarm-07",
+      "title": "07-suspend-resume (#683 cold-start persistence)",
+      "status": "PASS",
+      "seconds": 4.9,
+      "note": "Volume state persisted across suspend -> fresh VM boot",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "swarm",
+      "id": "swarm-08",
+      "title": "08-spec-config-metadata (:8099 boundary)",
+      "status": "PASS",
+      "seconds": 2.5,
+      "note": "External :80/metadata 404; loopback :8099 metadata & config ok",
+      "tail": ""
+    },
+    {
+      "tier": "T1",
+      "track": "ax-images",
+      "id": "images-genkit-live",
+      "title": "GHCR genkit-runner #688 AwaitPush + A2A card",
+      "status": "PASS",
+      "seconds": 1.5,
+      "note": "Pulled @sha256, verified ax-runner/ax-launcher & A2A card via router",
+      "tail": ""
+    }
+  ]
+}

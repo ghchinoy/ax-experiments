@@ -7,8 +7,10 @@ BINDER ?= $(shell command -v binder 2>/dev/null || echo $(HOME)/go/bin/binder)
 OKF_PROTO ?= $(shell command -v okf-proto 2>/dev/null || echo $(HOME)/go/bin/okf-proto)
 AX_REPO ?= $(HOME)/projects/ax
 AX_IMAGES_REPO ?= $(HOME)/projects/ax-images
+AX_CENTRAL_REPO ?= $(HOME)/projects/ax-central
+RC_VERSION ?=
 
-.PHONY: help check okf-validate stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple hero-demo dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
+.PHONY: help check okf-validate rc-static rc-quick rc-full rc-bench stack-up stack-status stack-down agent-image ax-images-local build-recorder viz-install viz-build viz-dev viz-preview genkit-apple hero-demo dgem-up dgem-status dgem-down dgem-cloudrun-down dgem-01 dgem-02 dgem-03 agy-01 agy-02 swarm-01 swarm-02 swarm-03 swarm-04 swarm-05 swarm-06 swarm-07 swarm-08
 
 help:
 	@echo "Targets:"
@@ -16,6 +18,10 @@ help:
 	@echo "  make stack-status     Show status of local AX + ate-local stack"
 	@echo "  make stack-down       Stop local AX + ate-local stack"
 	@echo "  make check            Run all static verification gates (OKF v0.2, shell lint, Go recorder)"
+	@echo "  make rc-static        Tier 0 RC gate: static & unit checks across all 4 repos (~30s)"
+	@echo "  make rc-quick         Tier 1 RC gate: static + live zero-LLM smoke + scorecard (~60s)"
+	@echo "  make rc-full          Tier 2 RC gate: full sweep including LLM, Hero Demo, dgem & agy (~3-6m)"
+	@echo "  make rc-bench         Tier 3 RC gate: quick + Kind timing benchmark (~15m)"
 	@echo "  make okf-validate     Validate OKF v0.2 bundle with binder and okf-proto"
 	@echo "  make agent-image      Build ax-agent-local:latest in Apple container"
 	@echo "  make ax-images-local  Build ghcr.io/ghchinoy/ax-images/* in Apple container (via $(AX_IMAGES_REPO))"
@@ -57,11 +63,23 @@ stack-down:
 	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
 
 check: okf-validate
-	bash -n swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh hero-demo/*.sh crostini/*.sh crostini/samples/*.sh
+	bash -n scripts/*.sh swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh hero-demo/*.sh crostini/*.sh crostini/samples/*.sh
 	cd viz/recorder && go build -o /dev/null ./... && go vet ./...
 	cd crostini/samples/a2a-duo && go build -o /dev/null ./... && go vet ./...
 	cd dgem/router && go build -o /dev/null ./... && go vet ./...
 	cd genkit && go build -o /dev/null ./... && go vet ./...
+
+rc-static:
+	./scripts/rc-check.sh --tier static $(if $(RC_VERSION),--rc $(RC_VERSION),)
+
+rc-quick:
+	./scripts/rc-check.sh --tier quick $(if $(RC_VERSION),--rc $(RC_VERSION),)
+
+rc-full:
+	./scripts/rc-check.sh --tier full $(if $(RC_VERSION),--rc $(RC_VERSION),)
+
+rc-bench:
+	./scripts/rc-check.sh --tier bench $(if $(RC_VERSION),--rc $(RC_VERSION),)
 
 okf-validate:
 	$(BINDER) validate okf --strict

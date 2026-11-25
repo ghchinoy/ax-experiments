@@ -99,6 +99,8 @@ viz/                    Track 3: Swarm trace recorder, web visualizer & telemetr
   recorder/             Go trace recorder (ax-trace)
   traces/               Recorded swarm execution traces (.jsonl)
   web/                  Lit 3 + Force-Graph + Cytoscape CoSE replay app
+scripts/                Cross-repo RC validation harness (rc-check.sh)
+reports/                Tracked per-RC validation scorecards (.md + .json)
 ```
 
 ## Agent Roles & Folder Ownership
