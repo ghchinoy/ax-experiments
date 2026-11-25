@@ -49,19 +49,21 @@ help:
 	@echo "  make viz-build        Typecheck and build the web visualizer"
 	@echo "  make viz-preview      Serve the built web visualizer locally"
 
+STACK_SCRIPT := $(if $(wildcard $(SUBSTRATE_LOCAL_REPO)/scripts/ax-stack.sh),$(SUBSTRATE_LOCAL_REPO)/scripts/ax-stack.sh,$(AX_REPO)/examples/ate_local/local-stack.sh)
+
 stack-up:
-	@if [[ ! -x "$(AX_REPO)/examples/ate_local/local-stack.sh" ]]; then \
-		echo "Error: $(AX_REPO)/examples/ate_local/local-stack.sh not found." >&2; \
-		echo "Ensure $(AX_REPO) is checked out on branch 'feat/ate-local-apple-container'." >&2; \
+	@if [[ ! -x "$(STACK_SCRIPT)" ]]; then \
+		echo "Error: neither $(SUBSTRATE_LOCAL_REPO)/scripts/ax-stack.sh nor $(AX_REPO)/examples/ate_local/local-stack.sh found." >&2; \
+		echo "Clone https://github.com/ghchinoy/substrate-local into $(SUBSTRATE_LOCAL_REPO)." >&2; \
 		exit 1; \
 	fi
-	"$(AX_REPO)/examples/ate_local/local-stack.sh" up
+	"$(STACK_SCRIPT)" up
 
 stack-status:
-	@"$(AX_REPO)/examples/ate_local/local-stack.sh" status
+	@"$(STACK_SCRIPT)" status
 
 stack-down:
-	@"$(AX_REPO)/examples/ate_local/local-stack.sh" down
+	@"$(STACK_SCRIPT)" down
 
 check: okf-validate
 	bash -n scripts/*.sh swarm/*.sh genkit/*.sh dgem/*.sh agy/*.sh hero-demo/*.sh crostini/*.sh crostini/samples/*.sh

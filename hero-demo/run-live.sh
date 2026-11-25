@@ -69,6 +69,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+SUBSTRATE_LOCAL_REPO="${SUBSTRATE_LOCAL_REPO:-$HOME/projects/substrate-local}"
+if [[ -x "${SUBSTRATE_LOCAL_REPO}/scripts/ax-stack.sh" ]]; then
+  STACK_SCRIPT="${SUBSTRATE_LOCAL_REPO}/scripts/ax-stack.sh"
+  DEFAULT_LOCAL_DIR="${SUBSTRATE_LOCAL_REPO}/.substrate-local"
+else
+  STACK_SCRIPT="${AX_REPO}/examples/ate_local/local-stack.sh"
+  DEFAULT_LOCAL_DIR="${AX_REPO}/.ax-local"
+fi
+
 if [[ "${ISOLATED}" == "1" ]]; then
   TMP_BASE="${TMPDIR:-/tmp}"
   export AX_LOCAL_DIR="${AX_LOCAL_DIR:-${TMP_BASE%/}/ax-hero-demo}"
@@ -79,7 +88,7 @@ if [[ "${ISOLATED}" == "1" ]]; then
   export AX_LOCAL_SERVER_B_PORT="${AX_LOCAL_SERVER_B_PORT:-8098}"
   export AX_LOCAL_POSTGRES_NAME="${AX_LOCAL_POSTGRES_NAME:-ax-hero-postgres}"
 else
-  export AX_LOCAL_DIR="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
+  export AX_LOCAL_DIR="${AX_LOCAL_DIR:-${DEFAULT_LOCAL_DIR}}"
   export AX_LOCAL_POSTGRES_PORT="${AX_LOCAL_POSTGRES_PORT:-5432}"
   export AX_LOCAL_SUBSTRATE_PORT="${AX_LOCAL_SUBSTRATE_PORT:-50051}"
   export AX_LOCAL_SERVER_PORT="${AX_LOCAL_SERVER_PORT:-8090}"
@@ -174,7 +183,7 @@ cleanup() {
   fi
   if [[ "${ISOLATED}" == "1" && "${KEEP_STACK}" != "1" ]]; then
     echo "==> Tearing down isolated dual-cluster stack (${AX_LOCAL_DIR})..."
-    "${AX_REPO}/examples/ate_local/local-stack.sh" down >/dev/null 2>&1 || true
+    "${STACK_SCRIPT}" down >/dev/null 2>&1 || true
     rm -rf "${AX_LOCAL_DIR}"
   fi
 }
@@ -189,8 +198,8 @@ go -C "${EXP_ROOT}/genkit" build -o "${WS_TAG_BIN}" ./cmd/ws-tag
 step1_local_up() {
   local step=0
   echo "==> [Step 1] Local Up & Studio"
-  if [[ ! -x "${AX_REPO}/examples/ate_local/local-stack.sh" ]]; then
-    mark_fail "${step}" "local-stack.sh not found in ${AX_REPO}"
+  if [[ ! -x "${STACK_SCRIPT}" ]]; then
+    mark_fail "${step}" "stack script not found (${STACK_SCRIPT})"
     return
   fi
 
@@ -198,9 +207,9 @@ step1_local_up() {
     if [[ -z "${AX_LOCAL_CLUSTER_B_RUNTIME:-}" ]] && ! podman info >/dev/null 2>&1; then
       export AX_LOCAL_CLUSTER_B_RUNTIME=apple
     fi
-    echo "    Starting dual-cluster local AX stack (Cluster A=apple :${AX_LOCAL_SERVER_PORT}, Cluster B=${AX_LOCAL_CLUSTER_B_RUNTIME:-podman} :${AX_LOCAL_SERVER_B_PORT})..."
-    if ! "${AX_REPO}/examples/ate_local/local-stack.sh" multi-up >/dev/null; then
-      mark_fail "${step}" "local-stack.sh multi-up failed"
+    echo "    Starting dual-cluster local AX stack via ${STACK_SCRIPT} (Cluster A=apple :${AX_LOCAL_SERVER_PORT}, Cluster B=${AX_LOCAL_CLUSTER_B_RUNTIME:-podman} :${AX_LOCAL_SERVER_B_PORT})..."
+    if ! "${STACK_SCRIPT}" multi-up >/dev/null; then
+      mark_fail "${step}" "$(basename "${STACK_SCRIPT}") multi-up failed"
       return
     fi
   fi

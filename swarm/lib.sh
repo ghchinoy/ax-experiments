@@ -16,9 +16,24 @@
 # Common library for AX Swarm recipes on Apple Container.
 
 AX_REPO="${AX_REPO:-$HOME/projects/ax}"
-AX_BIN="${AX_BIN:-${AX_REPO}/.ax-local/bin/ax}"
-if [[ ! -x "${AX_BIN}" ]]; then
-  AX_BIN="${AX_REPO}/bin/ax"
+SUBSTRATE_LOCAL_REPO="${SUBSTRATE_LOCAL_REPO:-$HOME/projects/substrate-local}"
+if [[ -z "${AX_LOCAL_DIR:-}" ]]; then
+  if [[ -d "${SUBSTRATE_LOCAL_REPO}/.substrate-local" || -x "${SUBSTRATE_LOCAL_REPO}/scripts/ax-stack.sh" ]]; then
+    AX_LOCAL_DIR="${SUBSTRATE_LOCAL_REPO}/.substrate-local"
+  else
+    AX_LOCAL_DIR="${AX_REPO}/.ax-local"
+  fi
+fi
+if [[ -z "${AX_BIN:-}" ]]; then
+  if [[ -x "${AX_LOCAL_DIR}/bin/ax" ]]; then
+    AX_BIN="${AX_LOCAL_DIR}/bin/ax"
+  elif [[ -x "${AX_REPO}/.ax-local/bin/ax" ]]; then
+    AX_BIN="${AX_REPO}/.ax-local/bin/ax"
+  elif [[ -x "${AX_REPO}/bin/ax" ]]; then
+    AX_BIN="${AX_REPO}/bin/ax"
+  else
+    AX_BIN="$(command -v ax 2>/dev/null || echo "${AX_LOCAL_DIR}/bin/ax")"
+  fi
 fi
 
 AX_SERVER="${AX_SERVER:-localhost:8090}"
@@ -195,7 +210,7 @@ wait_a2a_ready() {
 }
 
 ensure_genkit_runner() {
-  local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
+  local state_dir="${AX_LOCAL_DIR:-${SUBSTRATE_LOCAL_REPO}/.substrate-local}"
   local genkit_cache="${state_dir}/bin/linux_arm64/genkit-runner"
   local runner_target="${state_dir}/bin/linux_arm64/ax-runner"
   local runner_legacy="${state_dir}/bin/linux_arm64/ax-task-runner"
@@ -237,7 +252,7 @@ ensure_genkit_runner() {
 }
 
 restore_default_runner() {
-  local state_dir="${AX_LOCAL_DIR:-${AX_REPO}/.ax-local}"
+  local state_dir="${AX_LOCAL_DIR:-${SUBSTRATE_LOCAL_REPO}/.substrate-local}"
   local runner_target="${state_dir}/bin/linux_arm64/ax-runner"
   local runner_legacy="${state_dir}/bin/linux_arm64/ax-task-runner"
   local runner_orig="${state_dir}/bin/linux_arm64/ax-runner.orig"

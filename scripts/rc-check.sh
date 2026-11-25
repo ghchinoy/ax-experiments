@@ -135,7 +135,13 @@ skip_check() {
 }
 
 genkit_ghcr_live_smoke() {
-  local ax_bin="${AX_REPO}/.ax-local/bin/ax"
+  local ax_bin="${SUBSTRATE_LOCAL_REPO}/.substrate-local/bin/ax"
+  if [[ ! -x "${ax_bin}" ]]; then
+    ax_bin="${AX_REPO}/.ax-local/bin/ax"
+  fi
+  if [[ ! -x "${ax_bin}" ]]; then
+    ax_bin="$(command -v ax 2>/dev/null || echo "${ax_bin}")"
+  fi
   local img
   img="$(grep -m1 'ghcr.io/ghchinoy/ax-images/genkit-runner@sha256:' "${EXP_REPO}/genkit/task.yaml" | sed 's/.*"\(.*\)".*/\1/')"
   if [[ -z "${img}" ]]; then
@@ -218,8 +224,6 @@ if [[ -d "${AX_REPO}/internal/atelocal" ]]; then
   run_check "T0" "ax-fork" "atelocal-unit" "go test ./internal/atelocal (unit suite)" \
     "ControlServer, Podman, Tag/Router & PreBoot unit tests green" \
     bash -c "cd '${AX_REPO}' && go test -count=1 -run 'TestControlServer_(Atespace|Actor|Revert|Template|Reconciler)|TestCleanIPv4|TestPodmanRunner|TestTagAndRouterProxy|TestPreBoot' ./internal/atelocal/..."
-else
-  skip_check "T0" "ax-fork" "atelocal-unit" "ate-local unit tests" "${AX_REPO}/internal/atelocal not found"
 fi
 
 # --- Tier 1: Quick Live Smoke ---
@@ -234,9 +238,15 @@ if [[ "${TIER}" != "static" ]]; then
   if [[ "${STACK_UP}" != "1" ]]; then
     skip_check "T1" "stack" "live-tier1" "All Tier 1 live checks" "Local stack (:8090 / :50051) not listening; run 'make stack-up'"
   else
-    run_check "T1" "ax-fork" "atelocal-live" "Live Apple container + reconciler guest-exec" \
-      "Live microVM ControlServer & ax ssh green" \
-      bash -c "cd '${AX_REPO}' && go test -count=1 -run 'TestControlServer_LiveAppleContainer|TestControlServer_LiveReconcilerAndGuestExec' ./internal/atelocal/..."
+    if [[ -x "${SUBSTRATE_LOCAL_REPO}/scripts/test-ax-compat.sh" ]]; then
+      run_check "T1" "substrate-local" "sublocal-compat" "substrate-local live Apple container test" \
+        "Standalone substrate-local live microVM test green" \
+        bash -c "cd '${SUBSTRATE_LOCAL_REPO}' && go test -count=1 -run 'TestControlServer_LiveAppleContainer' ./pkg/sublocal/..."
+    elif [[ -d "${AX_REPO}/internal/atelocal" ]]; then
+      run_check "T1" "ax-fork" "atelocal-live" "Live Apple container + reconciler guest-exec" \
+        "Live microVM ControlServer & ax ssh green" \
+        bash -c "cd '${AX_REPO}' && go test -count=1 -run 'TestControlServer_LiveAppleContainer|TestControlServer_LiveReconcilerAndGuestExec' ./internal/atelocal/..."
+    fi
 
     if [[ -d "${AX_CENTRAL_REPO}" ]]; then
       run_check "T1" "ax-central" "central-doctor" "make doctor (6-point prerequisite audit)" \
