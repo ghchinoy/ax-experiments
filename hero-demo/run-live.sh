@@ -239,6 +239,13 @@ step2_warm_workspace() {
   local step=1
   echo "==> [Step 2] Warm Workspace Snapshot"
 
+  # Clear any stale hero-demo tasks and immutable Workspace from earlier
+  # --attach runs so updated workspace.yaml manifests apply cleanly.
+  ax_a delete task "${PREWARM_TASK}" >/dev/null 2>&1 || true
+  ax_a delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+  ax_a delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  ax_a delete workspace "${WORKSPACE_NAME}" >/dev/null 2>&1 || true
+
   local apply_err
   if ! apply_err="$(ax_a apply -f "${WORKSPACE_MANIFEST}" 2>&1)"; then
     mark_fail "${step}" "ax apply -f workspace.yaml failed: ${apply_err}"
@@ -460,6 +467,8 @@ step5_remote_promote() {
 
   if [[ -n "${REMOTE_CONTEXT}" ]]; then
     ax_a --context "${REMOTE_CONTEXT}" delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+    ax_a --context "${REMOTE_CONTEXT}" delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+    ax_a --context "${REMOTE_CONTEXT}" delete workspace "${WORKSPACE_NAME}" >/dev/null 2>&1 || true
     if ax_a --context "${REMOTE_CONTEXT}" apply -f "${WORKSPACE_MANIFEST}" >/dev/null 2>&1 &&
        ax_a --context "${REMOTE_CONTEXT}" apply -f "${STARTER_MANIFEST}" >/dev/null 2>&1; then
       mark_pass "${step}" "Manifests promoted unchanged to Kubernetes context ${REMOTE_CONTEXT}"
@@ -472,6 +481,8 @@ step5_remote_promote() {
   # Promote unchanged manifests from Cluster A (Apple container :8097/:8090) to
   # Cluster B (Podman runtime :8098/:8091) and verify unit tests pass on Cluster B!
   ax_b delete task "${CUSTOM_TASK}" >/dev/null 2>&1 || true
+  ax_b delete task "${STARTER_TASK}" >/dev/null 2>&1 || true
+  ax_b delete workspace "${WORKSPACE_NAME}" >/dev/null 2>&1 || true
   command -v podman >/dev/null 2>&1 && podman rm -f "ate-podman-default-${CUSTOM_TASK}" >/dev/null 2>&1 || true
   container delete --force "ate-cluster-b-default-${CUSTOM_TASK}" >/dev/null 2>&1 || true
   local b_err
