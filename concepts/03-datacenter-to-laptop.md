@@ -49,9 +49,15 @@ Even with **1 human tenant** on a laptop, multi-agent workflows (`swarm/03-seed-
 - **Alignment:** Directly mirrors why Substrate `1.0` manages hypervisor/kernel/initrd versions explicitly via cluster-scoped `SandboxConfig` assets (`substrate/docs/concepts/sandbox-asset-cache.md`).
 
 ### Learning 6: The Two Places Our Explorations *Intentionally* Diverged
-1. **Outbound Secret Injection (`atenet-egress` MITM vs. Local `spec.env`):**
-   - *Gap:* In `ate-local` v1, `EgressPolicy` RPCs are stored for API parity, but local tasks typically receive `GEMINI_API_KEY` via `spec.env` rather than an outbound TLS-intercepting proxy. In production Substrate, secrets *never* enter `spec.env` (`atenet-egress` swaps placeholder headers outside the sandbox).
-   - *Future local option:* A ~150-line optional Go HTTP/CONNECT proxy in `ate-local` reading `EgressPolicy` + macOS Keychain/env secrets would give local developers 100% `Gateway` credential-injection parity too.
+1. **Outbound Secret Injection (`atenet-egress` MITM vs. Local `spec.env` — `substrate-local` ADR-001):**
+   - *Boundary:* In `substrate-local` core, `ActorEgressPolicy` RPCs are stored for API parity so `Gateway` YAML validates cleanly, but outbound traffic is not intercepted and local dev keys are passed via `spec.env` or kept in an external host orchestrator. In official Kind (`ax local start`) and GKE targets, real keys *never* enter the sandbox—Envoy **`atenet-egress`** intercepts TLS at the pod network namespace and swaps placeholder headers with Kubernetes Secrets labeled `ax.io/credential=true` (`ate-secret://k8s.io/...`).
+   - *Why we keep core honest—and how experimenters can explore:* Apple `container`'s native `container network create --internal` + multi-network attachment *does* make a dual-homed Envoy microVM technically viable without root (giving each agent microVM no direct internet route and a unique `vmnet` IP). However, `--internal` still permits macOS host-bridge access, rootless Podman lacks equivalent per-actor IP isolation, and bridging `ate-secret://k8s.io/...` locally diverges from Kubernetes RBAC and upstream xDS. Per [`substrate-local/docs/adr-001-no-local-egress-proxy.md`](https://github.com/ghchinoy/substrate-local/blob/main/docs/adr-001-no-local-egress-proxy.md), real egress enforcement graduates to **Kind (`ax local`) / GKE**, while any dual-homed Envoy-in-Apple-`container` prototype stays strictly an opt-in lab spike in `ax-experiments`.
+
+   <picture>
+     <source media="(prefers-color-scheme: dark)" srcset="diagrams/06-gateway-egress-and-runtime-boundary-dark.webp">
+     <img alt="AX Gateway and egress boundary comparing Kind/GKE atenet-egress, core substrate-local, and an experimental dual-homed Envoy microVM on Apple container" src="diagrams/06-gateway-egress-and-runtime-boundary-light.webp">
+   </picture>
+
 2. **Stateful Cross-Cluster `/workspace` Migration (`Move Task` vs. Spec-Only `ax promote` `#694`):**
    - *Divergence:* Upstream chose to keep `ax promote` (`#618`, `#694`) strictly spec-only (no `/workspace` file transfer), and official single-cluster [`agentexecutor/studio`](https://github.com/agentexecutor/studio) (`ax studio`) explicitly focuses on a single local Kind cluster (`#28`). For developer inner-loop $\rightarrow$ cloud workflows, streaming uncommitted `/workspace` edits across clusters (`AX Central`'s `Move Task` over dual `ax ssh` pipes) remains a high-value multi-cluster capability layered cleanly *above* AX without needing core changes.
 

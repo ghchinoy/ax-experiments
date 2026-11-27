@@ -1,0 +1,45 @@
+// AX Gateway & Runtime Egress Boundary: comparing official Kind/GKE atenet-egress,
+// core substrate-local (validation-only per ADR-001), and an opt-in experimental
+// dual-homed Envoy microVM on Apple container --internal.
+digraph gateway_egress_and_runtime_boundary {
+  label = "AX Gateway & Egress Boundary · Kind/GKE vs. substrate-local Core vs. Apple container Lab Spike";
+  rankdir = LR;
+  ranksep = 0.7;
+  nodesep = 0.45;
+  newrank = true;
+
+  subgraph cluster_exp {
+    label = "3. Opt-In Lab Spike (ax-experiments · Apple container only)";
+    class = "accent";
+    e_agent [label="Agent MicroVM\nONLY on --network ax-internal\n(--internal: no internet route)\nUnique IP 192.168.65.x", class="cat-teal code"];
+    e_envoy [label="Dual-Homed Envoy MicroVM\nNIC 1: ax-internal (match source IP)\nNIC 2: default (NAT to internet)\nGo xDS -> ActorEgressPolicy", class="primary"];
+    e_sec   [label="Local Keychain / File\nMaps ate-secret:// locally\n(Caveats: host bridge reachable,\nPodman lacks parity, xDS drift)", class="warning"];
+    e_api   [label="Allowlisted APIs\nReceives injected key", class="cat-purple"];
+
+    e_agent -> e_envoy [label="HTTPS_PROXY\n(only route off --internal)", class="primary"];
+    e_sec -> e_envoy   [label="dev secret map", class="async"];
+    e_envoy -> e_api   [label="allowlisted TLS", class="positive"];
+  }
+
+  subgraph cluster_core {
+    label = "2. substrate-local Core (Default · ADR-001)";
+    class = "accent";
+    c_agent [label="Apple container / Podman\nDirect vmnet / pasta bridge\nGateway stored (validation-only)", class="warning"];
+    c_api   [label="Internet / APIs\nDirect outbound\n(dev key in spec.env or host)", class="muted"];
+
+    c_agent -> c_api [label="No proxy / no firewall\n(fast ~2s inner loop)", class="async"];
+  }
+
+  subgraph cluster_prod {
+    label = "1. Official Target · Kind (ax local) & GKE (Real atenet-egress)";
+    class = "accent";
+    p_agent [label="Agent Pod (gVisor)\nNo direct internet\nGEMINI_API_KEY=placeholder\nCA: /run/ate/egress-trust-bundle", class="code"];
+    p_envoy [label="atenet-egress (Envoy)\nKernel netns intercept (cannot bypass)\nAllowlist + SSRF filter + TLS MITM", class="positive"];
+    p_sec   [label="Kubernetes Secret\nax.io/credential=true\nate-secret://k8s.io/...", class="store code"];
+    p_api   [label="Upstream LLM / GitHub API\nReceives real x-goog-api-key", class="cat-purple"];
+
+    p_agent -> p_envoy [label="HTTPS + placeholder", class="primary"];
+    p_sec -> p_envoy   [label="inject real key", class="positive"];
+    p_envoy -> p_api   [label="re-originated TLS\n(allowlisted hosts only)", class="positive"];
+  }
+}
